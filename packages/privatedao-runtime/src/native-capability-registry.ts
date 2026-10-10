@@ -90,13 +90,6 @@ const PAYROLL_SOLANA_DEVNET_EVIDENCE = {
   timestamp: "2026-09-11T21:36:18.740Z",
 } as const;
 
-const ZCASH_TESTNET_EVIDENCE = {
-  provider: "zcash-testnet-zallet",
-  transaction: "c14158dad7761c5d3c497cf27b2a80ffa909156ba2306e18f3731e608d1521df",
-  commit: "d41bec9addcd6580afce1fa11554d5ec03b94c86",
-  timestamp: "2026-10-10T12:42:21.000Z",
-} as const;
-
 const SOLANA_DEVNET_ORGANIZATIONAL_EVIDENCE = {
   provider: "solana-devnet",
   governanceProgram: "EP9xE8MJZ6FfyEwLqns6HDdUZBknEa7WGYs1Jzsecuva",
@@ -290,20 +283,11 @@ function applyZcashTestnetEvidence(entry: NativeCapabilityEntry): NativeCapabili
   if (entry.product !== "payroll" || entry.capability !== "payroll.settle" || entry.network !== "zcash-testnet") return entry;
   return {
     ...entry,
-    provider: ZCASH_TESTNET_EVIDENCE.provider,
+    provider: "zcash-testnet-zallet",
     supportedAssets: ["TAZ"],
-    contracts: [ZCASH_TESTNET_EVIDENCE.transaction],
     walletModel: "provider-wallet",
-    supportsExecution: true,
-    supportsPrivateExecution: true,
-    supportsPrivateSettlement: true,
-    supportsProof: true,
-    supportsReceipt: true,
-    supportsReconciliation: true,
-    status: "testnet_verified",
-    lastVerifiedCommit: ZCASH_TESTNET_EVIDENCE.commit,
-    lastVerifiedTimestamp: ZCASH_TESTNET_EVIDENCE.timestamp,
-    evidence: "testnet-e2e",
+    status: "blocked_external",
+    evidence: "none",
   };
 }
 

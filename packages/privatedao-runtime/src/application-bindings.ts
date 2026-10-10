@@ -171,7 +171,7 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
     network: "zcash-testnet",
     mode: "kernel-gateway",
     entrypoint: "kernel://payroll.settle",
-    note: "Zcash Testnet shielded settlement passed a real Kernel-to-Zallet broadcast, confirmation, receipt, and reconciliation flow.",
+    note: "Kernel-to-Zallet routing is implemented, but live Zallet RPC readiness is blocked by the current wallet/indexer startup state; no settlement is advertised until an external Testnet receipt is observed.",
   },
   {
     product: "treasury",

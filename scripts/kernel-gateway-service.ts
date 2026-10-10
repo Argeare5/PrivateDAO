@@ -83,6 +83,8 @@ export class KernelGatewayService {
   private readonly maxBodyBytes: number;
   private readonly prepared = new Map<string, PreparedExecution<unknown>>();
   private readonly evmProviders = new Map<NetworkId, EvmProviderEntry>();
+  private readonly evmAdapters = new Map<NetworkId, EvmNetworkAdapter>();
+  private readonly zcashAdapter?: ZcashNetworkAdapter;
   private readonly runtime;
 
   constructor(options: KernelGatewayServiceOptions = {}) {
@@ -127,12 +129,14 @@ export class KernelGatewayService {
         allowBalanceReadinessProbe: process.env.PDAO_ZCASH_ALLOW_BALANCE_CHECK === "1",
         broadcastEnabled: process.env.PDAO_ZCASH_BROADCAST_ENABLED === "1",
       });
-      registry.register(new ZcashNetworkAdapter({
+      const zcashAdapter = new ZcashNetworkAdapter({
         id: "privatedao-zcash-testnet-zallet",
         config,
         capabilities: ["payroll.settle"],
         transport,
-      }));
+      });
+      this.zcashAdapter = zcashAdapter;
+      registry.register(zcashAdapter);
     }
     this.runtime = createPrivateDaoRuntime(registry);
   }
@@ -186,7 +190,7 @@ export class KernelGatewayService {
         config.nativeAsset,
       );
       const providerId = `privatedao-evm-${network}`;
-      registry.register(new EvmNetworkAdapter({
+      const adapter = new EvmNetworkAdapter({
         id: providerId,
         config,
         capabilities: EVM_KERNEL_CAPABILITIES,
@@ -203,7 +207,9 @@ export class KernelGatewayService {
           receipt: (executionId) => inner.receipt(executionId),
           estimateFee: (intent) => inner.estimateFee(intent),
         },
-      }));
+      });
+      registry.register(adapter);
+      this.evmAdapters.set(network, adapter);
       this.evmProviders.set(network, { id: providerId, network });
     }
   }
@@ -212,6 +218,11 @@ export class KernelGatewayService {
     const incomingPath = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`).pathname.replace(/\/+$/, "") || "/";
     const path = incomingPath.startsWith("/api/") ? incomingPath.slice(4) : incomingPath;
     if (path === "/healthz" && req.method === "GET") {
+      const [evmReadiness, zcashReadiness] = await Promise.all([
+        Promise.all([...this.evmAdapters.entries()].map(async ([network, adapter]) => [network, await this.probe(() => adapter.health())] as const)),
+        this.zcashAdapter ? this.probe(() => this.zcashAdapter!.health()) : Promise.resolve(null),
+      ]);
+      const evmReady = Object.fromEntries(evmReadiness.map(([network, result]) => [network, result.ok]));
       this.writeJson(res, 200, {
         ok: true,
         service: "privatedao-kernel-gateway",
@@ -225,14 +236,22 @@ export class KernelGatewayService {
           onchainAdapter: network === "zcash-testnet"
             ? this.supportedNetworks.includes("zcash-testnet")
             : this.evmProviders.has(network),
+          ready: network === "zcash-testnet"
+            ? Boolean(zcashReadiness?.ok)
+            : network in evmReady
+              ? Boolean(evmReady[network])
+              : false,
         })),
         evm: {
           configured: this.evmProviders.size > 0,
           networks: [...this.evmProviders.keys()],
+          ready: evmReady,
           broadcastEnabled: process.env.PDAO_KERNEL_EVM_BROADCAST_ENABLED === "1",
         },
         zcash: {
           configured: this.supportedNetworks.includes("zcash-testnet"),
+          ready: Boolean(zcashReadiness?.ok),
+          readinessReason: zcashReadiness?.reason || (this.zcashAdapter ? "rpc_unavailable" : "not_configured"),
           testnetOnly: true,
           broadcastEnabled: process.env.PDAO_ZCASH_BROADCAST_ENABLED === "1",
         },
@@ -324,6 +343,19 @@ export class KernelGatewayService {
     res.setHeader("Access-Control-Allow-Headers", "content-type, x-pdao-gateway-token, x-pdao-role");
     res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
     res.end(JSON.stringify(body));
+  }
+
+  private async probe<T>(operation: () => Promise<T>): Promise<{ ok: boolean; reason?: string }> {
+    try {
+      await Promise.race([
+        operation(),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error("probe_timeout")), 2_000)),
+      ]);
+      return { ok: true };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return { ok: false, reason: /timeout/i.test(message) ? "probe_timeout" : "rpc_unavailable" };
+    }
   }
 }
 

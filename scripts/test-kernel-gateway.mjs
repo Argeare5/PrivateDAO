@@ -53,9 +53,11 @@ try {
     if (network === "zcash-testnet") {
       assert.equal(mode.provider, "privatedao-zcash-testnet-zallet");
       assert.equal(mode.onchainAdapter, true);
+      assert.equal(mode.ready, false);
     } else {
       assert.equal(mode.provider, "kernel-native");
       assert.equal(mode.onchainAdapter, false);
+      assert.equal(mode.ready, false);
     }
   }
   if (expectedNetworks.includes("zcash-testnet")) {
