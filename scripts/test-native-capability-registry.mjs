@@ -8,7 +8,7 @@ const verifiedDevnet = entries.filter((entry) => entry.status === "devnet_verifi
 const verifiedPayroll = verifiedDevnet.filter((entry) => entry.product === "payroll");
 
 assert.equal(entries.length, 192, "unexpected native capability matrix size");
-assert.equal(verified.length, 28, "only evidence-backed testnet verification and organizational rows should be verified");
+assert.equal(verified.length, 29, "only evidence-backed testnet verification and organizational rows should be verified");
 assert.equal(liveAgents.length, 2, "the two live Agent Exchange rows must be runtime-verified");
 assert.equal(verifiedPayroll.length, 3, "only the three Payroll Devnet evidence rows should be verified");
 assert.equal(verifiedDevnet.length, 7, "Solana Devnet must include Payroll plus the evidenced governance, treasury, and auction lanes");
@@ -64,14 +64,15 @@ assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && 
 assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && entry.product === "record-verification")?.status, "planned", "HyperEVM must remain unverified until E2E evidence exists");
 
 const zcashSettlement = entries.find((entry) => entry.network === "zcash-testnet" && entry.product === "payroll" && entry.capability === "payroll.settle");
-assert.equal(zcashSettlement?.status, "blocked_external", "Zcash payroll settlement must remain blocked until live wallet readiness is proven");
+assert.equal(zcashSettlement?.status, "testnet_verified", "Zcash payroll settlement must use the committed Testnet E2E evidence");
 assert.equal(zcashSettlement?.nativeAsset, "TAZ");
 assert.equal(zcashSettlement?.provider, "zcash-testnet-zallet");
-assert.equal(zcashSettlement?.supportsExecution, false);
-assert.equal(zcashSettlement?.supportsPrivateSettlement, false);
-assert.equal(zcashSettlement?.supportsReconciliation, false);
+assert.equal(zcashSettlement?.supportsExecution, true);
+assert.equal(zcashSettlement?.supportsPrivateSettlement, true);
+assert.equal(zcashSettlement?.supportsReconciliation, true);
+assert.equal(zcashSettlement?.evidence, "testnet-e2e");
 assert.deepEqual(zcashSettlement?.contracts, []);
-assert.equal(zcashSettlement?.lastVerifiedCommit, null);
+assert.equal(zcashSettlement?.lastVerifiedCommit, "d41bec9addcd6580afce1fa11554d5ec03b94c86");
 
 assert.equal(entries.some((entry) => entry.network === "wormhole-integration"), false, "bridge network must not be present");
 console.log(`[native-capability-registry] rows=${entries.length} verified=${verified.length} bridge-free=true`);

@@ -63,8 +63,8 @@ export const PRODUCT_CATALOG: readonly ProductDescriptor[] = [
     availability: "available",
     networks: [solanaDevnet, zcashTestnet],
     capabilities: [
-      capability("payroll.calculate", "payroll", false),
-      capability("payroll.approve", "payroll", true),
+      capability("payroll.calculate", "payroll", false, true, [solanaDevnet, zcashTestnet]),
+      capability("payroll.approve", "payroll", true, true, [solanaDevnet, zcashTestnet]),
       capability("payroll.settle", "payroll", true, true, [solanaDevnet, zcashTestnet]),
     ],
   },

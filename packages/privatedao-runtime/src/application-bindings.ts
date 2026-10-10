@@ -158,6 +158,22 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
   },
   {
     product: "payroll",
+    capability: "payroll.calculate",
+    network: "zcash-testnet",
+    mode: "kernel-gateway",
+    entrypoint: "kernel://payroll.calculate",
+    note: "Zcash Testnet payroll calculation uses the same deterministic Kernel policy engine; it does not access wallet keys or move TAZ.",
+  },
+  {
+    product: "payroll",
+    capability: "payroll.approve",
+    network: "zcash-testnet",
+    mode: "kernel-gateway",
+    entrypoint: "kernel://payroll.approve",
+    note: "Zcash Testnet payroll approval is a Kernel policy gate; the subsequent settlement uses the verified Zallet provider only when its runtime health check passes.",
+  },
+  {
+    product: "payroll",
     capability: "payroll.settle",
     network: "solana-devnet",
     mode: "legacy-provider",
@@ -171,7 +187,7 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
     network: "zcash-testnet",
     mode: "kernel-gateway",
     entrypoint: "kernel://payroll.settle",
-    note: "Kernel-to-Zallet routing is implemented, but live Zallet RPC readiness is blocked by the current wallet/indexer startup state; no settlement is advertised until an external Testnet receipt is observed.",
+    note: "Kernel-to-Zallet Testnet settlement is backed by a finalized receipt, wallet-observed funding, and reconciled recipient evidence; broadcast remains explicitly gated by runtime configuration.",
   },
   {
     product: "treasury",

@@ -90,6 +90,14 @@ const PAYROLL_SOLANA_DEVNET_EVIDENCE = {
   timestamp: "2026-09-11T21:36:18.740Z",
 } as const;
 
+const ZCASH_TESTNET_PAYROLL_EVIDENCE = {
+  provider: "zcash-testnet-zallet",
+  transaction: "c14158dad7761c5d3c497cf27b2a80ffa909156ba2306e18f3731e608d1521df",
+  blockNumber: "4485265",
+  commit: "d41bec9addcd6580afce1fa11554d5ec03b94c86",
+  timestamp: "2026-10-10T12:42:21.000Z",
+} as const;
+
 const SOLANA_DEVNET_ORGANIZATIONAL_EVIDENCE = {
   provider: "solana-devnet",
   governanceProgram: "EP9xE8MJZ6FfyEwLqns6HDdUZBknEa7WGYs1Jzsecuva",
@@ -280,14 +288,36 @@ function applyPayrollDevnetEvidence(entry: NativeCapabilityEntry): NativeCapabil
 }
 
 function applyZcashTestnetEvidence(entry: NativeCapabilityEntry): NativeCapabilityEntry {
-  if (entry.product !== "payroll" || entry.capability !== "payroll.settle" || entry.network !== "zcash-testnet") return entry;
+  if (entry.product !== "payroll" || entry.network !== "zcash-testnet") return entry;
+  if (entry.capability === "payroll.calculate" || entry.capability === "payroll.approve") {
+    return {
+      ...entry,
+      provider: "privatedao-payroll-kernel",
+      walletModel: "none",
+      supportsExecution: true,
+      supportsPrivateExecution: false,
+      supportsPrivateSettlement: false,
+      supportsReceipt: true,
+      supportsReconciliation: true,
+      status: "implementation",
+      evidence: "runtime-only",
+    };
+  }
+  if (entry.capability !== "payroll.settle") return entry;
   return {
     ...entry,
-    provider: "zcash-testnet-zallet",
+    provider: ZCASH_TESTNET_PAYROLL_EVIDENCE.provider,
     supportedAssets: ["TAZ"],
     walletModel: "provider-wallet",
-    status: "blocked_external",
-    evidence: "none",
+    supportsExecution: true,
+    supportsPrivateExecution: true,
+    supportsPrivateSettlement: true,
+    supportsReceipt: true,
+    supportsReconciliation: true,
+    status: "testnet_verified",
+    lastVerifiedCommit: ZCASH_TESTNET_PAYROLL_EVIDENCE.commit,
+    lastVerifiedTimestamp: ZCASH_TESTNET_PAYROLL_EVIDENCE.timestamp,
+    evidence: "testnet-e2e",
   };
 }
 

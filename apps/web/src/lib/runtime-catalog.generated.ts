@@ -1215,6 +1215,23 @@ export const runtimeCatalog = {
                 "WSOL"
               ],
               "provider": "umbra-solana-devnet"
+            },
+            {
+              "network": "zcash-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.calculate",
+              "method": null,
+              "note": "Zcash Testnet payroll calculation uses the same deterministic Kernel policy engine; it does not access wallet keys or move TAZ.",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "TAZ"
+              ],
+              "provider": "privatedao-payroll-kernel"
             }
           ],
           "networkAvailability": [
@@ -1475,18 +1492,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": null,
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
               "executable": false,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "TAZ"
               ],
-              "provider": "zcash-testnet-zallet"
+              "provider": "privatedao-payroll-kernel"
             },
             {
               "network": "hyperliquid-testnet",
@@ -1531,6 +1548,23 @@ export const runtimeCatalog = {
                 "WSOL"
               ],
               "provider": "umbra-solana-devnet"
+            },
+            {
+              "network": "zcash-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.approve",
+              "method": null,
+              "note": "Zcash Testnet payroll approval is a Kernel policy gate; the subsequent settlement uses the verified Zallet provider only when its runtime health check passes.",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "TAZ"
+              ],
+              "provider": "privatedao-payroll-kernel"
             }
           ],
           "networkAvailability": [
@@ -1791,18 +1825,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": null,
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
               "executable": false,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "TAZ"
               ],
-              "provider": "zcash-testnet-zallet"
+              "provider": "privatedao-payroll-kernel"
             },
             {
               "network": "hyperliquid-testnet",
@@ -1853,13 +1887,13 @@ export const runtimeCatalog = {
               "mode": "kernel-gateway",
               "entrypoint": "kernel://payroll.settle",
               "method": null,
-              "note": "Kernel-to-Zallet routing is implemented, but live Zallet RPC readiness is blocked by the current wallet/indexer startup state; no settlement is advertised until an external Testnet receipt is observed.",
-              "evidenceStatus": "blocked_external",
-              "evidence": "none",
-              "supportsExecution": false,
+              "note": "Kernel-to-Zallet Testnet settlement is backed by a finalized receipt, wallet-observed funding, and reconciled recipient evidence; broadcast remains explicitly gated by runtime configuration.",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "testnet-e2e",
+              "supportsExecution": true,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "TAZ"
               ],
@@ -2126,12 +2160,12 @@ export const runtimeCatalog = {
               "chainId": null,
               "declared": true,
               "mode": "kernel-gateway",
-              "evidenceStatus": "blocked_external",
-              "evidence": "none",
-              "executable": false,
+              "evidenceStatus": "testnet_verified",
+              "evidence": "testnet-e2e",
+              "executable": true,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "TAZ"
               ],
