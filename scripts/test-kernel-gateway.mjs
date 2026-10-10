@@ -40,6 +40,8 @@ const waitForHealth = async () => {
 
 try {
   const health = await waitForHealth();
+  const prefixedHealth = await request("GET", "/api/healthz");
+  assert.equal(prefixedHealth.status, 200);
   const expectedNetworks = process.env.PDAO_ZCASH_ZALLET_BINARY && process.env.PDAO_ZCASH_ZALLET_DATA_DIR && process.env.PDAO_ZCASH_ZALLET_CONFIG
     ? ["solana-devnet", "ethereum-sepolia", "tempo-testnet", "base-sepolia", "zcash-testnet"]
     : ["solana-devnet", "ethereum-sepolia", "tempo-testnet", "base-sepolia"];
@@ -79,7 +81,8 @@ try {
   for (const network of health.networks) {
     if (network === "zcash-testnet") continue;
     const requestId = `gateway-${network}`;
-    const first = await request("POST", "/v1/executions/prepare", { intent: baseIntent(network, requestId) });
+    const preparePath = network === "solana-devnet" ? "/api/v1/executions/prepare" : "/v1/executions/prepare";
+    const first = await request("POST", preparePath, { intent: baseIntent(network, requestId) });
     assert.equal(first.status, 200, `${network} prepare failed`);
     const repeated = await request("POST", "/v1/executions/prepare", { intent: baseIntent(network, requestId) });
     assert.equal(repeated.status, 200, `${network} idempotent prepare failed`);
