@@ -74,37 +74,41 @@ export class ZalletCliTransport implements ZcashTransport {
     this.confirmations = options.confirmationDepth ?? 1;
   }
 
-  async health(): Promise<{ ok: boolean; network: "zcash-testnet"; latencyMs?: number }> {
+  async health(): Promise<{ ok: boolean; network: "zcash-testnet"; latencyMs?: number; reason?: string }> {
     const started = Date.now();
-    const [wallet, status] = await Promise.all([
-      this.rpc<Record<string, unknown>>("getwalletinfo"),
-      this.rpc<{ node_tip?: { height?: number }; wallet_tip?: { height?: number }; fully_synced_height?: number }>("getwalletstatus"),
-    ]);
-    const nodeHeight = Number(status.node_tip?.height ?? -1);
-    const walletHeight = Number(status.wallet_tip?.height ?? -1);
-    const fullySyncedHeight = Number(status.fully_synced_height ?? -1);
-    const locked = wallet["locked"] === true;
-    // Zallet's live RPC may omit wallet_tip/fully_synced_height while its
-    // wallet index is catching up. A successful balance query is its stable
-    // spend-readiness signal; keep the richer height check for providers
-    // that expose it.
-    let syncedToNode = nodeHeight >= 0 && walletHeight >= nodeHeight;
-    if (status.wallet_tip?.height === undefined || status.fully_synced_height === undefined) {
-      if (!this.options.allowBalanceReadinessProbe) return { ok: false, network: "zcash-testnet", latencyMs: Date.now() - started };
-      try {
-        // Zallet beta.3 currently requires include_watchonly=true even for
-        // wallets whose active account has spending authority.
-        await this.rpc("z_gettotalbalance", [1, true]);
-        syncedToNode = nodeHeight >= 0;
-      } catch {
-        syncedToNode = false;
+    try {
+      const [wallet, status] = await Promise.all([
+        this.rpc<Record<string, unknown>>("getwalletinfo"),
+        this.rpc<{ node_tip?: { height?: number }; wallet_tip?: { height?: number }; fully_synced_height?: number }>("getwalletstatus"),
+      ]);
+      const nodeHeight = Number(status.node_tip?.height ?? -1);
+      const walletHeight = Number(status.wallet_tip?.height ?? -1);
+      const fullySyncedHeight = Number(status.fully_synced_height ?? -1);
+      const locked = wallet["locked"] === true;
+      // Zallet's live RPC may omit wallet_tip/fully_synced_height while its
+      // wallet index is catching up. A successful balance query is its stable
+      // spend-readiness signal; keep the richer height check for providers
+      // that expose it.
+      let syncedToNode = nodeHeight >= 0 && walletHeight >= nodeHeight;
+      if (status.wallet_tip?.height === undefined || status.fully_synced_height === undefined) {
+        if (!this.options.allowBalanceReadinessProbe) return { ok: false, network: "zcash-testnet", latencyMs: Date.now() - started, reason: "wallet_sync_height_unavailable" };
+        try {
+          // Zallet beta.3 currently requires include_watchonly=true even for
+          // wallets whose active account has spending authority.
+          await this.rpc("z_gettotalbalance", [1, true]);
+          syncedToNode = nodeHeight >= 0;
+        } catch {
+          syncedToNode = false;
+        }
       }
+      const heightReady = status.wallet_tip?.height === undefined || status.fully_synced_height === undefined
+        ? true
+        : walletHeight >= fullySyncedHeight;
+      const ok = syncedToNode && heightReady && !locked;
+      return { ok, network: "zcash-testnet", latencyMs: Date.now() - started, ...(ok ? {} : { reason: locked ? "wallet_locked" : "wallet_not_synced" }) };
+    } catch (error) {
+      return { ok: false, network: "zcash-testnet", latencyMs: Date.now() - started, reason: classifyHealthFailure(error) };
     }
-    const heightReady = status.wallet_tip?.height === undefined || status.fully_synced_height === undefined
-      ? true
-      : walletHeight >= fullySyncedHeight;
-    const ok = syncedToNode && heightReady && !locked;
-    return { ok, network: "zcash-testnet", latencyMs: Date.now() - started };
   }
 
   async prepare<TPayload, TUnsigned>(intent: ExecutionIntent<TPayload>): Promise<PreparedExecution<TUnsigned>> {
@@ -227,6 +231,14 @@ export class ZalletCliTransport implements ZcashTransport {
     if (output.error) throw new Error(output.error.message ?? `Zallet RPC failed: ${method}`);
     return output.result as TResult;
   }
+}
+
+function classifyHealthFailure(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  if (/invalid consensus branch id/i.test(message)) return "zaino_consensus_branch_mismatch";
+  if (/timeout|timed out|abort/i.test(message)) return "rpc_timeout";
+  if (/connect|connection refused|not running/i.test(message)) return "zallet_rpc_unavailable";
+  return "wallet_health_check_failed";
 }
 
 function parsePayload(value: unknown): ZcashSendPayload {

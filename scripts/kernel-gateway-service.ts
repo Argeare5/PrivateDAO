@@ -347,10 +347,13 @@ export class KernelGatewayService {
 
   private async probe<T>(operation: () => Promise<T>): Promise<{ ok: boolean; reason?: string }> {
     try {
-      await Promise.race([
+      const result = await Promise.race([
         operation(),
         new Promise<never>((_, reject) => setTimeout(() => reject(new Error("probe_timeout")), 2_000)),
       ]);
+      if (isRecord(result) && result.ok === false) {
+        return { ok: false, reason: typeof result.reason === "string" ? result.reason : "provider_not_ready" };
+      }
       return { ok: true };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
