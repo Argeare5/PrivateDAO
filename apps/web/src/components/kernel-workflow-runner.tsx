@@ -32,7 +32,7 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
       if (!zcashFromAddress.trim() || !zcashRecipientAddress.trim() || !/^\d+$/.test(zcashAtomicAmount)) {
         throw new Error("Enter the public Zcash source address, recipient address, and a positive TAZ atomic amount.");
       }
-      if (BigInt(zcashAtomicAmount) <= 0n) throw new Error("The TAZ amount must be greater than zero.");
+      if (BigInt(zcashAtomicAmount) <= BigInt(0)) throw new Error("The TAZ amount must be greater than zero.");
       return {
         kind: "zallet-send",
         fromAddress: zcashFromAddress.trim(),
