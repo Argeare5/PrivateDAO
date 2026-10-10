@@ -1,4 +1,8 @@
 import * as http from "node:http";
+import { createPublicClient, createWalletClient, defineChain, http as viemHttp } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { createClient as createTempoClient } from "viem/tempo";
+import { tempoModerato } from "viem/chains";
 
 import {
   AuctionBidCommitProvider,
@@ -10,6 +14,9 @@ import {
   RecordCreationProvider,
   RecordVerificationProvider,
   TreasuryPolicyProvider,
+  EVM_NETWORK_CONFIGS,
+  EvmNetworkAdapter,
+  ViemEvmTransport,
   ZalletCliTransport,
   ZcashNetworkAdapter,
   ZCASH_NETWORK_CONFIGS,
@@ -25,6 +32,27 @@ export type KernelGatewayServiceOptions = {
   allowedOrigin?: string;
   requiredToken?: string;
   maxBodyBytes?: number;
+};
+
+const EVM_KERNEL_CAPABILITIES = [
+  "verification.record.create",
+  "verification.blind.prove",
+] as const;
+
+type EvmProviderEntry = {
+  id: string;
+  network: NetworkId;
+};
+
+type KernelViemPublicClient = {
+  getChainId(): Promise<number>;
+  waitForTransactionReceipt(input: { hash: `0x${string}`; timeout?: number }): Promise<{ status: "success" | "reverted"; blockNumber: bigint }>;
+  estimateContractGas(input: Record<string, unknown>): Promise<bigint>;
+  getGasPrice(): Promise<bigint>;
+};
+
+type KernelViemWalletClient = {
+  writeContract(input: Record<string, unknown>): Promise<`0x${string}`>;
 };
 
 type JsonRecord = Record<string, unknown>;
@@ -54,6 +82,7 @@ export class KernelGatewayService {
   private readonly requiredToken: string;
   private readonly maxBodyBytes: number;
   private readonly prepared = new Map<string, PreparedExecution<unknown>>();
+  private readonly evmProviders = new Map<NetworkId, EvmProviderEntry>();
   private readonly runtime;
 
   constructor(options: KernelGatewayServiceOptions = {}) {
@@ -70,6 +99,7 @@ export class KernelGatewayService {
     this.supportedNetworks = zcashConfigured ? [...baseNetworks, "zcash-testnet"] : baseNetworks;
 
     const registry = new InMemoryProviderRegistry();
+    this.registerConfiguredEvmAdapters(registry, baseNetworks);
     for (const network of this.supportedNetworks) {
       const providers: KernelProvider[] = [
         new PayrollCalculationProvider(),
@@ -107,6 +137,77 @@ export class KernelGatewayService {
     this.runtime = createPrivateDaoRuntime(registry);
   }
 
+  private registerConfiguredEvmAdapters(registry: InMemoryProviderRegistry, networks: readonly NetworkId[]): void {
+    if (process.env.PDAO_KERNEL_EVM_ENABLED !== "1") return;
+
+    const rawKey = process.env.PDAO_EVM_DEPLOYER_PRIVATE_KEY?.trim();
+    if (!rawKey || !/^0x?[0-9a-fA-F]{64}$/.test(rawKey)) {
+      throw new Error("PDAO_KERNEL_EVM_ENABLED requires a valid testnet signer in the secure environment.");
+    }
+    const privateKey = rawKey.startsWith("0x") ? rawKey : `0x${rawKey}`;
+    const account = privateKeyToAccount(privateKey as `0x${string}`);
+    const selected = new Set(
+      (process.env.PDAO_KERNEL_EVM_NETWORKS || "")
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean),
+    );
+    const unknown = [...selected].filter((network) => !networks.includes(network as NetworkId));
+    if (unknown.length > 0) throw new Error(`PDAO_KERNEL_EVM_NETWORKS contains unsupported gateway networks: ${unknown.join(", ")}`);
+
+    for (const network of networks) {
+      const config = EVM_NETWORK_CONFIGS.find((entry) => entry.network === network);
+      if (!config || config.environment !== "testnet" || !selected.has(network)) continue;
+      const rpcUrl = process.env[config.rpcUrlEnv]?.trim();
+      if (!rpcUrl || !/^https:\/\//i.test(rpcUrl)) {
+        throw new Error(`${config.rpcUrlEnv} must be an HTTPS testnet RPC URL when ${network} is enabled.`);
+      }
+
+      const transport = viemHttp(rpcUrl, { timeout: 30_000 });
+      const chain = network === "tempo-testnet"
+        ? tempoModerato
+        : defineChain({
+          id: Number(config.chainId),
+          name: config.label,
+          nativeCurrency: { name: config.nativeAsset, symbol: config.nativeAsset, decimals: 18 },
+          rpcUrls: { default: { http: [rpcUrl] } },
+        });
+      const publicClient = createPublicClient({ chain, transport });
+      const walletClient = network === "tempo-testnet"
+        ? createTempoClient({ account, chain: tempoModerato, transport })
+        : createWalletClient({ account, chain, transport });
+      const inner = new ViemEvmTransport(
+        publicClient as unknown as KernelViemPublicClient,
+        walletClient as unknown as KernelViemWalletClient,
+        network,
+        config.chainId,
+        "testnet",
+        config.explorerBaseUrl,
+        config.nativeAsset,
+      );
+      const providerId = `privatedao-evm-${network}`;
+      registry.register(new EvmNetworkAdapter({
+        id: providerId,
+        config,
+        capabilities: EVM_KERNEL_CAPABILITIES,
+        transport: {
+          health: () => inner.health(),
+          prepare: (intent) => inner.prepare(intent),
+          submit: (execution, signedPayload) => {
+            if (process.env.PDAO_KERNEL_EVM_BROADCAST_ENABLED !== "1") {
+              throw new Error("EVM testnet broadcast is disabled; enable it explicitly for an approved E2E run.");
+            }
+            return inner.submit(execution, signedPayload);
+          },
+          status: (executionId) => inner.status(executionId),
+          receipt: (executionId) => inner.receipt(executionId),
+          estimateFee: (intent) => inner.estimateFee(intent),
+        },
+      }));
+      this.evmProviders.set(network, { id: providerId, network });
+    }
+  }
+
   async handle(req: http.IncomingMessage, res: http.ServerResponse): Promise<boolean> {
     const incomingPath = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`).pathname.replace(/\/+$/, "") || "/";
     const path = incomingPath.startsWith("/api/") ? incomingPath.slice(4) : incomingPath;
@@ -116,6 +217,20 @@ export class KernelGatewayService {
         service: "privatedao-kernel-gateway",
         mode: "kernel",
         networks: this.supportedNetworks,
+        networkModes: this.supportedNetworks.map((network) => ({
+          network,
+          provider: network === "zcash-testnet"
+            ? "privatedao-zcash-testnet-zallet"
+            : this.evmProviders.get(network)?.id || "kernel-native",
+          onchainAdapter: network === "zcash-testnet"
+            ? this.supportedNetworks.includes("zcash-testnet")
+            : this.evmProviders.has(network),
+        })),
+        evm: {
+          configured: this.evmProviders.size > 0,
+          networks: [...this.evmProviders.keys()],
+          broadcastEnabled: process.env.PDAO_KERNEL_EVM_BROADCAST_ENABLED === "1",
+        },
         zcash: {
           configured: this.supportedNetworks.includes("zcash-testnet"),
           testnetOnly: true,
@@ -138,7 +253,8 @@ export class KernelGatewayService {
         if (!isRecord(intent) || !isRecord(intent.context)) throw new Error("intent.context is required.");
         const network = intent.context.network;
         if (typeof network !== "string" || !this.supportedNetworks.includes(network as NetworkId)) throw new Error("The selected network is not enabled in this gateway.");
-        const result = await this.runtime.gateway.prepare(intent as unknown as ExecutionIntent, role);
+        const routedIntent = this.routeNetworkAdapter(intent as unknown as ExecutionIntent);
+        const result = await this.runtime.gateway.prepare(routedIntent, role);
         this.prepared.set(result.executionId, result as PreparedExecution<unknown>);
         this.writeJson(res, 200, result as unknown as JsonRecord);
         return true;
@@ -166,6 +282,17 @@ export class KernelGatewayService {
       this.writeJson(res, 400, { ok: false, error: message });
       return true;
     }
+  }
+
+  private routeNetworkAdapter(intent: ExecutionIntent): ExecutionIntent {
+    if (intent.context.provider || !isRecord(intent.payload)) return intent;
+    if (intent.payload.kind !== "contract-write") return intent;
+    const provider = this.evmProviders.get(intent.context.network);
+    if (!provider) return intent;
+    return {
+      ...intent,
+      context: { ...intent.context, provider: provider.id },
+    };
   }
 
   private authorized(req: http.IncomingMessage): boolean {

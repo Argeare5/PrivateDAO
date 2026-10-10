@@ -46,6 +46,18 @@ try {
     ? ["solana-devnet", "ethereum-sepolia", "tempo-testnet", "base-sepolia", "zcash-testnet"]
     : ["solana-devnet", "ethereum-sepolia", "tempo-testnet", "base-sepolia"];
   assert.deepEqual(health.networks, expectedNetworks);
+  assert.equal(health.networkModes.length, expectedNetworks.length);
+  for (const network of expectedNetworks) {
+    const mode = health.networkModes.find((entry) => entry.network === network);
+    assert.ok(mode, `${network} must have a Kernel network mode`);
+    if (network === "zcash-testnet") {
+      assert.equal(mode.provider, "privatedao-zcash-testnet-zallet");
+      assert.equal(mode.onchainAdapter, true);
+    } else {
+      assert.equal(mode.provider, "kernel-native");
+      assert.equal(mode.onchainAdapter, false);
+    }
+  }
   if (expectedNetworks.includes("zcash-testnet")) {
     assert.equal(health.zcash.configured, true);
     assert.equal(health.zcash.testnetOnly, true);
