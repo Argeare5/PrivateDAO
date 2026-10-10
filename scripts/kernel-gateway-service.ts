@@ -19,7 +19,7 @@ import {
   type NetworkId,
   type PreparedExecution,
   type ProtocolRole,
-} from "../packages/privatedao-runtime/src/index.ts";
+} from "../packages/privatedao-runtime/src/index.js";
 
 export type KernelGatewayServiceOptions = {
   allowedOrigin?: string;
