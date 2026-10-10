@@ -18,6 +18,17 @@
     "policy": "Only a new Base Sepolia transaction created after ERC-8021 wiring may be reported as attributed.",
     "officialDocumentation": "https://docs.base.org/specifications/builder-codes/overview"
   },
+  "publicAnnouncement": {
+    "status": "published",
+    "announcementPath": "docs/base-builder-announcement.md",
+    "evidenceUrl": "https://privatedao.org/integrations/base",
+    "claims": [
+      "Base Sepolia integration is published",
+      "Existing workflow receipts are testnet evidence",
+      "Fresh Builder Code attribution remains pending",
+      "Base Mainnet execution is disabled"
+    ]
+  },
   "workflows": [
     {
       "product": "Record Verification",

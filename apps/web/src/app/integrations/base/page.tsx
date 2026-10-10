@@ -25,8 +25,8 @@ export default function BaseIntegrationPage() {
       </section>
       <section className="enterprise-card rounded-[24px] border-[#c9dcff] bg-[#f7faff] p-6 sm:p-8">
         <div className="commercial-eyebrow">Base Builder announcement</div>
-        <h2 className="mt-3 text-2xl font-semibold text-[#10233f]">PrivateDAO is Builder Code ready on Base Sepolia.</h2>
-        <p className="mt-4 max-w-4xl text-sm leading-7 text-[#5d6d82]">PrivateDAO now appends the registered ERC-8021 attribution suffix to eligible Base Sepolia transactions when the registered deployer wallet matches. The existing E2E receipts below remain valid, but they predate this wiring and are intentionally marked as not attributed.</p>
+        <h2 className="mt-3 text-2xl font-semibold text-[#10233f]">PrivateDAO Builder Code integration is published.</h2>
+        <p className="mt-4 max-w-4xl text-sm leading-7 text-[#5d6d82]">Eligible Base Sepolia transactions append the registered ERC-8021 attribution suffix when the registered deployer wallet matches. The existing E2E receipts below remain valid, but they predate this wiring and are intentionally marked as not attributed. A newly funded Base Sepolia write is still required to verify attribution.</p>
         <div className="mt-5 flex flex-wrap gap-4 text-sm font-semibold"><a className="text-[#175cd3]" href="https://docs.base.org/specifications/builder-codes/overview" target="_blank" rel="noreferrer">Read Base Builder Codes</a><a className="text-[#175cd3]" href="https://github.com/x-pact-pro/PrivateDAO/blob/codex/base-builder-evidence/docs/base-builder-announcement.md" target="_blank" rel="noreferrer">Open announcement</a></div>
       </section>
       <section className="space-y-4">
