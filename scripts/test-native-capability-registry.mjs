@@ -4,12 +4,14 @@ import { buildNativeCapabilityRegistry } from "../packages/privatedao-runtime/sr
 const entries = buildNativeCapabilityRegistry();
 const verified = entries.filter((entry) => entry.status === "testnet_verified");
 const liveAgents = entries.filter((entry) => entry.status === "mainnet_live" && entry.product === "agent");
-const verifiedPayroll = entries.filter((entry) => entry.status === "devnet_verified");
+const verifiedDevnet = entries.filter((entry) => entry.status === "devnet_verified");
+const verifiedPayroll = verifiedDevnet.filter((entry) => entry.product === "payroll");
 
 assert.equal(entries.length, 192, "unexpected native capability matrix size");
-assert.equal(verified.length, 24, "only the twelve verification and twelve organizational testnet evidence rows should be verified");
+assert.equal(verified.length, 29, "only evidence-backed testnet verification, organizational, and settlement rows should be verified");
 assert.equal(liveAgents.length, 2, "the two live Agent Exchange rows must be runtime-verified");
 assert.equal(verifiedPayroll.length, 3, "only the three Payroll Devnet evidence rows should be verified");
+assert.equal(verifiedDevnet.length, 7, "Solana Devnet must include Payroll plus the evidenced governance, treasury, and auction lanes");
 for (const entry of verifiedPayroll) {
   assert.equal(entry.product, "payroll");
   assert.equal(entry.network, "solana-devnet");
@@ -48,14 +50,27 @@ assert.equal(verified.filter((entry) => entry.provider === "evm-ethereum-sepolia
 assert.equal(verified.filter((entry) => entry.provider === "evm-tempo-testnet-organizational").length, 4, "Tempo organizational evidence must cover treasury, governance, and auction lanes");
 assert.equal(verified.filter((entry) => entry.provider === "evm-base-sepolia").length, 3, "Base Sepolia must have three verified verification rows");
 assert.equal(verified.filter((entry) => entry.provider === "evm-base-sepolia").every((entry) => entry.chainId === "84532"), true);
+assert.equal(verified.filter((entry) => entry.provider === "evm-base-sepolia-organizational").length, 4, "Base organizational evidence must cover treasury, governance, and auction lanes");
+assert.equal(verified.filter((entry) => entry.provider === "evm-base-sepolia-organizational").every((entry) => entry.chainId === "84532"), true);
 assert.equal(verified.filter((entry) => entry.provider === "evm-arbitrum-sepolia").length, 3, "Arbitrum Sepolia must have three verified verification rows");
 assert.equal(verified.filter((entry) => entry.provider === "evm-arbitrum-sepolia-organizational").length, 4, "Arbitrum organizational evidence must cover treasury, governance, and auction lanes");
 assert.equal(verified.filter((entry) => entry.network === "arbitrum-sepolia").every((entry) => entry.chainId === "421614"), true);
+assert.equal(verifiedDevnet.filter((entry) => entry.provider === "solana-devnet").length, 4, "Solana organizational evidence must cover treasury, governance, and auction lanes");
+assert.equal(verifiedDevnet.filter((entry) => entry.provider === "solana-devnet").every((entry) => entry.network === "solana-devnet"), true);
 assert.equal(entries.find((entry) => entry.network === "tempo-testnet" && entry.product === "treasury")?.nativeAsset, "USD", "Tempo native asset must match the EVM adapter configuration");
 assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && entry.product === "record-verification")?.networkFamily, "evm", "HyperEVM must use the EVM adapter family");
 assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && entry.product === "record-verification")?.chainId, "998", "HyperEVM testnet chain ID must be 998");
 assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && entry.product === "record-verification")?.nativeAsset, "HYPE", "HyperEVM native asset must be HYPE");
 assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && entry.product === "record-verification")?.status, "planned", "HyperEVM must remain unverified until E2E evidence exists");
+
+const zcashSettlement = entries.find((entry) => entry.network === "zcash-testnet" && entry.product === "payroll" && entry.capability === "payroll.settle");
+assert.equal(zcashSettlement?.status, "testnet_verified", "Zcash payroll settlement must be backed by the finalized Testnet E2E receipt");
+assert.equal(zcashSettlement?.nativeAsset, "TAZ");
+assert.equal(zcashSettlement?.provider, "zcash-testnet-zallet");
+assert.equal(zcashSettlement?.supportsPrivateSettlement, true);
+assert.equal(zcashSettlement?.supportsReconciliation, true);
+assert.deepEqual(zcashSettlement?.contracts, ["c14158dad7761c5d3c497cf27b2a80ffa909156ba2306e18f3731e608d1521df"]);
+assert.equal(zcashSettlement?.lastVerifiedCommit, "d41bec9addcd6580afce1fa11554d5ec03b94c86");
 
 assert.equal(entries.some((entry) => entry.network === "wormhole-integration"), false, "bridge network must not be present");
 console.log(`[native-capability-registry] rows=${entries.length} verified=${verified.length} bridge-free=true`);
