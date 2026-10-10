@@ -90,7 +90,7 @@ assert.equal(isRuntimeProductAvailable("governance"), true);
   assert.equal(isRuntimeProductAvailable("agent"), false);
 assert.equal(isRuntimeCapabilityExecutable("payroll", "payroll.calculate", "solana-devnet"), true);
 assert.equal(isRuntimeCapabilityExecutable("payroll", "payroll.approve", "solana-devnet"), true);
-assert.equal(isRuntimeCapabilityExecutable("payroll", "payroll.settle", "solana-devnet"), false);
+assert.equal(isRuntimeCapabilityExecutable("payroll", "payroll.settle", "solana-devnet"), true);
 assert.equal(isRuntimeCapabilityExecutable("payroll", "payroll.calculate", "zcash-testnet"), false);
 assert.equal(isRuntimeCapabilityExecutable("payroll", "payroll.approve", "zcash-testnet"), false);
 assert.equal(isRuntimeCapabilityExecutable("payroll", "payroll.settle", "zcash-testnet"), true);

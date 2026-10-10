@@ -176,10 +176,9 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
     product: "payroll",
     capability: "payroll.settle",
     network: "solana-devnet",
-    mode: "legacy-provider",
-    entrypoint: "/api/private-payout/prepare",
-    method: "POST",
-    note: "Existing private-payout provider route; it is not evidence of an end-to-end payroll settlement.",
+    mode: "kernel-gateway",
+    entrypoint: "kernel://payroll.settle",
+    note: "Kernel delegates to the existing Umbra Devnet payroll workflow; the provider keeps recipient data hashed and accepts only an observed workflow receipt.",
   },
   {
     product: "payroll",

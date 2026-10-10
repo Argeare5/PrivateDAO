@@ -27,7 +27,7 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
   const [zcashRecipientAddress, setZcashRecipientAddress] = useState("");
   const [zcashAtomicAmount, setZcashAtomicAmount] = useState("10000");
 
-  function buildPayload() {
+  async function buildPayload() {
     if (network === "zcash-testnet" && capability === "payroll.settle") {
       if (!zcashFromAddress.trim() || !zcashRecipientAddress.trim() || !/^\d+$/.test(zcashAtomicAmount)) {
         throw new Error("Enter the public Zcash source address, recipient address, and a positive TAZ atomic amount.");
@@ -39,6 +39,22 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
         recipients: [{ address: zcashRecipientAddress.trim(), atomicAmount: zcashAtomicAmount }],
       };
     }
+    if (network === "solana-devnet" && capability === "payroll.settle") {
+      const batchId = `web-payroll-${requestIdForHash()}`;
+      const manifestCommitment = await digestHex(`PrivateDAO:${batchId}:payroll-demo`);
+      const recipientHash = await digestHex(`PrivateDAO:${batchId}:recipient-demo`);
+      return { kind: "umbra-payroll", manifestCommitment, recipientHash, recipientCount: 1, totalAmount: "0.001", asset: "WSOL", batchId, sensitive: true };
+    }
+    if (capability === "payroll.approve") {
+      const batchId = `web-payroll-${requestIdForHash()}`;
+      return {
+        batchId,
+        makerId: "demo-maker",
+        policyHash: await digestHex(`PrivateDAO:${batchId}:policy`),
+        policy: { requiredApprovals: 1, allowedRoles: ["checker"], preventSelfApproval: true },
+      };
+    }
+    if (capability === "agent.discover") return { url: "https://agents.privatedao.org/.well-known/agent-card.json" };
     if (capability === "payroll.calculate") {
       return {
         lines: [{ employeeRef: "demo-employee-1", grossCents: 10000 }],
@@ -72,8 +88,10 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
               actorId: "browser-user",
               network,
             },
-            payload: buildPayload(),
-            accounts: [],
+            payload: await buildPayload(),
+            accounts: capability === "payroll.approve"
+              ? [{ role: "authority", address: "demo-checker", network }]
+              : [],
           },
         }),
       });
@@ -107,4 +125,13 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
       {error ? <div className="mt-4 rounded-[14px] border border-[#f1c7cc] bg-[#fff7f7] p-4 text-sm text-[#8f1d2c]" role="alert">{error}</div> : null}
     </section>
   );
+}
+
+function requestIdForHash() {
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+async function digestHex(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }

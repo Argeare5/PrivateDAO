@@ -66,6 +66,7 @@
     "start:read-node": "TS_NODE_FILES=true TS_NODE_PREFER_TS_EXTS=true ts-node scripts/run-read-node.ts",
     "start:kernel-gateway": "TS_NODE_PREFER_TS_EXTS=true ts-node scripts/kernel-gateway.ts",
     "test:kernel-gateway": "node scripts/test-kernel-gateway.mjs",
+    "test:kernel:solana-payroll": "node --import tsx scripts/test-solana-payroll-kernel.mjs",
     "test:zcash:foundation": "node --import tsx scripts/test-zcash-foundation.mjs",
     "start:chain-watcher": "TS_NODE_PREFER_TS_EXTS=true ts-node scripts/chain-watcher.ts",
     "probe:qvac-runtime": "node scripts/probe-qvac-sdk.mjs",

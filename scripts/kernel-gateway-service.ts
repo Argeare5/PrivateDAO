@@ -20,6 +20,8 @@ import {
   ZalletCliTransport,
   ZcashNetworkAdapter,
   ZCASH_NETWORK_CONFIGS,
+  SolanaPayrollSettlementProvider,
+  AgentDiscoveryProvider,
   createPrivateDaoRuntime,
   type ExecutionIntent,
   type KernelProvider,
@@ -115,6 +117,8 @@ export class KernelGatewayService {
       ];
       for (const provider of providers) registry.register(scopedProvider(provider, network));
     }
+    registry.register(new SolanaPayrollSettlementProvider());
+    registry.register(new AgentDiscoveryProvider());
 
     if (zcashConfigured) {
       const config = ZCASH_NETWORK_CONFIGS.find((entry) => entry.network === "zcash-testnet");
