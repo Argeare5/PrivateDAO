@@ -61,6 +61,18 @@ evidence record. Attribution can be verified in Base's dashboard or by
 decoding the transaction input suffix; it does not change contract calldata
 semantics.
 
+### Public announcement status
+
+PrivateDAO is ready to submit Base Sepolia Builder Code evidence. The public
+integration page and announcement intentionally distinguish:
+
+- `testnet_verified`: the workflow and receipt were verified on Base Sepolia;
+- `configured_pending_fresh_testnet_transaction`: ERC-8021 is wired, but a new
+  funded transaction created after the wiring is still required to prove
+  attribution.
+
+No Base Mainnet execution or grant submission is implied by this status.
+
 The generic runner can be selected with `PDAO_EVM_NETWORKS` for Ethereum
 Sepolia, Base Sepolia, Arbitrum Sepolia, BNB Testnet, Robinhood Testnet,
 Hyperliquid HyperEVM Testnet, or Tempo Testnet. Hyperliquid uses the standard

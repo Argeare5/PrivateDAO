@@ -16,6 +16,11 @@ const evidence = {
   mainnetExecution: "disabled",
   explorerBaseUrl: "https://sepolia.basescan.org",
   builderCode: builder,
+  attribution: {
+    status: "configured_pending_fresh_testnet_transaction",
+    policy: "Only a new Base Sepolia transaction created after ERC-8021 wiring may be reported as attributed.",
+    officialDocumentation: "https://docs.base.org/specifications/builder-codes/overview",
+  },
   workflows: [
     { product: "Record Verification", status: verification.status, txHash: source.record.txHash, blockNumber: source.record.blockNumber, verification: source.checks.recordVerified, builderCodeAttribution: "historical evidence predates Builder Code wiring", explorerUrl: source.record.explorerUrl, proofUrl: source.links.record },
     { product: "Blind Verification", status: verification.status, txHash: source.blind.txHash, blockNumber: source.blind.blockNumber, verification: source.checks.blindProofVerified, builderCodeAttribution: "historical evidence predates Builder Code wiring", explorerUrl: source.blind.explorerUrl, proofUrl: source.links.blind },

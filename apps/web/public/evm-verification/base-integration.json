@@ -1,6 +1,6 @@
 {
   "schema": "privatedao.base-integration-evidence.v1",
-  "generatedAt": "2026-10-05T20:39:15.464Z",
+  "generatedAt": "2026-10-10T22:30:04.211Z",
   "network": "base-sepolia",
   "chainId": 84532,
   "environment": "testnet",
@@ -12,6 +12,11 @@
     "networkScope": "Base transactions only",
     "source": "Base Builder Code API",
     "mainnetExecutionEnabled": false
+  },
+  "attribution": {
+    "status": "configured_pending_fresh_testnet_transaction",
+    "policy": "Only a new Base Sepolia transaction created after ERC-8021 wiring may be reported as attributed.",
+    "officialDocumentation": "https://docs.base.org/specifications/builder-codes/overview"
   },
   "workflows": [
     {
