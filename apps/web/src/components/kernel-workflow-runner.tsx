@@ -17,11 +17,22 @@ type PreparedExecution = {
   intent?: { context?: { network?: string; capability?: string } };
 };
 
+type ExecutionReceipt = {
+  executionId?: string;
+  state?: string;
+  network?: string;
+  provider?: string;
+  signatures?: string[];
+  result?: unknown;
+};
+
 const RUNTIME_API_BASE = (process.env.NEXT_PUBLIC_RUNTIME_API_BASE || "https://api.privatedao.org/api").replace(/\/+$/, "");
 
 export function KernelWorkflowRunner({ product, capability, network, networkLabel }: KernelWorkflowRunnerProps) {
   const [busy, setBusy] = useState(false);
   const [prepared, setPrepared] = useState<PreparedExecution | null>(null);
+  const [receipt, setReceipt] = useState<ExecutionReceipt | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [zcashFromAddress, setZcashFromAddress] = useState("");
   const [zcashRecipientAddress, setZcashRecipientAddress] = useState("");
@@ -72,6 +83,7 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
   async function prepare() {
     setBusy(true);
     setPrepared(null);
+    setReceipt(null);
     setError(null);
     const requestId = `web-${product}-${capability}-${network}-${Date.now()}`;
     try {
@@ -107,6 +119,33 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
     }
   }
 
+  async function complete() {
+    if (!prepared) return;
+    if ((prepared.requiredSigners?.length ?? 0) > 0) {
+      setError("This workflow is prepared, but it requires the listed authority or wallet signature before it can be completed.");
+      return;
+    }
+    setSubmitting(true);
+    setError(null);
+    try {
+      const submitResponse = await fetch(`${RUNTIME_API_BASE}/v1/executions/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ execution: prepared, signedPayload: null }),
+      });
+      const submitted = await submitResponse.json().catch(() => ({}));
+      if (!submitResponse.ok) throw new Error(typeof submitted.error === "string" ? submitted.error : `The workflow could not be completed (${submitResponse.status}).`);
+      const receiptResponse = await fetch(`${RUNTIME_API_BASE}/v1/executions/${encodeURIComponent(prepared.executionId)}/receipt`, { headers: { Accept: "application/json" } });
+      const finalReceipt = await receiptResponse.json().catch(() => ({}));
+      if (!receiptResponse.ok || finalReceipt.state !== "reconciled") throw new Error(typeof finalReceipt.error === "string" ? finalReceipt.error : "The workflow completed without a reconciled receipt.");
+      setReceipt(finalReceipt as ExecutionReceipt);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "The selected workflow could not be completed.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <section className="rounded-[24px] border border-[#bcd5f7] bg-[#f7fbff] p-5 text-[#10233f]" aria-labelledby="selected-kernel-workflow">
       <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-[#175cd3]"><ShieldCheck className="h-4 w-4" /> Selected workflow</div>
@@ -116,7 +155,8 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
         {busy ? "Preparing..." : "Continue with this workflow"}
       </button>
-      {prepared ? <div className="mt-4 rounded-[14px] border border-[#bde7d3] bg-[#f1fcf6] p-4 text-sm text-[#14532d]"><strong>Prepared through the runtime</strong><div className="mt-2 text-xs">Execution: <code>{prepared.executionId}</code></div><div className="mt-1 text-xs">State: {prepared.state}</div></div> : null}
+      {prepared ? <div className="mt-4 rounded-[14px] border border-[#bde7d3] bg-[#f1fcf6] p-4 text-sm text-[#14532d]"><strong>Prepared through the runtime</strong><div className="mt-2 text-xs">Execution: <code>{prepared.executionId}</code></div><div className="mt-1 text-xs">State: {prepared.state}</div>{prepared.requiredSigners?.length ? <div className="mt-2 text-xs">Required signer: {prepared.requiredSigners.map((signer) => signer.address || signer.role || "authority").join(", ")}</div> : <button type="button" onClick={() => void complete()} disabled={submitting} className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-[9px] bg-[#14532d] px-3 py-2 text-xs font-semibold text-white disabled:opacity-50">{submitting ? "Completing..." : "Complete and verify receipt"}</button>}</div> : null}
+      {receipt ? <div className="mt-4 rounded-[14px] border border-[#bcd5f7] bg-white p-4 text-sm text-[#10233f]"><strong>Reconciled receipt</strong><div className="mt-2 grid gap-1 text-xs text-[#40536d]"><span>Network: {receipt.network || network}</span><span>Provider: {receipt.provider || "Kernel provider"}</span><span>State: {receipt.state}</span>{receipt.signatures?.length ? <span>Reference: {receipt.signatures.join(", ")}</span> : null}</div></div> : null}
       {network === "zcash-testnet" && capability === "payroll.settle" ? <div className="mt-5 grid gap-3 rounded-[14px] border border-[#d7e2f0] bg-white p-4 sm:grid-cols-3">
         <label className="text-xs font-semibold text-[#40536d]">Source address<input value={zcashFromAddress} onChange={(event) => setZcashFromAddress(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-normal" autoComplete="off" /></label>
         <label className="text-xs font-semibold text-[#40536d]">Recipient address<input value={zcashRecipientAddress} onChange={(event) => setZcashRecipientAddress(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-normal" autoComplete="off" /></label>
