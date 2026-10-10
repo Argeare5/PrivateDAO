@@ -251,7 +251,7 @@ export class KernelGatewayService {
         zcash: {
           configured: this.supportedNetworks.includes("zcash-testnet"),
           ready: Boolean(zcashReadiness?.ok),
-          readinessReason: zcashReadiness?.reason || (this.zcashAdapter ? "rpc_unavailable" : "not_configured"),
+          readinessReason: zcashReadiness?.reason || (zcashReadiness?.ok ? "ready" : this.zcashAdapter ? "rpc_unavailable" : "not_configured"),
           testnetOnly: true,
           broadcastEnabled: process.env.PDAO_ZCASH_BROADCAST_ENABLED === "1",
         },
