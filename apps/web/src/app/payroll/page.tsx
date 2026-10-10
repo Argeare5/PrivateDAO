@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { OperationsShell } from "@/components/operations-shell";
+import { SelectedKernelWorkflow } from "@/components/selected-kernel-workflow";
 import { UmbraPayrollControlRoom } from "@/components/umbra-payroll-control-room";
 import { buildRouteMetadata } from "@/lib/route-metadata";
 
@@ -23,7 +24,9 @@ export default function PayrollPage() {
         { label: "Shareable proof", variant: "violet" },
       ]}
     >
-      <UmbraPayrollControlRoom />
+      <SelectedKernelWorkflow product="payroll">
+        <UmbraPayrollControlRoom />
+      </SelectedKernelWorkflow>
     </OperationsShell>
   );
 }
