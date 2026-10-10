@@ -236,12 +236,18 @@ export class KernelGatewayService {
           network,
           provider: network === "zcash-testnet"
             ? "privatedao-zcash-testnet-zallet"
+            : network === "solana-devnet"
+              ? "privatedao-umbra-solana-devnet"
             : this.evmProviders.get(network)?.id || "kernel-native",
           onchainAdapter: network === "zcash-testnet"
             ? this.supportedNetworks.includes("zcash-testnet")
+            : network === "solana-devnet"
+              ? false
             : this.evmProviders.has(network),
           ready: network === "zcash-testnet"
             ? Boolean(zcashReadiness?.ok)
+            : network === "solana-devnet"
+              ? Boolean(process.env.PDAO_SOLANA_PAYROLL_UMBRA_ENDPOINT?.trim())
             : network in evmReady
               ? Boolean(evmReady[network])
               : false,
