@@ -40,7 +40,15 @@ const waitForHealth = async () => {
 
 try {
   const health = await waitForHealth();
-  assert.deepEqual(health.networks, ["solana-devnet", "ethereum-sepolia", "tempo-testnet", "base-sepolia"]);
+  const expectedNetworks = process.env.PDAO_ZCASH_ZALLET_BINARY && process.env.PDAO_ZCASH_ZALLET_DATA_DIR && process.env.PDAO_ZCASH_ZALLET_CONFIG
+    ? ["solana-devnet", "ethereum-sepolia", "tempo-testnet", "base-sepolia", "zcash-testnet"]
+    : ["solana-devnet", "ethereum-sepolia", "tempo-testnet", "base-sepolia"];
+  assert.deepEqual(health.networks, expectedNetworks);
+  if (expectedNetworks.includes("zcash-testnet")) {
+    assert.equal(health.zcash.configured, true);
+    assert.equal(health.zcash.testnetOnly, true);
+    assert.equal(health.zcash.broadcastEnabled, false);
+  }
 
   const baseIntent = (network, requestId) => ({
     context: {
@@ -69,6 +77,7 @@ try {
   });
 
   for (const network of health.networks) {
+    if (network === "zcash-testnet") continue;
     const requestId = `gateway-${network}`;
     const first = await request("POST", "/v1/executions/prepare", { intent: baseIntent(network, requestId) });
     assert.equal(first.status, 200, `${network} prepare failed`);

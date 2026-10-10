@@ -9,6 +9,9 @@ import {
   PayrollCalculationProvider,
   RecordCreationProvider,
   RecordVerificationProvider,
+  ZalletCliTransport,
+  ZcashNetworkAdapter,
+  ZCASH_NETWORK_CONFIGS,
   TreasuryPolicyProvider,
   createPrivateDaoRuntime,
   type ExecutionIntent,
@@ -24,7 +27,13 @@ const port = Number(process.env.PDAO_KERNEL_GATEWAY_PORT || 8790);
 const maxBodyBytes = Number(process.env.PDAO_KERNEL_GATEWAY_MAX_BODY_BYTES || 1_000_000);
 const allowedOrigin = process.env.PDAO_KERNEL_GATEWAY_ALLOWED_ORIGIN || "http://127.0.0.1:4173";
 const requiredToken = process.env.PDAO_KERNEL_GATEWAY_TOKEN?.trim() || "";
-const supportedNetworks: readonly NetworkId[] = ["solana-devnet", "ethereum-sepolia", "tempo-testnet", "base-sepolia"];
+const baseNetworks: readonly NetworkId[] = ["solana-devnet", "ethereum-sepolia", "tempo-testnet", "base-sepolia"];
+const zcashConfigured = Boolean(
+  process.env.PDAO_ZCASH_ZALLET_BINARY?.trim()
+  && process.env.PDAO_ZCASH_ZALLET_DATA_DIR?.trim()
+  && process.env.PDAO_ZCASH_ZALLET_CONFIG?.trim(),
+);
+const supportedNetworks: readonly NetworkId[] = zcashConfigured ? [...baseNetworks, "zcash-testnet"] : baseNetworks;
 
 const registry = new InMemoryProviderRegistry();
 const prepared = new Map<string, PreparedExecution<unknown>>();
@@ -59,6 +68,27 @@ function registerNetworkProviders(network: NetworkId): void {
 }
 
 for (const network of supportedNetworks) registerNetworkProviders(network);
+
+if (zcashConfigured) {
+  const config = ZCASH_NETWORK_CONFIGS.find((entry) => entry.network === "zcash-testnet");
+  if (!config) throw new Error("Zcash Testnet configuration is missing from the Kernel network matrix.");
+  const transport = new ZalletCliTransport({
+    binaryPath: process.env.PDAO_ZCASH_ZALLET_BINARY.trim(),
+    dataDirectory: process.env.PDAO_ZCASH_ZALLET_DATA_DIR.trim(),
+    configPath: process.env.PDAO_ZCASH_ZALLET_CONFIG.trim(),
+    network: "zcash-testnet",
+    explorerBaseUrl: config.explorerBaseUrl,
+    confirmationDepth: Number(process.env.PDAO_ZCASH_CONFIRMATIONS || 1),
+    allowBalanceReadinessProbe: process.env.PDAO_ZCASH_ALLOW_BALANCE_CHECK === "1",
+    broadcastEnabled: process.env.PDAO_ZCASH_BROADCAST_ENABLED === "1",
+  });
+  registry.register(new ZcashNetworkAdapter({
+    id: "privatedao-zcash-testnet-zallet",
+    config,
+    capabilities: ["payroll.settle"],
+    transport,
+  }));
+}
 
 const runtime = createPrivateDaoRuntime(registry);
 
@@ -101,7 +131,13 @@ async function handle(req: http.IncomingMessage, res: http.ServerResponse): Prom
   const url = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
   if (req.method === "OPTIONS") return writeJson(res, 204, {});
   if (url.pathname === "/healthz" && req.method === "GET") {
-    return writeJson(res, 200, { ok: true, service: "privatedao-kernel-gateway", mode: "kernel", networks: supportedNetworks });
+    return writeJson(res, 200, {
+      ok: true,
+      service: "privatedao-kernel-gateway",
+      mode: "kernel",
+      networks: supportedNetworks,
+      zcash: { configured: zcashConfigured, testnetOnly: true, broadcastEnabled: zcashConfigured && process.env.PDAO_ZCASH_BROADCAST_ENABLED === "1" },
+    });
   }
   if (!authorized(req)) return writeJson(res, 401, { ok: false, error: "Kernel gateway authentication required." });
   if (!url.pathname.startsWith("/v1/executions/")) return writeJson(res, 404, { ok: false, error: "Unknown Kernel gateway route." });

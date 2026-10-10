@@ -23,6 +23,35 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
   const [busy, setBusy] = useState(false);
   const [prepared, setPrepared] = useState<PreparedExecution | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [zcashFromAddress, setZcashFromAddress] = useState("");
+  const [zcashRecipientAddress, setZcashRecipientAddress] = useState("");
+  const [zcashAtomicAmount, setZcashAtomicAmount] = useState("10000");
+
+  function buildPayload() {
+    if (network === "zcash-testnet" && capability === "payroll.settle") {
+      if (!zcashFromAddress.trim() || !zcashRecipientAddress.trim() || !/^\d+$/.test(zcashAtomicAmount)) {
+        throw new Error("Enter the public Zcash source address, recipient address, and a positive TAZ atomic amount.");
+      }
+      if (BigInt(zcashAtomicAmount) <= 0n) throw new Error("The TAZ amount must be greater than zero.");
+      return {
+        kind: "zallet-send",
+        fromAddress: zcashFromAddress.trim(),
+        recipients: [{ address: zcashRecipientAddress.trim(), atomicAmount: zcashAtomicAmount }],
+      };
+    }
+    if (capability === "payroll.calculate") {
+      return {
+        lines: [{ employeeRef: "demo-employee-1", grossCents: 10000 }],
+        policy: { network, jurisdiction: "demo", taxYear: "2026", taxRateBps: 1000, deductionRateBps: 500, maxTotalCents: 20000, maxEmployeeCents: 15000, allowedAsset: "USDC", rounding: "half-up" },
+      };
+    }
+    if (capability === "treasury.policy.check") return { amountCents: 100, budgetCents: 1000, requestedAsset: "USDC", allowedAsset: "USDC" };
+    if (capability === "verification.blind.prove") return { workflowId: `demo-${network}`, privateInputs: { approved: true, budgetCents: 1000 } };
+    if (capability === "verification.record.create") return { schemaVersion: "1", recordType: "private-workflow", recordId: `demo-${Date.now()}`, issuer: "PrivateDAO", issuedAt: new Date().toISOString(), payload: { outcome: "approved" }, publicFieldPaths: ["outcome"] };
+    if (capability === "auction.bid.commit") return { config: { auctionId: `demo-${network}`, asset: "USDC" }, privateBids: [{ bidderRef: "demo-bidder", amountCents: 100 }] };
+    if (capability === "auction.settle") return { metadata: { auctionId: `demo-${network}`, policy: "highest-valid-bid" }, bids: [{ bidderRef: "demo-bidder", amountCents: 100 }] };
+    throw new Error("This workflow requires its product-specific approval or wallet form before it can be prepared.");
+  }
 
   async function prepare() {
     setBusy(true);
@@ -43,7 +72,7 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
               actorId: "browser-user",
               network,
             },
-            payload: { source: "PrivateDAO product workspace", requestedAt: new Date().toISOString() },
+            payload: buildPayload(),
             accounts: [],
           },
         }),
@@ -70,6 +99,11 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
         {busy ? "Preparing..." : "Continue with this workflow"}
       </button>
       {prepared ? <div className="mt-4 rounded-[14px] border border-[#bde7d3] bg-[#f1fcf6] p-4 text-sm text-[#14532d]"><strong>Prepared through the runtime</strong><div className="mt-2 text-xs">Execution: <code>{prepared.executionId}</code></div><div className="mt-1 text-xs">State: {prepared.state}</div></div> : null}
+      {network === "zcash-testnet" && capability === "payroll.settle" ? <div className="mt-5 grid gap-3 rounded-[14px] border border-[#d7e2f0] bg-white p-4 sm:grid-cols-3">
+        <label className="text-xs font-semibold text-[#40536d]">Source address<input value={zcashFromAddress} onChange={(event) => setZcashFromAddress(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-normal" autoComplete="off" /></label>
+        <label className="text-xs font-semibold text-[#40536d]">Recipient address<input value={zcashRecipientAddress} onChange={(event) => setZcashRecipientAddress(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-normal" autoComplete="off" /></label>
+        <label className="text-xs font-semibold text-[#40536d]">TAZ atomic amount<input inputMode="numeric" value={zcashAtomicAmount} onChange={(event) => setZcashAtomicAmount(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-normal" /></label>
+      </div> : null}
       {error ? <div className="mt-4 rounded-[14px] border border-[#f1c7cc] bg-[#fff7f7] p-4 text-sm text-[#8f1d2c]" role="alert">{error}</div> : null}
     </section>
   );
