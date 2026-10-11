@@ -1,0 +1,84 @@
+import assert from "node:assert/strict";
+import { EvmNetworkAdapter, EVM_NETWORK_CONFIGS, ZcashNetworkAdapter, ZCASH_NETWORK_CONFIGS } from "../packages/privatedao-runtime/src/index.ts";
+
+const session = (network, address) => ({
+  address,
+  network,
+  connectedAt: "2026-10-11T00:00:00.000Z",
+});
+
+const evmConfig = EVM_NETWORK_CONFIGS.find((entry) => entry.network === "hyperliquid-testnet");
+assert(evmConfig, "Hyperliquid EVM config is required for recovery coverage");
+let switchedChain;
+const evmWallet = {
+  connect: async () => session("hyperliquid-testnet", "0x1111111111111111111111111111111111111111"),
+  switchChain: async (chainId) => { switchedChain = chainId; },
+  sign: async (payload) => payload,
+};
+const evmTransport = {
+  health: async () => ({ ok: true, chainId: "998", latencyMs: 1 }),
+  prepare: async () => { throw new Error("not used in recovery test"); },
+  submit: async () => { throw new Error("not used in recovery test"); },
+  status: async () => { throw new Error("not used in recovery test"); },
+  receipt: async () => { throw new Error("not used in recovery test"); },
+  estimateFee: async () => ({ network: "hyperliquid-testnet", atomicAmount: "0", asset: "HYPE" }),
+};
+const evmAdapter = new EvmNetworkAdapter({
+  id: "recovery-test-hyperliquid",
+  config: evmConfig,
+  capabilities: ["governance.proposal.execute"],
+  transport: evmTransport,
+  wallet: evmWallet,
+});
+const recoveredEvm = await evmAdapter.connectWallet();
+assert.equal(recoveredEvm.network, "hyperliquid-testnet");
+await evmAdapter.switchWalletChain();
+assert.equal(switchedChain, "998");
+
+const wrongEvmAdapter = new EvmNetworkAdapter({
+  id: "recovery-test-wrong-evm",
+  config: evmConfig,
+  capabilities: ["governance.proposal.execute"],
+  transport: evmTransport,
+  wallet: {
+    ...evmWallet,
+    connect: async () => session("ethereum-sepolia", "0x1111111111111111111111111111111111111111"),
+  },
+});
+await assert.rejects(() => wrongEvmAdapter.connectWallet(), /different network/);
+
+const zcashConfig = ZCASH_NETWORK_CONFIGS.find((entry) => entry.network === "zcash-testnet");
+assert(zcashConfig, "Zcash Testnet config is required for recovery coverage");
+const zcashTransport = {
+  health: async () => ({ ok: true, network: "zcash-testnet", latencyMs: 1 }),
+  prepare: async () => { throw new Error("not used in recovery test"); },
+  submit: async () => { throw new Error("not used in recovery test"); },
+  status: async () => { throw new Error("not used in recovery test"); },
+  receipt: async () => { throw new Error("not used in recovery test"); },
+  estimateFee: async () => ({ network: "zcash-testnet", atomicAmount: "0", asset: "TAZ" }),
+};
+const zcashAdapter = new ZcashNetworkAdapter({
+  id: "recovery-test-zcash",
+  config: zcashConfig,
+  capabilities: ["payroll.settle"],
+  transport: zcashTransport,
+  wallet: {
+    connect: async () => session("zcash-testnet", "utest1recovery"),
+    sign: async (payload) => payload,
+  },
+});
+const recoveredZcash = await zcashAdapter.connectWallet();
+assert.equal(recoveredZcash.network, "zcash-testnet");
+const wrongZcashAdapter = new ZcashNetworkAdapter({
+  id: "recovery-test-wrong-zcash",
+  config: zcashConfig,
+  capabilities: ["payroll.settle"],
+  transport: zcashTransport,
+  wallet: {
+    connect: async () => session("ethereum-sepolia", "wrong-network"),
+    sign: async (payload) => payload,
+  },
+});
+await assert.rejects(() => wrongZcashAdapter.connectWallet(), /different Zcash network/);
+
+console.log("WALLET_RECOVERY: PASS evm-chain-check=PASS zcash-testnet-check=PASS wrong-network-rejection=PASS");
