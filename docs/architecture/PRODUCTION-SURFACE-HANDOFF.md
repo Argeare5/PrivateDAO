@@ -63,6 +63,6 @@ verifier described in `ENGINEER-INDEX.md`.
 
 ## Rollback boundary
 
-The current live website and PDAO Worlds game are separate from BNB Testnet
+The current live website is separate from BNB Testnet
 execution evidence. A web rollback must not delete network receipts, wallet
 state, Zebra data, or Agent Exchange runtime state.

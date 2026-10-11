@@ -108,8 +108,8 @@ export const commercialProductGroups: readonly CommercialProductGroup[] = [
     ],
   },
   {
-    title: "Ecosystem Products",
-    summary: "Extend the same trust model to agents and consumer experiences.",
+    title: "Agent Ecosystem",
+    summary: "Extend the same trust model to machine-facing services.",
     icon: Bot,
     products: [
       {
@@ -119,13 +119,6 @@ export const commercialProductGroups: readonly CommercialProductGroup[] = [
         href: "https://agents.privatedao.org/",
         cta: "Open Agent Marketplace",
         runtimeProductId: "agent",
-      },
-      {
-        title: "PDAO Worlds",
-        summary: "Explore privacy, trust, evidence, and coordination through an independent game product.",
-        audience: "Players, communities, and consumer acquisition channels.",
-        href: "https://game.privatedao.org/game/godot/index.html",
-        cta: "Play PDAO Worlds",
       },
     ],
   },

@@ -7,7 +7,7 @@ const liveAgents = entries.filter((entry) => entry.status === "mainnet_live" && 
 const verifiedDevnet = entries.filter((entry) => entry.status === "devnet_verified");
 const verifiedPayroll = verifiedDevnet.filter((entry) => entry.product === "payroll");
 
-assert.equal(entries.length, 204, "unexpected native capability matrix size");
+assert.equal(entries.length, 216, "unexpected native capability matrix size");
 assert.equal(verified.length, 52, "only evidence-backed testnet verification and organizational rows should be verified");
 assert.equal(liveAgents.length, 2, "the two live Agent Exchange rows must be runtime-verified");
 assert.equal(verifiedPayroll.length, 2, "only Payroll calculation and approval remain enabled on Solana Devnet");
@@ -75,7 +75,7 @@ assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && 
 assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && entry.product === "record-verification")?.status, "testnet_verified", "HyperEVM Record Verification must reflect its verified E2E artifact");
 assert.equal(entries.find((entry) => entry.network === "hypercore-testnet" && entry.product === "record-verification")?.networkFamily, "exchange", "HyperCore must use the native exchange family");
 assert.equal(entries.find((entry) => entry.network === "hypercore-testnet" && entry.product === "record-verification")?.status, "testnet_ready", "HyperCore policy paths must be ready without claiming native execution");
-for (const network of ["bnb-testnet", "robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"]) {
+for (const network of ["bnb-testnet", "robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet", "stellar-testnet"]) {
   const policyRows = entries.filter((entry) => entry.network === network && entry.declared && entry.product !== "agent");
   const expectedRows = network === "bnb-testnet" ? 10 : 9;
   assert.equal(policyRows.length, expectedRows, `${network} must expose all declared product lanes`);

@@ -119,6 +119,12 @@ const ZCASH_TESTNET_PAYROLL_EVIDENCE = {
   timestamp: "2026-10-10T12:42:21.000Z",
 } as const;
 
+const STELLAR_TESTNET_EVIDENCE = {
+  provider: "stellar-testnet-horizon",
+  transaction: "591cb9a2bd0eba190a532b6592a7b277e6a24d84d7966d9b98c485dca1e0b769",
+  timestamp: "2026-09-17T07:46:42Z",
+} as const;
+
 const SOLANA_DEVNET_ORGANIZATIONAL_EVIDENCE = {
   provider: "solana-devnet",
   governanceProgram: "EP9xE8MJZ6FfyEwLqns6HDdUZBknEa7WGYs1Jzsecuva",
@@ -474,6 +480,26 @@ function applyFutureKernelPolicyReadiness(entry: NativeCapabilityEntry): NativeC
   };
 }
 
+function applyStellarTestnetReadiness(entry: NativeCapabilityEntry): NativeCapabilityEntry {
+  if (entry.network !== "stellar-testnet" || entry.product === "agent") return entry;
+  if (!entry.declared) return entry;
+  return {
+    ...entry,
+    provider: STELLAR_TESTNET_EVIDENCE.provider,
+    supportedAssets: ["XLM"],
+    walletModel: "external-wallet",
+    supportsExecution: true,
+    supportsPrivateExecution: false,
+    supportsPrivateSettlement: false,
+    supportsProof: ["verification.blind.prove", "verification.record.create", "verification.record.verify", "auction.bid.commit", "auction.settle"].includes(entry.capability),
+    supportsReceipt: true,
+    supportsReconciliation: true,
+    status: "testnet_ready",
+    lastVerifiedTimestamp: STELLAR_TESTNET_EVIDENCE.timestamp,
+    evidence: "runtime-only",
+  };
+}
+
 function applySolanaDevnetOrganizationalEvidence(entry: NativeCapabilityEntry): NativeCapabilityEntry {
   if (entry.network !== "solana-devnet") return entry;
   const isTreasury = entry.product === "treasury" && entry.capability === "treasury.policy.check";
@@ -596,7 +622,8 @@ export function buildNativeCapabilityRegistry(): readonly NativeCapabilityEntry[
         const withSolanaOrg = applySolanaDevnetOrganizationalEvidence(withFuturePolicy);
         const withBnb = applyBnbTestnetEvidence(withSolanaOrg);
         const withHyperliquid = applyHyperliquidTestnetEvidence(withBnb);
-        return applyOrganizationalEvidence(withHyperliquid);
+        const withStellar = applyStellarTestnetReadiness(withHyperliquid);
+        return applyOrganizationalEvidence(withStellar);
       }),
     ),
   );

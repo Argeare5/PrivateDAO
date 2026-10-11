@@ -57,9 +57,6 @@ value.
 - **PrivateDAO Agent Exchange** - an MCP-compatible service marketplace for
   verification, blockchain intelligence, market context, agent discovery, and
   verifiable receipts.
-- **PDAO Worlds** - an independent community game about privacy, trust,
-  evidence, and coordination. It is a separate product and does not define
-  the commercial workflow runtime.
 
 ### PDAO token surface
 
@@ -240,7 +237,6 @@ gates.
 - Payroll: <https://privatedao.org/payroll/>
 - Verification: <https://privatedao.org/verify/>
 - PDAO information: <https://privatedao.org/token/>
-- PDAO Worlds: <https://game.privatedao.org/game/godot/index.html>
 - Machine-readable guide: <https://privatedao.org/llms.txt>
 - Machine-readable manifest: <https://privatedao.org/ai.json>
 - Site execution route inventory: <https://privatedao.org/documents/site-execution-route-inventory-2026-05-27/>

@@ -54,6 +54,8 @@ Kernel
 │   └── Solana Devnet/Mainnet boundary
 ├── Zcash family
 │   └── Zcash Testnet / Zallet boundary
+├── Stellar family
+│   └── Stellar Testnet / Horizon boundary
 └── HyperCore family
     └── Hyperliquid native API boundary, separate from HyperEVM
 ```
@@ -62,10 +64,14 @@ The EVM family shares lifecycle and transaction abstractions, but every
 network retains its own chain ID, RPC variable, fee model, adapter identity,
 and evidence. HyperEVM and HyperCore are different execution surfaces.
 
+Stellar is a separate non-EVM family. Its current PrivateDAO path uses the
+Horizon provider boundary and keeps signing/broadcast disabled until an
+authorized signed XDR is supplied.
+
 ## Evidence Status
 
 The generated matrix is the status index; the deployment artifact and verifier
-are the proof. The current matrix contains 204 product/network entries, 52
+are the proof. The current matrix contains 216 product/network entries, 52
 `testnet_verified` entries, 6 `devnet_verified` entries, and 2 `mainnet_live`
 entries. Those counts are not a universal claim that every product runs on
 every network.

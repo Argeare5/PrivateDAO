@@ -15,6 +15,7 @@ export const runtimeCatalog = {
         "base-sepolia",
         "bnb-testnet",
         "zcash-testnet",
+        "stellar-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
         "hypercore-testnet"
@@ -147,6 +148,23 @@ export const runtimeCatalog = {
               "provider": "privatedao-kernel-policy"
             },
             {
+              "network": "stellar-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://verification.blind.prove",
+              "method": null,
+              "note": "Stellar Testnet uses the shared Kernel workflow and Horizon adapter; proof payloads remain private and no transaction is implied until a signed XDR is supplied.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
+            },
+            {
               "network": "robinhood-testnet",
               "mode": "kernel-gateway",
               "entrypoint": "kernel://verification.blind.prove",
@@ -169,16 +187,16 @@ export const runtimeCatalog = {
               "entrypoint": "kernel://verification.blind.prove",
               "method": null,
               "note": "This network uses the Kernel policy verification path; no contract write or settlement claim is made before funded E2E evidence.",
-              "evidenceStatus": "testnet_ready",
-              "evidence": "runtime-only",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "testnet-e2e",
               "supportsExecution": true,
               "supportsProof": true,
               "supportsReceipt": true,
-              "supportsReconciliation": true,
+              "supportsReconciliation": false,
               "supportedAssets": [
                 "HYPE"
               ],
-              "provider": "privatedao-kernel-policy"
+              "provider": "evm-hyperliquid-testnet"
             },
             {
               "network": "hypercore-testnet",
@@ -476,6 +494,24 @@ export const runtimeCatalog = {
               "chainId": "998",
               "declared": true,
               "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "testnet-e2e",
+              "executable": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": false,
+              "supportedAssets": [
+                "HYPE"
+              ],
+              "provider": "evm-hyperliquid-testnet"
+            },
+            {
+              "network": "stellar-testnet",
+              "stage": "available",
+              "environment": "testnet",
+              "chainId": "Test SDF Network ; September 2015",
+              "declared": true,
+              "mode": "kernel-gateway",
               "evidenceStatus": "testnet_ready",
               "evidence": "runtime-only",
               "executable": false,
@@ -483,9 +519,9 @@ export const runtimeCatalog = {
               "supportsReceipt": true,
               "supportsReconciliation": true,
               "supportedAssets": [
-                "HYPE"
+                "XLM"
               ],
-              "provider": "privatedao-kernel-policy"
+              "provider": "stellar-testnet-horizon"
             },
             {
               "network": "hypercore-testnet",
@@ -521,6 +557,7 @@ export const runtimeCatalog = {
         "base-sepolia",
         "bnb-testnet",
         "zcash-testnet",
+        "stellar-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
         "hypercore-testnet"
@@ -653,6 +690,23 @@ export const runtimeCatalog = {
               "provider": "privatedao-kernel-policy"
             },
             {
+              "network": "stellar-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://verification.record.create",
+              "method": null,
+              "note": "Stellar Testnet record creation is routed through the Kernel and can be anchored with a reviewed Stellar operation; source records remain off-chain.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
+            },
+            {
               "network": "robinhood-testnet",
               "mode": "kernel-gateway",
               "entrypoint": "kernel://verification.record.create",
@@ -675,16 +729,16 @@ export const runtimeCatalog = {
               "entrypoint": "kernel://verification.record.create",
               "method": null,
               "note": "Record creation is routed through the Kernel policy provider; the source record remains off-chain until network E2E is verified.",
-              "evidenceStatus": "testnet_ready",
-              "evidence": "runtime-only",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "testnet-e2e",
               "supportsExecution": true,
-              "supportsProof": true,
+              "supportsProof": false,
               "supportsReceipt": true,
-              "supportsReconciliation": true,
+              "supportsReconciliation": false,
               "supportedAssets": [
                 "HYPE"
               ],
-              "provider": "privatedao-kernel-policy"
+              "provider": "evm-hyperliquid-testnet"
             },
             {
               "network": "hypercore-testnet",
@@ -982,6 +1036,24 @@ export const runtimeCatalog = {
               "chainId": "998",
               "declared": true,
               "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "testnet-e2e",
+              "executable": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": false,
+              "supportedAssets": [
+                "HYPE"
+              ],
+              "provider": "evm-hyperliquid-testnet"
+            },
+            {
+              "network": "stellar-testnet",
+              "stage": "available",
+              "environment": "testnet",
+              "chainId": "Test SDF Network ; September 2015",
+              "declared": true,
+              "mode": "kernel-gateway",
               "evidenceStatus": "testnet_ready",
               "evidence": "runtime-only",
               "executable": false,
@@ -989,9 +1061,9 @@ export const runtimeCatalog = {
               "supportsReceipt": true,
               "supportsReconciliation": true,
               "supportedAssets": [
-                "HYPE"
+                "XLM"
               ],
-              "provider": "privatedao-kernel-policy"
+              "provider": "stellar-testnet-horizon"
             },
             {
               "network": "hypercore-testnet",
@@ -1140,6 +1212,23 @@ export const runtimeCatalog = {
               "provider": "privatedao-kernel-policy"
             },
             {
+              "network": "stellar-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://verification.record.verify",
+              "method": null,
+              "note": "Stellar Testnet verification is routed through the Kernel without exposing source data.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
+            },
+            {
               "network": "robinhood-testnet",
               "mode": "kernel-gateway",
               "entrypoint": "kernel://verification.record.verify",
@@ -1162,16 +1251,16 @@ export const runtimeCatalog = {
               "entrypoint": "kernel://verification.record.verify",
               "method": null,
               "note": "Record verification is routed through the Kernel without exposing source data or claiming a chain anchor.",
-              "evidenceStatus": "testnet_ready",
-              "evidence": "runtime-only",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "testnet-e2e",
               "supportsExecution": true,
-              "supportsProof": true,
+              "supportsProof": false,
               "supportsReceipt": true,
-              "supportsReconciliation": true,
+              "supportsReconciliation": false,
               "supportedAssets": [
                 "HYPE"
               ],
-              "provider": "privatedao-kernel-policy"
+              "provider": "evm-hyperliquid-testnet"
             },
             {
               "network": "hypercore-testnet",
@@ -1469,6 +1558,24 @@ export const runtimeCatalog = {
               "chainId": "998",
               "declared": true,
               "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "testnet-e2e",
+              "executable": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": false,
+              "supportedAssets": [
+                "HYPE"
+              ],
+              "provider": "evm-hyperliquid-testnet"
+            },
+            {
+              "network": "stellar-testnet",
+              "stage": "available",
+              "environment": "testnet",
+              "chainId": "Test SDF Network ; September 2015",
+              "declared": true,
+              "mode": "kernel-gateway",
               "evidenceStatus": "testnet_ready",
               "evidence": "runtime-only",
               "executable": false,
@@ -1476,9 +1583,9 @@ export const runtimeCatalog = {
               "supportsReceipt": true,
               "supportsReconciliation": true,
               "supportedAssets": [
-                "HYPE"
+                "XLM"
               ],
-              "provider": "privatedao-kernel-policy"
+              "provider": "stellar-testnet-horizon"
             },
             {
               "network": "hypercore-testnet",
@@ -1514,6 +1621,7 @@ export const runtimeCatalog = {
         "base-sepolia",
         "bnb-testnet",
         "zcash-testnet",
+        "stellar-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
         "hypercore-testnet"
@@ -1644,6 +1752,23 @@ export const runtimeCatalog = {
                 "TAZ"
               ],
               "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "stellar-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.calculate",
+              "method": null,
+              "note": "Payroll calculation remains a deterministic Kernel workflow; Stellar is the selectable execution context.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
             },
             {
               "network": "robinhood-testnet",
@@ -1985,6 +2110,24 @@ export const runtimeCatalog = {
                 "HYPE"
               ],
               "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "stellar-testnet",
+              "stage": "available",
+              "environment": "testnet",
+              "chainId": "Test SDF Network ; September 2015",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "executable": false,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
             },
             {
               "network": "hypercore-testnet",
@@ -2133,6 +2276,23 @@ export const runtimeCatalog = {
               "provider": "privatedao-kernel-policy"
             },
             {
+              "network": "stellar-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.approve",
+              "method": null,
+              "note": "Payroll Maker/Checker approval remains a Kernel policy gate on Stellar Testnet.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
+            },
+            {
               "network": "robinhood-testnet",
               "mode": "kernel-gateway",
               "entrypoint": "kernel://payroll.approve",
@@ -2474,6 +2634,24 @@ export const runtimeCatalog = {
               "provider": "privatedao-kernel-policy"
             },
             {
+              "network": "stellar-testnet",
+              "stage": "available",
+              "environment": "testnet",
+              "chainId": "Test SDF Network ; September 2015",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "executable": false,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
+            },
+            {
               "network": "hypercore-testnet",
               "stage": "available",
               "environment": "testnet",
@@ -2532,7 +2710,7 @@ export const runtimeCatalog = {
               "supportedAssets": [
                 "BNB"
               ],
-              "provider": "evm-bnb-testnet"
+              "provider": "evm-bnb-testnet-organizational"
             }
           ],
           "networkAvailability": [
@@ -2660,7 +2838,7 @@ export const runtimeCatalog = {
               "supportedAssets": [
                 "BNB"
               ],
-              "provider": "evm-bnb-testnet"
+              "provider": "evm-bnb-testnet-organizational"
             },
             {
               "network": "bnb-mainnet",
@@ -2825,6 +3003,22 @@ export const runtimeCatalog = {
               "provider": "evm-hyperliquid-testnet"
             },
             {
+              "network": "stellar-testnet",
+              "stage": "available",
+              "environment": "testnet",
+              "chainId": "Test SDF Network ; September 2015",
+              "declared": false,
+              "mode": "unbound",
+              "evidenceStatus": "planned",
+              "evidence": "none",
+              "executable": false,
+              "supportsProof": false,
+              "supportsReceipt": false,
+              "supportsReconciliation": false,
+              "supportedAssets": [],
+              "provider": "stellar-testnet-horizon"
+            },
+            {
               "network": "hypercore-testnet",
               "stage": "available",
               "environment": "testnet",
@@ -2858,6 +3052,7 @@ export const runtimeCatalog = {
         "base-sepolia",
         "bnb-testnet",
         "zcash-testnet",
+        "stellar-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
         "hypercore-testnet"
@@ -2990,6 +3185,23 @@ export const runtimeCatalog = {
               "provider": "privatedao-kernel-policy"
             },
             {
+              "network": "stellar-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://treasury.policy.check",
+              "method": null,
+              "note": "Treasury policy evaluation is Kernel-backed; no asset movement is implied.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
+            },
+            {
               "network": "robinhood-testnet",
               "mode": "kernel-gateway",
               "entrypoint": "kernel://treasury.policy.check",
@@ -3331,6 +3543,24 @@ export const runtimeCatalog = {
               "provider": "privatedao-kernel-policy"
             },
             {
+              "network": "stellar-testnet",
+              "stage": "available",
+              "environment": "testnet",
+              "chainId": "Test SDF Network ; September 2015",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "executable": false,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
+            },
+            {
               "network": "hypercore-testnet",
               "stage": "available",
               "environment": "testnet",
@@ -3364,6 +3594,7 @@ export const runtimeCatalog = {
         "base-sepolia",
         "bnb-testnet",
         "zcash-testnet",
+        "stellar-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
         "hypercore-testnet"
@@ -3496,6 +3727,23 @@ export const runtimeCatalog = {
               "provider": "privatedao-kernel-policy"
             },
             {
+              "network": "stellar-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://governance.proposal.execute",
+              "method": null,
+              "note": "Governance approval is Kernel-backed; Stellar transaction execution remains signature-gated.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
+            },
+            {
               "network": "robinhood-testnet",
               "mode": "kernel-gateway",
               "entrypoint": "kernel://governance.proposal.execute",
@@ -3837,6 +4085,24 @@ export const runtimeCatalog = {
               "provider": "privatedao-kernel-policy"
             },
             {
+              "network": "stellar-testnet",
+              "stage": "available",
+              "environment": "testnet",
+              "chainId": "Test SDF Network ; September 2015",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "executable": false,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
+            },
+            {
               "network": "hypercore-testnet",
               "stage": "available",
               "environment": "testnet",
@@ -3870,6 +4136,7 @@ export const runtimeCatalog = {
         "base-sepolia",
         "bnb-testnet",
         "zcash-testnet",
+        "stellar-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
         "hypercore-testnet"
@@ -4002,6 +4269,23 @@ export const runtimeCatalog = {
               "provider": "privatedao-kernel-policy"
             },
             {
+              "network": "stellar-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://auction.bid.commit",
+              "method": null,
+              "note": "Sealed-bid commitments are computed in the Kernel; no bid settlement is claimed without a verified Stellar operation.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
+            },
+            {
               "network": "robinhood-testnet",
               "mode": "kernel-gateway",
               "entrypoint": "kernel://auction.bid.commit",
@@ -4341,6 +4625,24 @@ export const runtimeCatalog = {
                 "HYPE"
               ],
               "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "stellar-testnet",
+              "stage": "available",
+              "environment": "testnet",
+              "chainId": "Test SDF Network ; September 2015",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "executable": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
             },
             {
               "network": "hypercore-testnet",
@@ -4489,6 +4791,23 @@ export const runtimeCatalog = {
               "provider": "privatedao-kernel-policy"
             },
             {
+              "network": "stellar-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://auction.settle",
+              "method": null,
+              "note": "Auction outcome proof is Kernel-backed; financial settlement remains signature-gated.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
+            },
+            {
               "network": "robinhood-testnet",
               "mode": "kernel-gateway",
               "entrypoint": "kernel://auction.settle",
@@ -4828,6 +5147,24 @@ export const runtimeCatalog = {
                 "HYPE"
               ],
               "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "stellar-testnet",
+              "stage": "available",
+              "environment": "testnet",
+              "chainId": "Test SDF Network ; September 2015",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "executable": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
             },
             {
               "network": "hypercore-testnet",
@@ -5192,6 +5529,22 @@ export const runtimeCatalog = {
               "provider": "evm-hyperliquid-testnet"
             },
             {
+              "network": "stellar-testnet",
+              "stage": "available",
+              "environment": "testnet",
+              "chainId": "Test SDF Network ; September 2015",
+              "declared": false,
+              "mode": "unbound",
+              "evidenceStatus": "planned",
+              "evidence": "none",
+              "executable": false,
+              "supportsProof": false,
+              "supportsReceipt": false,
+              "supportsReconciliation": false,
+              "supportedAssets": [],
+              "provider": "stellar-testnet-horizon"
+            },
+            {
               "network": "hypercore-testnet",
               "stage": "available",
               "environment": "testnet",
@@ -5543,6 +5896,22 @@ export const runtimeCatalog = {
               "provider": "evm-hyperliquid-testnet"
             },
             {
+              "network": "stellar-testnet",
+              "stage": "available",
+              "environment": "testnet",
+              "chainId": "Test SDF Network ; September 2015",
+              "declared": false,
+              "mode": "unbound",
+              "evidenceStatus": "planned",
+              "evidence": "none",
+              "executable": false,
+              "supportsProof": false,
+              "supportsReceipt": false,
+              "supportsReconciliation": false,
+              "supportedAssets": [],
+              "provider": "stellar-testnet-horizon"
+            },
+            {
               "network": "hypercore-testnet",
               "stage": "available",
               "environment": "testnet",
@@ -5705,6 +6074,15 @@ export const runtimeCatalog = {
       "environment": "testnet",
       "chainId": "998",
       "adapterId": "evm-hyperliquid-testnet"
+    },
+    {
+      "id": "stellar-testnet",
+      "label": "Stellar Testnet",
+      "family": "stellar",
+      "stage": "available",
+      "environment": "testnet",
+      "chainId": "Test SDF Network ; September 2015",
+      "adapterId": "stellar-testnet-horizon"
     },
     {
       "id": "hypercore-testnet",

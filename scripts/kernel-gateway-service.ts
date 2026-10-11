@@ -23,6 +23,9 @@ import {
   ZcashNetworkAdapter,
   ZCASH_NETWORK_CONFIGS,
   HyperCoreNetworkAdapter,
+  StellarHorizonTransport,
+  StellarNetworkAdapter,
+  STELLAR_NETWORK_CONFIGS,
   AgentDiscoveryProvider,
   SolanaBrowserExecutionProvider,
   createPrivateDaoRuntime,
@@ -118,6 +121,7 @@ export class KernelGatewayService {
   private readonly evmAdapters = new Map<NetworkId, EvmNetworkAdapter>();
   private readonly zcashAdapter?: ZcashNetworkAdapter;
   private readonly hypercoreAdapter?: HyperCoreNetworkAdapter;
+  private readonly stellarAdapter?: StellarNetworkAdapter;
   private readonly runtime;
 
   constructor(options: KernelGatewayServiceOptions = {}) {
@@ -135,7 +139,7 @@ export class KernelGatewayService {
       "robinhood-testnet",
       "hyperliquid-testnet",
     ];
-    const kernelNetworks: readonly NetworkId[] = [...evmNetworks, "zcash-testnet", "hypercore-testnet"];
+    const kernelNetworks: readonly NetworkId[] = [...evmNetworks, "zcash-testnet", "stellar-testnet", "hypercore-testnet"];
     const zcashConfigured = Boolean(
       process.env.PDAO_ZCASH_ZALLET_BINARY?.trim()
       && process.env.PDAO_ZCASH_ZALLET_DATA_DIR?.trim()
@@ -150,6 +154,26 @@ export class KernelGatewayService {
 
     const registry = new InMemoryProviderRegistry();
     this.registerConfiguredEvmAdapters(registry, evmNetworks);
+    const stellarConfig = STELLAR_NETWORK_CONFIGS.find((entry) => entry.network === "stellar-testnet");
+    if (!stellarConfig) throw new Error("Stellar Testnet configuration is missing from the Kernel network matrix.");
+    const stellarAdapter = new StellarNetworkAdapter({
+      id: "privatedao-stellar-testnet-horizon",
+      config: stellarConfig,
+      capabilities: [
+        "verification.blind.prove",
+        "verification.record.create",
+        "verification.record.verify",
+        "payroll.calculate",
+        "payroll.approve",
+        "treasury.policy.check",
+        "governance.proposal.execute",
+        "auction.bid.commit",
+        "auction.settle",
+      ],
+      transport: new StellarHorizonTransport(),
+    });
+    this.stellarAdapter = stellarAdapter;
+    registry.register(stellarAdapter);
     for (const network of this.supportedNetworks) {
       const providers: KernelProvider[] = [
         new PayrollCalculationProvider(),
@@ -304,9 +328,10 @@ export class KernelGatewayService {
     const incomingPath = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`).pathname.replace(/\/+$/, "") || "/";
     const path = incomingPath.startsWith("/api/") ? incomingPath.slice(4) : incomingPath;
     if (path === "/healthz" && req.method === "GET") {
-      const [evmReadiness, zcashReadiness, hypercoreReadiness] = await Promise.all([
+      const [evmReadiness, zcashReadiness, stellarReadiness, hypercoreReadiness] = await Promise.all([
         Promise.all([...this.evmAdapters.entries()].map(async ([network, adapter]) => [network, await this.probe(() => adapter.health())] as const)),
         this.zcashAdapter ? this.probe(() => this.zcashAdapter!.health()) : Promise.resolve(null),
+        this.probe(() => this.stellarAdapter!.health()),
         this.hypercoreAdapter ? this.hypercoreAdapter.health() : Promise.resolve(null),
       ]);
       const evmReady = Object.fromEntries(evmReadiness.map(([network, result]) => [network, result.ok]));
@@ -319,6 +344,8 @@ export class KernelGatewayService {
           network,
           provider: network === "zcash-testnet"
             ? this.zcashAdapter?.id || "privatedao-kernel-policy"
+            : network === "stellar-testnet"
+              ? this.stellarAdapter?.id || "privatedao-kernel-policy"
             : network === "solana-devnet"
               ? "kernel-native"
             : this.evmProviders.get(network)?.id
@@ -327,6 +354,8 @@ export class KernelGatewayService {
                 : "kernel-native"),
             onchainAdapter: network === "zcash-testnet"
               ? Boolean(this.zcashAdapter)
+              : network === "stellar-testnet"
+                ? Boolean(this.stellarAdapter)
               : network === "solana-devnet"
                 ? false
               : this.evmProviders.has(network),
@@ -334,6 +363,8 @@ export class KernelGatewayService {
             nativeReadReady: network === "hypercore-testnet" ? Boolean(hypercoreReadiness?.ok) : false,
           ready: network === "zcash-testnet"
             ? Boolean(zcashReadiness?.ok)
+            : network === "stellar-testnet"
+              ? Boolean(stellarReadiness?.ok)
             : network === "solana-devnet"
               ? false
             : network in evmReady
@@ -346,13 +377,20 @@ export class KernelGatewayService {
           ready: evmReady,
           broadcastEnabled: process.env.PDAO_KERNEL_EVM_BROADCAST_ENABLED === "1",
         },
-        zcash: {
+          zcash: {
           configured: Boolean(this.zcashAdapter),
           policyReady: true,
           ready: Boolean(zcashReadiness?.ok),
           readinessReason: zcashReadiness?.reason || (zcashReadiness?.ok ? "ready" : this.zcashAdapter ? "rpc_unavailable" : "policy_only_wallet_not_configured"),
           testnetOnly: true,
           broadcastEnabled: process.env.PDAO_ZCASH_BROADCAST_ENABLED === "1",
+          },
+        stellar: {
+          configured: Boolean(this.stellarAdapter),
+          ready: Boolean(stellarReadiness?.ok),
+          readinessReason: stellarReadiness?.reason || (stellarReadiness?.ok ? "ready" : "horizon_unavailable"),
+          testnetOnly: true,
+          broadcastEnabled: false,
         },
         hypercore: {
           configured: Boolean(this.hypercoreAdapter),

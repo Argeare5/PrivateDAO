@@ -37,6 +37,7 @@ path instead of borrowing Treasury evidence.
 | EVM family | `packages/privatedao-runtime/src/evm-network.ts` and EVM transport | Shared EVM transaction lifecycle with per-network chain configuration |
 | Solana family | Solana runtime providers | Wallet-signing and commitment lifecycle for Solana |
 | Zcash family | Zcash adapter/provider and Zallet boundary | Testnet shielded lifecycle and explicit broadcast gates |
+| Stellar family | `packages/privatedao-runtime/src/stellar-network.ts` | Testnet Horizon health, fee, preparation, receipt, and explicit broadcast gate |
 | HyperCore native | `packages/privatedao-runtime/src/hypercore-network.ts` | Read-only native HyperCore metadata and health; not HyperEVM execution |
 | Evidence | `packages/evm-verification/deployments/` and `docs/` | On-chain receipts, block numbers, verification results, and limitations |
 
@@ -59,6 +60,9 @@ BNB Testnet uses tBNB gas. These differences stay behind the adapter.
   Payroll calculation/approval or other Kernel workflows.
 - Zcash Testnet is not represented as EVM. Shielded wallet state, notes,
   anchors, confirmation, and broadcast guards remain Zcash-specific.
+- Stellar Testnet is not represented as EVM. Horizon account/ledger data,
+  receipt lookup, and workflow preparation remain behind the Stellar adapter;
+  signed XDR broadcast is fail-closed until a reviewed signer path is enabled.
 - HyperCore is not HyperEVM. The current adapter is intentionally read-only;
   no financial execution claim is made for HyperCore.
 

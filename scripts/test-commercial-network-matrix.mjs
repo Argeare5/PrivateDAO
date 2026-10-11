@@ -9,6 +9,7 @@ const targetNetworks = [
   "bnb-testnet",
   "tempo-testnet",
   "zcash-testnet",
+  "stellar-testnet",
   "arbitrum-sepolia",
   "robinhood-testnet",
   "hyperliquid-testnet",

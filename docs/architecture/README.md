@@ -58,7 +58,16 @@ Product
 
 Products do not own RPC calls. EVM networks reuse the EVM lifecycle but retain
 separate chain IDs, RPC configuration, fee rules, adapters, and evidence.
-Solana, Zcash, and HyperCore remain separate execution families.
+Solana, Zcash, Stellar, and HyperCore remain separate execution families.
+
+## Stellar Testnet status
+
+Stellar Testnet is registered through the shared Kernel catalog and routed by
+`StellarNetworkAdapter` to the official Horizon Testnet API. The adapter is
+used by the current non-agent product workflows for preparation, health, fee,
+and receipt boundaries. Broadcast remains disabled by default; the existing
+record-probe transaction is evidence of network access, not proof that every
+product has completed an independent write E2E.
 
 ## BNB Testnet status
 

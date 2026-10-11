@@ -1,6 +1,6 @@
 {
   "schema": "privatedao.engineer-architecture-index.v1",
-  "generatedAt": "2026-10-11T18:37:38.881Z",
+  "generatedAt": "2026-10-11T21:35:46.389Z",
   "bridgeFree": true,
   "sources": {
     "protocol": "packages/privatedao-runtime/src/protocol.ts",
@@ -166,6 +166,19 @@
       ]
     },
     {
+      "family": "stellar",
+      "networks": [
+        {
+          "id": "stellar-testnet",
+          "label": "Stellar Testnet",
+          "environment": "testnet",
+          "chainId": "Test SDF Network ; September 2015",
+          "adapterId": "stellar-testnet-horizon",
+          "finalityModel": "Stellar closed-ledger confirmation"
+        }
+      ]
+    },
+    {
       "family": "exchange",
       "networks": [
         {
@@ -192,6 +205,7 @@
         "base-sepolia",
         "bnb-testnet",
         "zcash-testnet",
+        "stellar-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
         "hypercore-testnet"
@@ -207,6 +221,7 @@
             "base-sepolia",
             "bnb-testnet",
             "zcash-testnet",
+            "stellar-testnet",
             "robinhood-testnet",
             "hyperliquid-testnet",
             "hypercore-testnet"
@@ -215,7 +230,7 @@
           "supportsAsync": true
         }
       ],
-      "bindingCount": 10
+      "bindingCount": 11
     },
     {
       "id": "record-verification",
@@ -229,6 +244,7 @@
         "base-sepolia",
         "bnb-testnet",
         "zcash-testnet",
+        "stellar-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
         "hypercore-testnet"
@@ -244,6 +260,7 @@
             "base-sepolia",
             "bnb-testnet",
             "zcash-testnet",
+            "stellar-testnet",
             "robinhood-testnet",
             "hyperliquid-testnet",
             "hypercore-testnet"
@@ -261,6 +278,7 @@
             "base-sepolia",
             "bnb-testnet",
             "zcash-testnet",
+            "stellar-testnet",
             "robinhood-testnet",
             "hyperliquid-testnet",
             "hypercore-testnet"
@@ -269,7 +287,7 @@
           "supportsAsync": true
         }
       ],
-      "bindingCount": 20
+      "bindingCount": 22
     },
     {
       "id": "payroll",
@@ -283,6 +301,7 @@
         "base-sepolia",
         "bnb-testnet",
         "zcash-testnet",
+        "stellar-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
         "hypercore-testnet"
@@ -298,6 +317,7 @@
             "base-sepolia",
             "bnb-testnet",
             "zcash-testnet",
+            "stellar-testnet",
             "robinhood-testnet",
             "hyperliquid-testnet",
             "hypercore-testnet"
@@ -315,6 +335,7 @@
             "base-sepolia",
             "bnb-testnet",
             "zcash-testnet",
+            "stellar-testnet",
             "robinhood-testnet",
             "hyperliquid-testnet",
             "hypercore-testnet"
@@ -332,7 +353,7 @@
           "supportsAsync": true
         }
       ],
-      "bindingCount": 22
+      "bindingCount": 24
     },
     {
       "id": "treasury",
@@ -346,6 +367,7 @@
         "base-sepolia",
         "bnb-testnet",
         "zcash-testnet",
+        "stellar-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
         "hypercore-testnet"
@@ -361,6 +383,7 @@
             "base-sepolia",
             "bnb-testnet",
             "zcash-testnet",
+            "stellar-testnet",
             "robinhood-testnet",
             "hyperliquid-testnet",
             "hypercore-testnet"
@@ -369,7 +392,7 @@
           "supportsAsync": true
         }
       ],
-      "bindingCount": 10
+      "bindingCount": 11
     },
     {
       "id": "governance",
@@ -383,6 +406,7 @@
         "base-sepolia",
         "bnb-testnet",
         "zcash-testnet",
+        "stellar-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
         "hypercore-testnet"
@@ -398,6 +422,7 @@
             "base-sepolia",
             "bnb-testnet",
             "zcash-testnet",
+            "stellar-testnet",
             "robinhood-testnet",
             "hyperliquid-testnet",
             "hypercore-testnet"
@@ -406,7 +431,7 @@
           "supportsAsync": true
         }
       ],
-      "bindingCount": 10
+      "bindingCount": 11
     },
     {
       "id": "auction",
@@ -420,6 +445,7 @@
         "base-sepolia",
         "bnb-testnet",
         "zcash-testnet",
+        "stellar-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
         "hypercore-testnet"
@@ -435,6 +461,7 @@
             "base-sepolia",
             "bnb-testnet",
             "zcash-testnet",
+            "stellar-testnet",
             "robinhood-testnet",
             "hyperliquid-testnet",
             "hypercore-testnet"
@@ -452,6 +479,7 @@
             "base-sepolia",
             "bnb-testnet",
             "zcash-testnet",
+            "stellar-testnet",
             "robinhood-testnet",
             "hyperliquid-testnet",
             "hypercore-testnet"
@@ -460,7 +488,7 @@
           "supportsAsync": true
         }
       ],
-      "bindingCount": 20
+      "bindingCount": 22
     },
     {
       "id": "agent",
@@ -494,7 +522,7 @@
     }
   ],
   "evidenceSummary": {
-    "entries": 204,
+    "entries": 216,
     "testnetVerified": 52,
     "devnetVerified": 6,
     "mainnetLive": 2,

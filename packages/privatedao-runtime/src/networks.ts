@@ -1,7 +1,7 @@
 import type { NetworkId } from "./index.js";
 
 export type NetworkStage = "available" | "planned";
-export type NetworkFamily = "solana" | "evm" | "utxo" | "exchange";
+export type NetworkFamily = "solana" | "evm" | "utxo" | "stellar" | "exchange";
 
 export interface NetworkDescriptor {
   id: NetworkId;
@@ -191,6 +191,17 @@ export const NETWORK_MATRIX: readonly NetworkDescriptor[] = [
     finalityModel: "HyperBFT/EVM block finality",
     explorerBaseUrl: "https://www.hyperscan.com/",
     adapterId: "evm-hyperliquid-testnet",
+  },
+  {
+    id: "stellar-testnet",
+    label: "Stellar Testnet",
+    family: "stellar",
+    stage: "available",
+    environment: "testnet",
+    chainId: "Test SDF Network ; September 2015",
+    finalityModel: "Stellar closed-ledger confirmation",
+    explorerBaseUrl: "https://stellar.expert/explorer/testnet/tx/",
+    adapterId: "stellar-testnet-horizon",
   },
   {
     id: "hypercore-testnet",
