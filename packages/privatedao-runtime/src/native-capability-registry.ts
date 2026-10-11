@@ -309,6 +309,8 @@ function applyZcashTestnetEvidence(entry: NativeCapabilityEntry): NativeCapabili
     "verification.blind.prove",
     "verification.record.create",
     "verification.record.verify",
+    "payroll.calculate",
+    "payroll.approve",
     "treasury.policy.check",
     "auction.bid.commit",
     "auction.settle",
@@ -328,20 +330,6 @@ function applyZcashTestnetEvidence(entry: NativeCapabilityEntry): NativeCapabili
     };
   }
   if (entry.product !== "payroll" || entry.network !== "zcash-testnet") return entry;
-  if (entry.capability === "payroll.calculate" || entry.capability === "payroll.approve") {
-    return {
-      ...entry,
-      provider: "privatedao-payroll-kernel",
-      walletModel: "none",
-      supportsExecution: true,
-      supportsPrivateExecution: false,
-      supportsPrivateSettlement: false,
-      supportsReceipt: true,
-      supportsReconciliation: true,
-      status: "implementation",
-      evidence: "runtime-only",
-    };
-  }
   if (entry.capability !== "payroll.settle") return entry;
   return {
     ...entry,
