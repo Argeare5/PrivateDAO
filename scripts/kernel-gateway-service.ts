@@ -446,6 +446,7 @@ export class KernelGatewayService {
       intent.context.capability === "governance.proposal.execute"
       && intent.payload.kind !== "contract-write"
       && intent.context.network !== "solana-devnet"
+      && intent.context.network !== "stellar-testnet"
     ) {
       return {
         ...intent,

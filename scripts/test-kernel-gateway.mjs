@@ -132,6 +132,53 @@ try {
     assert.equal(receipt.body.network, network);
   }
 
+  const stellarProductIntents = [
+    ["blind-verification", "verification.blind.prove"],
+    ["record-verification", "verification.record.create"],
+    ["record-verification", "verification.record.verify"],
+    ["payroll", "payroll.calculate"],
+    ["payroll", "payroll.approve"],
+    ["treasury", "treasury.policy.check"],
+    ["governance", "governance.proposal.execute"],
+    ["auction", "auction.bid.commit"],
+    ["auction", "auction.settle"],
+  ];
+  for (const [product, capability] of stellarProductIntents) {
+    const requestId = `gateway-stellar-${capability}`;
+    const intentPayload = capability === "governance.proposal.execute"
+      ? { proposalId: "stellar-proposal-1", proposalHash: "stellar-proposal-hash", policyHash: "stellar-policy-hash", requiredApprovals: 1 }
+      : { kind: "readiness-probe", capability };
+    const intentAccounts = capability === "governance.proposal.execute"
+      ? [{ role: "authority", address: "stellar-authority-test", network: "stellar-testnet" }]
+      : [];
+    const prepared = await request("POST", "/v1/executions/prepare", {
+      intent: {
+        context: {
+          requestId,
+          idempotencyKey: requestId,
+          product,
+          capability,
+          actorId: "gateway-stellar-test",
+          network: "stellar-testnet",
+        },
+        payload: intentPayload,
+        accounts: intentAccounts,
+      },
+    });
+    assert.equal(prepared.status, 200, `${product}/${capability} Stellar prepare failed`);
+    assert.equal(prepared.body.state, "awaiting_signature");
+    assert.equal(prepared.body.unsignedPayload.network, "stellar-testnet");
+    assert.equal(prepared.body.unsignedPayload.capability, capability);
+    const submit = await request("POST", "/v1/executions/submit", {
+      execution: prepared.body,
+      signedPayload: null,
+    });
+    assert.equal(submit.status, 400, `${product}/${capability} must remain signature-gated`);
+    const status = await request("GET", `/v1/executions/${encodeURIComponent(prepared.body.executionId)}/status`);
+    assert.equal(status.status, 200);
+    assert.equal(status.body.state, "awaiting_signature");
+  }
+
   const governanceRequest = "gateway-zcash-governance";
   const governanceIntent = {
     context: {
