@@ -231,7 +231,9 @@ export class StellarHorizonTransport implements StellarTransport {
     const transaction = TransactionBuilder.fromXdr(payload.signedTransactionXdr, Networks.TESTNET);
     if (transaction.signatures.length === 0) throw new Error("Stellar submit requires at least one transaction signature.");
     const expectedSource = execution.intent.accounts.find((account) => account.role === "payer" || account.role === "authority")?.address;
-    if (expectedSource && transaction.source !== expectedSource) throw new Error("Stellar transaction source does not match the authorized execution account.");
+    if (expectedSource && "source" in transaction && transaction.source !== expectedSource) {
+      throw new Error("Stellar transaction source does not match the authorized execution account.");
+    }
     const response = await new Horizon.Server(this.horizonUrl).submitTransaction(transaction);
     if (typeof response.hash !== "string" || !/^[a-f0-9]{64}$/i.test(response.hash)) throw new Error("Stellar Horizon returned no valid transaction hash.");
     record.transactionHash = response.hash;
