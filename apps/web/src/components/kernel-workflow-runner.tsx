@@ -213,7 +213,8 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
       if (!submitResponse.ok) throw new Error(typeof submitted.error === "string" ? submitted.error : `The workflow could not be completed (${submitResponse.status}).`);
       const receiptResponse = await fetch(`${RUNTIME_API_BASE}/v1/executions/${encodeURIComponent(prepared.executionId)}/receipt`, { headers: { Accept: "application/json" } });
       const finalReceipt = await receiptResponse.json().catch(() => ({}));
-      if (!receiptResponse.ok || finalReceipt.state !== "reconciled") throw new Error(typeof finalReceipt.error === "string" ? finalReceipt.error : "The workflow completed without a reconciled receipt.");
+      const receiptState = typeof finalReceipt.state === "string" ? finalReceipt.state : "";
+      if (!receiptResponse.ok || !["confirmed", "finalized", "reconciled"].includes(receiptState)) throw new Error(typeof finalReceipt.error === "string" ? finalReceipt.error : "The workflow completed without a confirmed receipt.");
       setReceipt(finalReceipt as ExecutionReceipt);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "The selected workflow could not be completed.");
