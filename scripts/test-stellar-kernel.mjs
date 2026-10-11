@@ -63,9 +63,29 @@ const prepared = await adapter.prepare({
   payload: {},
   accounts: [],
 });
+assert.equal((await adapter.status(prepared.executionId)).state, "awaiting_signature");
+await transport.observeConfirmedTransaction(prepared.executionId, txHash);
+assert.equal((await adapter.status(prepared.executionId)).state, "confirmed");
+const receipt = await adapter.receipt(prepared.executionId);
+assert.equal(receipt.state, "confirmed");
+assert.equal(receipt.signatures[0], txHash);
+
 await assert.rejects(
-  () => adapter.submit(prepared, { kind: "stellar-signed-xdr", network: "stellar-testnet", signedTransactionXdr: "redacted-test-payload" }),
+  () => adapter.prepare({
+    context: { requestId: "wrong-account-network", idempotencyKey: "wrong-account-network", product: "treasury", capability: "treasury.policy.check", network: "stellar-testnet" },
+    payload: {},
+    accounts: [{ role: "payer", address: "GTEST", network: "ethereum-sepolia" }],
+  }),
+  /different network/i,
+);
+
+await assert.rejects(
+  async () => adapter.submit(await adapter.prepare({
+    context: { requestId: "broadcast-guard-2", idempotencyKey: "broadcast-guard-2", product: "treasury", capability: "treasury.policy.check", network: "stellar-testnet" },
+    payload: {},
+    accounts: [],
+  }), { kind: "stellar-signed-xdr", network: "stellar-testnet", signedTransactionXdr: "redacted-test-payload" }),
   /broadcast is disabled/i,
 );
 
-console.log(`[stellar-kernel] PASS health=1 known_tx=1 ledger=${transaction.ledger} product_capabilities=${capabilities.length} broadcast=disabled`);
+console.log(`[stellar-kernel] PASS health=1 known_tx=1 ledger=${transaction.ledger} product_capabilities=${capabilities.length} receipt=1 broadcast=disabled`);

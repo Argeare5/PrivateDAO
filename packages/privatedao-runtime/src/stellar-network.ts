@@ -75,6 +75,7 @@ export interface StellarTransport {
   health(): Promise<{ ok: boolean; network: NetworkId; ledger?: string; latencyMs?: number; reason?: string }>;
   prepare<TPayload, TUnsigned>(intent: ExecutionIntent<TPayload>): Promise<PreparedExecution<TUnsigned>>;
   submit<TUnsigned>(execution: PreparedExecution<TUnsigned>, signedPayload: TUnsigned): Promise<{ executionId: string; signatures: string[] }>;
+  observeConfirmedTransaction(executionId: string, transactionHash: string): Promise<void>;
   status(executionId: string): Promise<{ executionId: string; state: ExecutionState; errorCode?: string }>;
   receipt<TResult = unknown>(executionId: string): Promise<ExecutionReceipt<TResult>>;
   estimateFee<TPayload>(intent: ExecutionIntent<TPayload>): Promise<FeeEstimate>;
@@ -139,7 +140,7 @@ export class StellarHorizonTransport implements StellarTransport {
       payload: intent.payload,
       accounts: intent.accounts.map(({ role, address }) => ({ role, address })),
     };
-    this.records.set(executionId, { intent: intent as ExecutionIntent<unknown>, state: "prepared", preparedAt: new Date().toISOString() });
+    this.records.set(executionId, { intent: intent as ExecutionIntent<unknown>, state: "awaiting_signature", preparedAt: new Date().toISOString() });
     return {
       executionId,
       intent,
@@ -157,6 +158,18 @@ export class StellarHorizonTransport implements StellarTransport {
       throw new Error("Stellar submit requires a signed Testnet XDR payload.");
     }
     throw new Error("Stellar broadcast is disabled; no transaction was sent.");
+  }
+
+  async observeConfirmedTransaction(executionId: string, transactionHash: string): Promise<void> {
+    const record = this.records.get(executionId);
+    if (!record) throw new Error("Unknown Stellar execution.");
+    if (!/^[a-f0-9]{64}$/i.test(transactionHash)) throw new Error("Stellar transaction hash is malformed.");
+    const transaction = await this.transaction(transactionHash);
+    if (transaction.hash !== transactionHash || transaction.successful !== true || typeof transaction.ledger !== "number") {
+      throw new Error("Stellar transaction is not a confirmed successful Testnet transaction.");
+    }
+    record.transactionHash = transactionHash;
+    record.state = "confirmed";
   }
 
   async status(executionId: string): Promise<{ executionId: string; state: ExecutionState; errorCode?: string }> {
@@ -260,6 +273,7 @@ export class StellarNetworkAdapter implements NetworkAdapter {
 
   private assertIntent<TPayload>(intent: ExecutionIntent<TPayload>): void {
     if (intent.context.network !== this.config.network) throw new StellarAdapterError("NETWORK_MISMATCH", "Execution intent targets a different network.");
+    if (intent.accounts.some((account) => account.network !== this.config.network)) throw new StellarAdapterError("NETWORK_MISMATCH", "Execution account targets a different network.");
     if (!this.supports(intent.context.capability)) throw new StellarAdapterError("UNSUPPORTED_CAPABILITY", `Capability is not enabled: ${intent.context.capability}`);
   }
 }
