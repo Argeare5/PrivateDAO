@@ -58,9 +58,6 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
   const [receipt, setReceipt] = useState<ExecutionReceipt | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [zcashFromAddress, setZcashFromAddress] = useState("");
-  const [zcashRecipientAddress, setZcashRecipientAddress] = useState("");
-  const [zcashAtomicAmount, setZcashAtomicAmount] = useState("10000");
   const [evmProposalId, setEvmProposalId] = useState("");
   const [evmActionHash, setEvmActionHash] = useState("");
   const [evmAuctionId, setEvmAuctionId] = useState("");
@@ -90,23 +87,6 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
   }
 
   async function buildPayload() {
-    if (network === "zcash-testnet" && capability === "payroll.settle") {
-      if (!zcashFromAddress.trim() || !zcashRecipientAddress.trim() || !/^\d+$/.test(zcashAtomicAmount)) {
-        throw new Error("Enter the public Zcash source address, recipient address, and a positive TAZ atomic amount.");
-      }
-      if (BigInt(zcashAtomicAmount) <= BigInt(0)) throw new Error("The TAZ amount must be greater than zero.");
-      return {
-        kind: "zallet-send",
-        fromAddress: zcashFromAddress.trim(),
-        recipients: [{ address: zcashRecipientAddress.trim(), atomicAmount: zcashAtomicAmount }],
-      };
-    }
-    if (network === "solana-devnet" && capability === "payroll.settle") {
-      const batchId = `web-payroll-${requestIdForHash()}`;
-      const manifestCommitment = await digestHex(`PrivateDAO:${batchId}:payroll-demo`);
-      const recipientHash = await digestHex(`PrivateDAO:${batchId}:recipient-demo`);
-      return { kind: "umbra-payroll", manifestCommitment, recipientHash, recipientCount: 1, totalAmount: "0.001", asset: "WSOL", batchId, sensitive: true };
-    }
     if (network === "solana-devnet" && capability === "governance.proposal.execute") {
       if (!solanaConnected || !solanaPublicKey) throw new Error("Connect a Solana Devnet wallet before preparing governance execution.");
       try {
@@ -300,11 +280,6 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
       </button>
       {prepared ? <div className="mt-4 rounded-[14px] border border-[#bde7d3] bg-[#f1fcf6] p-4 text-sm text-[#14532d]"><strong>Prepared through the runtime</strong><div className="mt-2 text-xs">Execution: <code>{prepared.executionId}</code></div><div className="mt-1 text-xs">State: {prepared.state}</div>{prepared.requiredSigners?.length ? <div className="mt-2 text-xs">Required signer: {prepared.requiredSigners.map((signer) => signer.address || signer.role || "authority").join(", ")}</div> : <button type="button" onClick={() => void complete()} disabled={submitting} className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-[9px] bg-[#14532d] px-3 py-2 text-xs font-semibold text-white disabled:opacity-50">{submitting ? "Completing..." : "Complete and verify receipt"}</button>}</div> : null}
       {receipt ? <div className="mt-4 rounded-[14px] border border-[#bcd5f7] bg-white p-4 text-sm text-[#10233f]"><strong>Reconciled receipt</strong><div className="mt-2 grid gap-1 text-xs text-[#40536d]"><span>Network: {receipt.network || network}</span><span>Provider: {receipt.provider || "Kernel provider"}</span><span>State: {receipt.state}</span>{receipt.signatures?.length ? <span>Reference: {receipt.signatures.join(", ")}</span> : null}</div></div> : null}
-      {network === "zcash-testnet" && capability === "payroll.settle" ? <div className="mt-5 grid gap-3 rounded-[14px] border border-[#d7e2f0] bg-white p-4 sm:grid-cols-3">
-        <label className="text-xs font-semibold text-[#40536d]">Source address<input value={zcashFromAddress} onChange={(event) => setZcashFromAddress(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-normal" autoComplete="off" /></label>
-        <label className="text-xs font-semibold text-[#40536d]">Recipient address<input value={zcashRecipientAddress} onChange={(event) => setZcashRecipientAddress(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-normal" autoComplete="off" /></label>
-        <label className="text-xs font-semibold text-[#40536d]">TAZ atomic amount<input inputMode="numeric" value={zcashAtomicAmount} onChange={(event) => setZcashAtomicAmount(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-normal" /></label>
-      </div> : null}
       {getEvmProductContracts(network) ? <div className="mt-5 rounded-[14px] border border-[#d7e2f0] bg-white p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="text-xs text-[#40536d]">EVM wallet signing stays in your browser. The Kernel only prepares the request and verifies the testnet receipt.</div>
