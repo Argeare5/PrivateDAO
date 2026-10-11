@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
+import { encodeFunctionData, parseAbi } from "viem";
 import { auctionWriteAbi, getEvmProductContracts, governanceWriteAbi } from "@/lib/evm-contract-config";
 
 type KernelWorkflowRunnerProps = {
@@ -16,6 +17,8 @@ type PreparedExecution = {
   state: "prepared" | "awaiting_signature";
   requiredSigners?: Array<{ role?: string; address?: string; network?: string }>;
   intent?: { context?: { network?: string; capability?: string } };
+  unsignedPayload?: Record<string, unknown>;
+  signingMode?: "browser" | "server";
 };
 
 type ExecutionReceipt = {
@@ -28,6 +31,23 @@ type ExecutionReceipt = {
 };
 
 const RUNTIME_API_BASE = (process.env.NEXT_PUBLIC_RUNTIME_API_BASE || "https://api.privatedao.org/api").replace(/\/+$/, "");
+
+const EVM_CHAIN_IDS: Record<string, number> = {
+  "ethereum-sepolia": 11155111,
+  "tempo-testnet": 42431,
+  "base-sepolia": 84532,
+};
+
+function getEvmProvider(): PrivateDaoEip1193Provider | null {
+  if (typeof window === "undefined" || !window.ethereum) return null;
+  return window.ethereum;
+}
+
+function chainHex(network: string): string {
+  const chainId = EVM_CHAIN_IDS[network];
+  if (!chainId) throw new Error("This workflow does not have a supported browser-wallet network.");
+  return `0x${chainId.toString(16)}`;
+}
 
 export function KernelWorkflowRunner({ product, capability, network, networkLabel }: KernelWorkflowRunnerProps) {
   const [busy, setBusy] = useState(false);
@@ -42,6 +62,24 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
   const [evmActionHash, setEvmActionHash] = useState("");
   const [evmAuctionId, setEvmAuctionId] = useState("");
   const [evmCommitment, setEvmCommitment] = useState("");
+  const [evmWalletAddress, setEvmWalletAddress] = useState<string | null>(null);
+  const [evmWalletChain, setEvmWalletChain] = useState<string | null>(null);
+
+  async function connectEvmWallet() {
+    const provider = getEvmProvider();
+    if (!provider) throw new Error("Connect an EVM wallet such as MetaMask or Rabby before signing.");
+    const accounts = await provider.request({ method: "eth_requestAccounts" }) as string[];
+    const address = accounts[0];
+    if (!address) throw new Error("The wallet did not return an account.");
+    let chain = await provider.request({ method: "eth_chainId" }) as string;
+    if (chain.toLowerCase() !== chainHex(network).toLowerCase()) {
+      await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: chainHex(network) }] });
+      chain = await provider.request({ method: "eth_chainId" }) as string;
+    }
+    if (chain.toLowerCase() !== chainHex(network).toLowerCase()) throw new Error("The wallet is on a different testnet.");
+    setEvmWalletAddress(address);
+    setEvmWalletChain(chain);
+  }
 
   async function buildPayload() {
     if (network === "zcash-testnet" && capability === "payroll.settle") {
@@ -67,17 +105,20 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
         throw new Error("Enter a 32-byte proposal ID and action hash before preparing the Base, Tempo, or Ethereum workflow.");
       }
       const now = Math.floor(Date.now() / 1000);
-      return { kind: "contract-write", address: evmContracts.governance, abi: governanceWriteAbi, functionName: "createProposal", args: [evmProposalId, evmActionHash, now + 120, now + 300, 1] };
+      if (!evmWalletAddress) throw new Error("Connect your EVM wallet before preparing this workflow.");
+      return { kind: "contract-write", address: evmContracts.governance, abi: governanceWriteAbi, functionName: "createProposal", args: [evmProposalId, evmActionHash, now + 120, now + 300, 1], account: evmWalletAddress };
     }
     if (evmContracts && capability === "auction.bid.commit") {
       if (!/^0x[0-9a-fA-F]{64}$/.test(evmAuctionId) || !/^0x[0-9a-fA-F]{64}$/.test(evmCommitment)) {
         throw new Error("Enter a 32-byte auction ID and bid commitment before preparing the workflow.");
       }
-      return { kind: "contract-write", address: evmContracts.auction, abi: auctionWriteAbi, functionName: "commitBid", args: [evmAuctionId, evmCommitment] };
+      if (!evmWalletAddress) throw new Error("Connect your EVM wallet before preparing this workflow.");
+      return { kind: "contract-write", address: evmContracts.auction, abi: auctionWriteAbi, functionName: "commitBid", args: [evmAuctionId, evmCommitment], account: evmWalletAddress };
     }
     if (evmContracts && capability === "auction.settle") {
       if (!/^0x[0-9a-fA-F]{64}$/.test(evmAuctionId)) throw new Error("Enter the 32-byte auction ID before preparing settlement.");
-      return { kind: "contract-write", address: evmContracts.auction, abi: auctionWriteAbi, functionName: "settleAuction", args: [evmAuctionId] };
+      if (!evmWalletAddress) throw new Error("Connect your EVM wallet before preparing this workflow.");
+      return { kind: "contract-write", address: evmContracts.auction, abi: auctionWriteAbi, functionName: "settleAuction", args: [evmAuctionId], account: evmWalletAddress };
     }
     if (capability === "payroll.approve") {
       const batchId = `web-payroll-${requestIdForHash()}`;
@@ -144,17 +185,29 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
 
   async function complete() {
     if (!prepared) return;
-    if ((prepared.requiredSigners?.length ?? 0) > 0) {
+    if (prepared.signingMode !== "browser" && (prepared.requiredSigners?.length ?? 0) > 0) {
       setError("This workflow is prepared, but it requires the listed authority or wallet signature before it can be completed.");
       return;
     }
     setSubmitting(true);
     setError(null);
     try {
+      let signedPayload: unknown = null;
+      if (prepared.signingMode === "browser") {
+        const provider = getEvmProvider();
+        const payload = prepared.unsignedPayload;
+        if (!provider || !payload || typeof payload.address !== "string" || typeof payload.account !== "string" || typeof payload.functionName !== "string" || !Array.isArray(payload.abi) || !Array.isArray(payload.args)) {
+          throw new Error("The prepared browser-wallet transaction is incomplete.");
+        }
+        const data = encodeFunctionData({ abi: parseAbi(payload.abi as string[]), functionName: payload.functionName, args: payload.args });
+        const hash = await provider.request({ method: "eth_sendTransaction", params: [{ from: payload.account, to: payload.address, data }] });
+        if (typeof hash !== "string" || !/^0x[0-9a-fA-F]{64}$/.test(hash)) throw new Error("The wallet did not return a valid transaction hash.");
+        signedPayload = { kind: "browser-evm-transaction", hash };
+      }
       const submitResponse = await fetch(`${RUNTIME_API_BASE}/v1/executions/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ execution: prepared, signedPayload: null }),
+        body: JSON.stringify({ execution: prepared, signedPayload }),
       });
       const submitted = await submitResponse.json().catch(() => ({}));
       if (!submitResponse.ok) throw new Error(typeof submitted.error === "string" ? submitted.error : `The workflow could not be completed (${submitResponse.status}).`);
@@ -185,11 +238,18 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
         <label className="text-xs font-semibold text-[#40536d]">Recipient address<input value={zcashRecipientAddress} onChange={(event) => setZcashRecipientAddress(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-normal" autoComplete="off" /></label>
         <label className="text-xs font-semibold text-[#40536d]">TAZ atomic amount<input inputMode="numeric" value={zcashAtomicAmount} onChange={(event) => setZcashAtomicAmount(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-normal" /></label>
       </div> : null}
-      {getEvmProductContracts(network) && capability === "governance.proposal.execute" ? <div className="mt-5 grid gap-3 rounded-[14px] border border-[#d7e2f0] bg-white p-4 sm:grid-cols-2">
+      {getEvmProductContracts(network) ? <div className="mt-5 rounded-[14px] border border-[#d7e2f0] bg-white p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="text-xs text-[#40536d]">EVM wallet signing stays in your browser. The Kernel only prepares the request and verifies the testnet receipt.</div>
+          <button type="button" onClick={() => void connectEvmWallet().catch((cause) => setError(cause instanceof Error ? cause.message : "Wallet connection failed."))} className="inline-flex min-h-10 items-center rounded-[9px] border border-[#175cd3] px-3 py-2 text-xs font-semibold text-[#175cd3]">{evmWalletAddress ? `Connected ${evmWalletAddress.slice(0, 6)}…${evmWalletAddress.slice(-4)}` : "Connect EVM wallet"}</button>
+        </div>
+        {evmWalletAddress && evmWalletChain?.toLowerCase() === chainHex(network).toLowerCase() ? <div className="mt-2 text-xs text-[#1a7f5a]">Wallet ready on {networkLabel}.</div> : null}
+      </div> : null}
+      {getEvmProductContracts(network) && capability === "governance.proposal.execute" ? <div className="mt-3 grid gap-3 rounded-[14px] border border-[#d7e2f0] bg-white p-4 sm:grid-cols-2">
         <label className="text-xs font-semibold text-[#40536d]">Proposal ID (bytes32)<input value={evmProposalId} onChange={(event) => setEvmProposalId(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-mono font-normal" autoComplete="off" placeholder="0x..." /></label>
         <label className="text-xs font-semibold text-[#40536d]">Action hash (bytes32)<input value={evmActionHash} onChange={(event) => setEvmActionHash(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-mono font-normal" autoComplete="off" placeholder="0x..." /></label>
       </div> : null}
-      {getEvmProductContracts(network) && (capability === "auction.bid.commit" || capability === "auction.settle") ? <div className="mt-5 grid gap-3 rounded-[14px] border border-[#d7e2f0] bg-white p-4 sm:grid-cols-2">
+      {getEvmProductContracts(network) && (capability === "auction.bid.commit" || capability === "auction.settle") ? <div className="mt-3 grid gap-3 rounded-[14px] border border-[#d7e2f0] bg-white p-4 sm:grid-cols-2">
         <label className="text-xs font-semibold text-[#40536d]">Auction ID (bytes32)<input value={evmAuctionId} onChange={(event) => setEvmAuctionId(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-mono font-normal" autoComplete="off" placeholder="0x..." /></label>
         {capability === "auction.bid.commit" ? <label className="text-xs font-semibold text-[#40536d]">Bid commitment (bytes32)<input value={evmCommitment} onChange={(event) => setEvmCommitment(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-mono font-normal" autoComplete="off" placeholder="0x..." /></label> : null}
       </div> : null}

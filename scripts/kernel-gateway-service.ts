@@ -16,6 +16,7 @@ import {
   TreasuryPolicyProvider,
   EVM_NETWORK_CONFIGS,
   EvmNetworkAdapter,
+  BrowserEvmTransport,
   ViemEvmTransport,
   ZalletCliTransport,
   ZcashNetworkAdapter,
@@ -43,6 +44,12 @@ const EVM_KERNEL_CAPABILITIES = [
   "auction.bid.commit",
   "auction.settle",
 ] as const;
+
+const PUBLIC_EVM_TESTNET_RPC_URLS: Partial<Record<NetworkId, string>> = {
+  "ethereum-sepolia": "https://ethereum-sepolia-rpc.publicnode.com",
+  "tempo-testnet": "https://rpc.moderato.tempo.xyz",
+  "base-sepolia": "https://sepolia.base.org",
+};
 
 type EvmProviderEntry = {
   id: string;
@@ -149,27 +156,25 @@ export class KernelGatewayService {
   }
 
   private registerConfiguredEvmAdapters(registry: InMemoryProviderRegistry, networks: readonly NetworkId[]): void {
-    if (process.env.PDAO_KERNEL_EVM_ENABLED !== "1") return;
+    const serverEnabled = process.env.PDAO_KERNEL_EVM_ENABLED === "1";
+    const browserEnabled = process.env.PDAO_KERNEL_EVM_BROWSER_ENABLED !== "0";
+    if (!serverEnabled && !browserEnabled) return;
 
-    const rawKey = process.env.PDAO_EVM_DEPLOYER_PRIVATE_KEY?.trim();
-    if (!rawKey || !/^0x?[0-9a-fA-F]{64}$/.test(rawKey)) {
-      throw new Error("PDAO_KERNEL_EVM_ENABLED requires a valid testnet signer in the secure environment.");
-    }
-    const privateKey = rawKey.startsWith("0x") ? rawKey : `0x${rawKey}`;
-    const account = privateKeyToAccount(privateKey as `0x${string}`);
+    const account = serverEnabled ? this.serverEvmAccount() : undefined;
     const selected = new Set(
       (process.env.PDAO_KERNEL_EVM_NETWORKS || "")
         .split(",")
         .map((value) => value.trim())
         .filter(Boolean),
     );
+    if (selected.size === 0) for (const network of networks) selected.add(network);
     const unknown = [...selected].filter((network) => !networks.includes(network as NetworkId));
     if (unknown.length > 0) throw new Error(`PDAO_KERNEL_EVM_NETWORKS contains unsupported gateway networks: ${unknown.join(", ")}`);
 
     for (const network of networks) {
       const config = EVM_NETWORK_CONFIGS.find((entry) => entry.network === network);
       if (!config || config.environment !== "testnet" || !selected.has(network)) continue;
-      const rpcUrl = process.env[config.rpcUrlEnv]?.trim();
+      const rpcUrl = process.env[config.rpcUrlEnv]?.trim() || (!serverEnabled ? PUBLIC_EVM_TESTNET_RPC_URLS[network] : undefined);
       if (!rpcUrl || !/^https:\/\//i.test(rpcUrl)) {
         throw new Error(`${config.rpcUrlEnv} must be an HTTPS testnet RPC URL when ${network} is enabled.`);
       }
@@ -184,20 +189,27 @@ export class KernelGatewayService {
           rpcUrls: { default: { http: [rpcUrl] } },
         });
       const publicClient = createPublicClient({ chain, transport });
-      const walletClient = network === "tempo-testnet"
-        ? createTempoClient({ account, chain: tempoModerato, transport })
-        : createWalletClient({ account, chain, transport });
-      const inner = new ViemEvmTransport(
-        publicClient as unknown as KernelViemPublicClient,
-        walletClient as unknown as KernelViemWalletClient,
-        network,
-        config.chainId,
-        "testnet",
-        config.explorerBaseUrl,
-        config.nativeAsset,
-        account.address,
-      );
-      const providerId = `privatedao-evm-${network}`;
+      const inner = serverEnabled
+        ? new ViemEvmTransport(
+          publicClient as unknown as KernelViemPublicClient,
+          (network === "tempo-testnet"
+            ? createTempoClient({ account: account!, chain: tempoModerato, transport })
+            : createWalletClient({ account: account!, chain, transport })) as unknown as KernelViemWalletClient,
+          network,
+          config.chainId,
+          "testnet",
+          config.explorerBaseUrl,
+          config.nativeAsset,
+          account!.address,
+        )
+        : new BrowserEvmTransport(
+          publicClient as unknown as ConstructorParameters<typeof BrowserEvmTransport>[0],
+          network,
+          config.chainId,
+          config.explorerBaseUrl,
+          config.nativeAsset,
+        );
+      const providerId = `privatedao-evm-${network}${serverEnabled ? "" : "-browser"}`;
       const adapter = new EvmNetworkAdapter({
         id: providerId,
         config,
@@ -206,7 +218,7 @@ export class KernelGatewayService {
           health: () => inner.health(),
           prepare: (intent) => inner.prepare(intent),
           submit: (execution, signedPayload) => {
-            if (process.env.PDAO_KERNEL_EVM_BROADCAST_ENABLED !== "1") {
+            if (serverEnabled && process.env.PDAO_KERNEL_EVM_BROADCAST_ENABLED !== "1") {
               throw new Error("EVM testnet broadcast is disabled; enable it explicitly for an approved E2E run.");
             }
             return inner.submit(execution, signedPayload);
@@ -220,6 +232,15 @@ export class KernelGatewayService {
       this.evmAdapters.set(network, adapter);
       this.evmProviders.set(network, { id: providerId, network });
     }
+  }
+
+  private serverEvmAccount() {
+    const rawKey = process.env.PDAO_EVM_DEPLOYER_PRIVATE_KEY?.trim();
+    if (!rawKey || !/^0x?[0-9a-fA-F]{64}$/.test(rawKey)) {
+      throw new Error("PDAO_KERNEL_EVM_ENABLED requires a valid testnet signer in the secure environment.");
+    }
+    const privateKey = rawKey.startsWith("0x") ? rawKey : `0x${rawKey}`;
+    return privateKeyToAccount(privateKey as `0x${string}`);
   }
 
   async handle(req: http.IncomingMessage, res: http.ServerResponse): Promise<boolean> {

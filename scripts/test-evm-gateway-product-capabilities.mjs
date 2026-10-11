@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { ViemEvmTransport } from "../packages/privatedao-runtime/src/evm-viem-transport.ts";
+import { BrowserEvmTransport } from "../packages/privatedao-runtime/src/browser-evm-transport.ts";
 
 const signer = "0x1111111111111111111111111111111111111111";
 const clients = {
@@ -55,5 +56,25 @@ await assert.rejects(
   () => new ViemEvmTransport(clients.publicClient, clients.walletClient, "base-sepolia", "84532", "testnet", "https://sepolia.basescan.org", "ETH").prepare(baseIntent("governance.proposal.execute", { kind: "contract-write", address: "0x123", abi: [], functionName: "x", args: [] })),
   /EVM contract write requires a configured signer account/,
 );
+
+const browserTransport = new BrowserEvmTransport(clients.publicClient, "base-sepolia", "84532", "https://sepolia.basescan.org", "ETH");
+const browserPreparation = await browserTransport.prepare(baseIntent("governance.proposal.execute", {
+  kind: "contract-write",
+  address: "0x9887bcfe7daad364202d5d3102de180c389ecb20",
+  abi: ["function createProposal(bytes32,bytes32,uint64,uint64,uint256)"],
+  functionName: "createProposal",
+  args: ["0x" + "05".repeat(32), "0x" + "06".repeat(32), 100, 200, 1],
+  account: "0x2222222222222222222222222222222222222222",
+}));
+assert.equal(browserPreparation.signingMode, "browser");
+assert.equal(browserPreparation.requiredSigners[0].address, "0x2222222222222222222222222222222222222222");
+const browserSubmission = await browserTransport.submit(browserPreparation, {
+  kind: "browser-evm-transaction",
+  hash: "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+});
+assert.deepEqual(browserSubmission.signatures, ["0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"]);
+const browserReceipt = await browserTransport.receipt(browserPreparation.executionId);
+assert.equal(browserReceipt.network, "base-sepolia");
+assert.equal(browserReceipt.provider, "privatedao-browser-evm");
 
 console.log("EVM_GATEWAY_PRODUCT_CAPABILITIES: PASS");

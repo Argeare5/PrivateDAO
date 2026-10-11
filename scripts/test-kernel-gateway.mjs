@@ -5,7 +5,7 @@ import http from "node:http";
 const port = 8791;
 const child = spawn("npx", ["tsx", "scripts/kernel-gateway.ts"], {
   cwd: process.cwd(),
-  env: { ...process.env, PDAO_KERNEL_GATEWAY_PORT: String(port) },
+    env: { ...process.env, PDAO_KERNEL_GATEWAY_PORT: String(port), PDAO_KERNEL_EVM_BROWSER_ENABLED: "0" },
   stdio: ["ignore", "pipe", "pipe"],
   detached: true,
 });
