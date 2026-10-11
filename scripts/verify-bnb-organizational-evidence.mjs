@@ -6,8 +6,9 @@ const artifact = JSON.parse(await readFile(artifactPath, "utf8"));
 assert.equal(artifact.network, "bnb-testnet");
 assert.equal(artifact.chainId, 97);
 assert.equal(artifact.environment, "testnet");
-assert.ok(artifact.contracts?.treasury?.address && artifact.contracts?.governance?.address && artifact.contracts?.auction?.address, "missing organizational contract addresses");
+assert.ok(artifact.contracts?.treasury?.address && artifact.contracts?.payroll?.address && artifact.contracts?.governance?.address && artifact.contracts?.auction?.address, "missing organizational contract addresses");
 assert.equal(artifact.evidence?.treasury?.status, "executed");
+assert.equal(artifact.evidence?.payroll?.status, "settled");
 assert.equal(artifact.evidence?.governance?.status, "passed");
 assert.equal(artifact.evidence?.auction?.status, "settled");
 
@@ -28,6 +29,10 @@ const transactions = [
   ["treasury.requestedHash", artifact.evidence.treasury.requestedHash],
   ["treasury.approvedHash", artifact.evidence.treasury.approvedHash],
   ["treasury.executedHash", artifact.evidence.treasury.executedHash],
+  ["payroll.payrollFundingHash", artifact.evidence.payroll.payrollFundingHash],
+  ["payroll.payrollCreateHash", artifact.evidence.payroll.payrollCreateHash],
+  ["payroll.payrollApproveHash", artifact.evidence.payroll.payrollApproveHash],
+  ["payroll.payrollSettleHash", artifact.evidence.payroll.payrollSettleHash],
   ["governance.proposalHash", artifact.evidence.governance.proposalHash],
   ["governance.voteCommitHash", artifact.evidence.governance.voteCommitHash],
   ["governance.voteRevealHash", artifact.evidence.governance.voteRevealHash],
@@ -47,7 +52,7 @@ for (const [label, hash] of transactions) {
   receipts.push({ label, hash, blockNumber: Number.parseInt(receipt.blockNumber, 16), status: "success" });
 }
 const contracts = [];
-for (const [label, address] of Object.entries({ treasury: artifact.contracts.treasury.address, governance: artifact.contracts.governance.address, auction: artifact.contracts.auction.address })) {
+for (const [label, address] of Object.entries({ treasury: artifact.contracts.treasury.address, payroll: artifact.contracts.payroll.address, governance: artifact.contracts.governance.address, auction: artifact.contracts.auction.address })) {
   const bytecode = await call("eth_getCode", [address, "latest"]);
   assert.ok(bytecode && bytecode !== "0x", `${label} contract has no deployed bytecode`);
   contracts.push({ label, address, deployed: true });

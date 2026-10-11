@@ -21,6 +21,9 @@ Product workflow
 Products do not call RPC endpoints directly. A network is only executable for
 a capability when the binding, provider lifecycle, receipt path, and
 independent evidence exist. RPC health alone is never product evidence.
+BNB Confidential Payroll is a product-specific EVM provider: it binds an
+off-chain payroll commitment to a dedicated settlement contract and receipt
+path instead of borrowing Treasury evidence.
 
 ## Layer ownership
 

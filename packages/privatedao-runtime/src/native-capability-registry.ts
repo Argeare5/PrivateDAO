@@ -187,11 +187,12 @@ const ORGANIZATIONAL_EVIDENCE = {
     provider: "evm-bnb-testnet-organizational",
     contracts: [
       "0x5011c9c68006c2857eaea0f67401e9d58ff39770",
+      "0x62f8f7ffc4235a1dde58ba811fa9c448c56f7620",
       "0x57d5d75f81db5459d541891f4c1a20f51abe32fc",
       "0x4dbe25b21607cf04bbf06b9b88927af3e381d373",
     ],
     assets: ["BNB"],
-    commit: "462dc66af",
+    commit: "ef862608a",
     timestamp: "2026-10-11T17:04:22.062Z",
   },
 } as const;
@@ -280,14 +281,17 @@ function applyArbitrumSepoliaEvidence(entry: NativeCapabilityEntry): NativeCapab
 function applyBnbTestnetEvidence(entry: NativeCapabilityEntry): NativeCapabilityEntry {
   const isBlind = entry.product === "blind-verification" && entry.capability === "verification.blind.prove";
   const isRecord = entry.product === "record-verification" && ["verification.record.create", "verification.record.verify"].includes(entry.capability);
-  if (entry.network !== "bnb-testnet" || (!isBlind && !isRecord)) return entry;
+  const isPayroll = entry.product === "payroll" && entry.capability === "payroll.settle";
+  if (entry.network !== "bnb-testnet" || (!isBlind && !isRecord && !isPayroll)) return entry;
   return {
     ...entry,
-    provider: BNB_TESTNET_EVIDENCE.provider,
-    contracts: BNB_TESTNET_EVIDENCE.contracts,
+    provider: isPayroll ? "evm-bnb-testnet-organizational" : BNB_TESTNET_EVIDENCE.provider,
+    contracts: isPayroll ? ["0x62f8f7ffc4235a1dde58ba811fa9c448c56f7620"] : BNB_TESTNET_EVIDENCE.contracts,
     verifier: BNB_TESTNET_EVIDENCE.verifier,
     walletModel: "provider-wallet",
     supportsExecution: true,
+    supportsPrivateExecution: isPayroll ? false : true,
+    supportsPrivateSettlement: isPayroll ? false : true,
     supportsProof: isBlind,
     supportsReceipt: true,
     supportsReconciliation: true,

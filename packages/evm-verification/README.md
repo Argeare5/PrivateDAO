@@ -81,7 +81,7 @@ token, not the standard EVM gas-balance path. Tempo Testnet is only promoted
 after the same contract-write, receipt, proof, expiry, wrong-chain, altered-
 proof, and revocation checks pass on the Tempo chain itself.
 
-The organizational Treasury, Governance, and Sealed Auction E2E runner uses
+The organizational Treasury, Confidential Payroll, Governance, and Sealed Auction E2E runner uses
 `PDAO_EVM_NETWORK` for one standard-EVM testnet at a time:
 
 ```bash
@@ -109,8 +109,10 @@ npm run verify:bnb:evidence
 ```
 
 The BNB artifact proves the Blind Verification and Record Verification lanes.
-The organizational Treasury, Governance, and Auction lanes have a separate
-runner and remain unpromoted until that runner completes with sufficient tBNB.
+The organizational artifact separately proves Treasury, Confidential Payroll,
+Governance, and Auction on chain 97. Payroll evidence covers commitment,
+Maker/Checker approval, settlement, receipt, and deployed product-specific
+bytecode; it does not claim shielded EVM settlement.
 
 ## Current evidence boundary
 

@@ -223,6 +223,14 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
     note: "Zcash Testnet payroll settlement is backed by the confirmed Zallet/Zebra receipt and remains Testnet-only with broadcast controlled by the secure runtime gate.",
   },
   {
+    product: "payroll",
+    capability: "payroll.settle",
+    network: "bnb-testnet",
+    mode: "kernel-gateway",
+    entrypoint: "kernel://payroll.settle",
+    note: "BNB Testnet payroll settlement binds an off-chain payroll commitment to a real Maker/Checker payout receipt; employee records and policy details remain off-chain.",
+  },
+  {
     product: "treasury",
     capability: "treasury.policy.check",
     network: "solana-devnet",

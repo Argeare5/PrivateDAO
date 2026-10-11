@@ -35,8 +35,10 @@ and disposable-entry revocation.
 
 The artifact `packages/evm-verification/deployments/organizational-bnb-testnet.json`
 now records successful BNB Testnet organizational execution for Treasury,
-Governance, and Sealed Auction. Payroll settlement remains a separate product
-gate. Verify the organizational receipts and deployed contract bytecode with:
+Confidential Payroll, Governance, and Sealed Auction. Payroll binds an
+off-chain batch commitment to a real Maker/Checker payout and settlement
+receipt; employee records and policy details remain off-chain. Verify the
+organizational receipts and deployed contract bytecode with:
 
 ```bash
 npm run verify:bnb:organizational-evidence

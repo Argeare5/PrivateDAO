@@ -72,10 +72,10 @@ export const PRODUCT_CATALOG: readonly ProductDescriptor[] = [
     capabilities: [
       capability("payroll.calculate", "payroll", false, true, [solanaDevnet, ethereumSepolia, arbitrumSepolia, tempoTestnet, baseSepolia, bnbTestnet, zcashTestnet, robinhoodTestnet, hyperliquidTestnet, hypercoreTestnet]),
       capability("payroll.approve", "payroll", true, true, [solanaDevnet, ethereumSepolia, arbitrumSepolia, tempoTestnet, baseSepolia, bnbTestnet, zcashTestnet, robinhoodTestnet, hyperliquidTestnet, hypercoreTestnet]),
-      // Zcash Testnet has independent, confirmed settlement evidence. Keep
-      // this capability scoped to Zcash; Solana settlement remains outside
-      // the product catalog while the legacy Umbra path is disabled.
-      capability("payroll.settle", "payroll", true, true, [zcashTestnet]),
+      // Settlement is exposed only where a network-specific provider has
+      // independent evidence. The BNB lane binds a commitment to a real
+      // Testnet payout; Tempo remains token-payroll work, not this native lane.
+      capability("payroll.settle", "payroll", true, true, [zcashTestnet, bnbTestnet]),
     ],
   },
   {
