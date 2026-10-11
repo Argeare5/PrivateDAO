@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 import { runtimeCatalog } from "@/lib/runtime-catalog.generated";
@@ -64,15 +64,36 @@ const productOptions: readonly ProductOption[] = runtimeCatalog.products
   .filter((product) => product.workflows.length > 0);
 
 export function ProductNetworkWorkspace() {
+  const [readyNetworks, setReadyNetworks] = useState<Set<string>>(() => new Set(runtimeCatalog.networks.map((network) => String(network.id)).filter((network) => network !== "zcash-testnet")));
+  useEffect(() => {
+    let cancelled = false;
+    void fetch("https://api.privatedao.org/healthz", { headers: { Accept: "application/json" } })
+      .then((response) => response.ok ? response.json() as Promise<{ networks?: string[]; zcash?: { configured?: boolean; ready?: boolean } }> : null)
+      .then((health) => {
+        if (cancelled) return;
+        const next = new Set(runtimeCatalog.networks.map((network) => String(network.id)).filter((network) => network !== "zcash-testnet"));
+        if (health?.zcash?.configured && health.zcash.ready && health.networks?.includes("zcash-testnet")) next.add("zcash-testnet");
+        setReadyNetworks(next);
+      })
+      .catch(() => undefined);
+    return () => { cancelled = true; };
+  }, []);
+  const availableProductOptions = useMemo(() => productOptions.map((product) => ({
+    ...product,
+    workflows: product.workflows.map((workflow) => ({
+      ...workflow,
+      networks: workflow.networks.filter((network) => readyNetworks.has(network.id)),
+    })).filter((workflow) => workflow.networks.length > 0),
+  })).filter((product) => product.workflows.length > 0), [readyNetworks]);
   const [productId, setProductId] = useState(productOptions[0]?.id ?? "");
-  const product = useMemo(() => productOptions.find((entry) => entry.id === productId) ?? productOptions[0], [productId]);
+  const product = useMemo(() => availableProductOptions.find((entry) => entry.id === productId) ?? availableProductOptions[0], [availableProductOptions, productId]);
   const [workflowId, setWorkflowId] = useState(product?.workflows[0]?.id ?? "");
   const workflow = product?.workflows.find((entry) => entry.id === workflowId) ?? product?.workflows[0];
   const [networkId, setNetworkId] = useState(workflow?.networks[0]?.id ?? "");
   const network = workflow?.networks.find((entry) => entry.id === networkId) ?? workflow?.networks[0];
 
   function chooseProduct(nextProductId: string) {
-    const nextProduct = productOptions.find((entry) => entry.id === nextProductId) ?? productOptions[0];
+    const nextProduct = availableProductOptions.find((entry) => entry.id === nextProductId) ?? availableProductOptions[0];
     const nextWorkflow = nextProduct?.workflows[0];
     setProductId(nextProduct?.id ?? "");
     setWorkflowId(nextWorkflow?.id ?? "");
@@ -103,7 +124,7 @@ export function ProductNetworkWorkspace() {
         <div className="grid gap-3 sm:grid-cols-3">
           <label className="text-xs font-semibold text-[#5d6d82]">Product
             <select className={`${controlClass} mt-2`} value={product.id} onChange={(event) => chooseProduct(event.target.value)}>
-              {productOptions.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}
+              {availableProductOptions.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}
             </select>
           </label>
           <label className="text-xs font-semibold text-[#5d6d82]">What you want to do
