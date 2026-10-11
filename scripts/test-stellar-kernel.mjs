@@ -26,6 +26,11 @@ const adapter = new StellarNetworkAdapter({ id: "test-stellar", config, capabili
 const health = await transport.health();
 assert.equal(health.ok, true, `Stellar Horizon health failed: ${health.reason || "unknown"}`);
 assert.equal(health.network, "stellar-testnet");
+const recoveredAccount = await adapter.recoverAccount(knownAccount);
+assert.equal(recoveredAccount.publicKey, knownAccount);
+assert.equal(recoveredAccount.network, "stellar-testnet");
+assert.match(recoveredAccount.sequence, /^\d+$/);
+assert.ok(recoveredAccount.balances.length > 0);
 
 const response = await fetch(`${horizon}/transactions/${txHash}`, { headers: { Accept: "application/json" } });
 assert.equal(response.ok, true, `Known Stellar evidence transaction HTTP ${response.status}`);
@@ -98,4 +103,4 @@ await assert.rejects(
   /broadcast is disabled/i,
 );
 
-console.log(`[stellar-kernel] PASS health=1 known_tx=1 ledger=${transaction.ledger} product_capabilities=${capabilities.length} unsigned_xdr=1 receipt=1 broadcast=disabled`);
+console.log(`[stellar-kernel] PASS health=1 recovery=1 known_tx=1 ledger=${transaction.ledger} product_capabilities=${capabilities.length} unsigned_xdr=1 receipt=1 broadcast=disabled`);

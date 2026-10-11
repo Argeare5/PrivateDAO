@@ -57,6 +57,15 @@ export interface StellarPaymentPayload {
   memo?: string;
 }
 
+export interface StellarRecoveredAccount {
+  network: "stellar-testnet";
+  publicKey: string;
+  sequence: string;
+  ledger?: string;
+  balances: readonly { asset: string; balance: string; buyingLiabilities?: string; sellingLiabilities?: string }[];
+  recoveredAt: string;
+}
+
 export interface StellarSignedPayload {
   kind: "stellar-signed-xdr";
   network: "stellar-testnet";
@@ -82,6 +91,7 @@ type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;
 
 export interface StellarTransport {
   health(): Promise<{ ok: boolean; network: NetworkId; ledger?: string; latencyMs?: number; reason?: string }>;
+  recoverAccount(publicKey: string): Promise<StellarRecoveredAccount>;
   prepare<TPayload, TUnsigned>(intent: ExecutionIntent<TPayload>): Promise<PreparedExecution<TUnsigned>>;
   submit<TUnsigned>(execution: PreparedExecution<TUnsigned>, signedPayload: TUnsigned): Promise<{ executionId: string; signatures: string[] }>;
   observeConfirmedTransaction(executionId: string, transactionHash: string): Promise<void>;
@@ -134,6 +144,33 @@ export class StellarHorizonTransport implements StellarTransport {
     } catch (error) {
       return { ok: false, network: "stellar-testnet", latencyMs: Date.now() - started, reason: error instanceof Error ? error.message : "horizon_unavailable" };
     }
+  }
+
+  async recoverAccount(publicKey: string): Promise<StellarRecoveredAccount> {
+    const { Keypair, Horizon } = await import("@stellar/stellar-sdk");
+    try {
+      Keypair.fromPublicKey(publicKey);
+    } catch {
+      throw new Error("Stellar account public key is malformed.");
+    }
+    const account = await new Horizon.Server(this.horizonUrl).loadAccount(publicKey);
+    const health = await this.health();
+    return {
+      network: "stellar-testnet",
+      publicKey,
+      sequence: account.sequence,
+      ledger: health.ledger,
+      balances: account.balances.map((balance) => {
+        const line = balance as { asset_type?: string; asset_code?: string; asset_issuer?: string; balance: string; buying_liabilities?: string; selling_liabilities?: string };
+        return {
+          asset: line.asset_type === "native" ? "XLM" : `${line.asset_code || "unknown"}:${line.asset_issuer || "unknown"}`,
+          balance: line.balance,
+          buyingLiabilities: line.buying_liabilities,
+          sellingLiabilities: line.selling_liabilities,
+        };
+      }),
+      recoveredAt: new Date().toISOString(),
+    };
   }
 
   async prepare<TPayload, TUnsigned>(intent: ExecutionIntent<TPayload>): Promise<PreparedExecution<TUnsigned>> {
@@ -238,6 +275,7 @@ export class StellarHorizonTransport implements StellarTransport {
       throw new Error("Stellar payment contains an invalid public account.");
     }
     const server = new Horizon.Server(this.horizonUrl);
+    await this.recoverAccount(payer.address);
     const source = await server.loadAccount(payer.address);
     const fee = await this.estimateFee(intent);
     let builder = new TransactionBuilder(source, {
@@ -321,6 +359,7 @@ export class StellarNetworkAdapter implements NetworkAdapter {
   receipt<TResult = unknown>(executionId: string): Promise<ExecutionReceipt<TResult>> { return this.transport.receipt<TResult>(executionId); }
   estimateFee<TPayload>(intent: ExecutionIntent<TPayload>): Promise<FeeEstimate> { this.assertIntent(intent); return this.transport.estimateFee(intent); }
   health() { return this.transport.health(); }
+  recoverAccount(publicKey: string): Promise<StellarRecoveredAccount> { return this.transport.recoverAccount(publicKey); }
   explorerUrl(reference: string): string { return `${this.config.explorerBaseUrl}${encodeURIComponent(reference)}`; }
 
   private assertIntent<TPayload>(intent: ExecutionIntent<TPayload>): void {
