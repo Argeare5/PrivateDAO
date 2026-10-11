@@ -192,7 +192,7 @@ const ORGANIZATIONAL_EVIDENCE = {
       "0x4dbe25b21607cf04bbf06b9b88927af3e381d373",
     ],
     assets: ["BNB"],
-    commit: "ef862608a",
+    commit: "107b73c8b",
     timestamp: "2026-10-11T17:04:22.062Z",
   },
 } as const;
