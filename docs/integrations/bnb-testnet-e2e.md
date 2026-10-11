@@ -41,6 +41,17 @@ Its first attempt was correctly rejected before execution because the funded
 deployer balance was `0.0096602694 tBNB`, below the configured `0.01 tBNB`
 minimum. No false success was recorded. Re-run after funding:
 
+Run the read-only readiness check first. It never broadcasts and reports the
+public deployer address, chain ID, balance, minimum, and write count without
+printing the signer:
+
+```bash
+set -a
+. /home/x-pact/.privatedao-secret-vault/files/multichain-testnet.env
+set +a
+npm run verify:bnb:organizational-readiness
+```
+
 ```bash
 set -a
 . /home/x-pact/.privatedao-secret-vault/files/multichain-testnet.env
