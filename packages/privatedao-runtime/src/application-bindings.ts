@@ -212,7 +212,15 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
     network: "zcash-testnet",
     mode: "kernel-gateway",
     entrypoint: "kernel://payroll.approve",
-    note: "Zcash Testnet Maker/Checker approval is Kernel-only until wallet recovery and settlement pass independent E2E.",
+    note: "Zcash Testnet Maker/Checker approval remains a Kernel policy gate before settlement.",
+  },
+  {
+    product: "payroll",
+    capability: "payroll.settle",
+    network: "zcash-testnet",
+    mode: "kernel-gateway",
+    entrypoint: "kernel://payroll.settle",
+    note: "Zcash Testnet payroll settlement is backed by the confirmed Zallet/Zebra receipt and remains Testnet-only with broadcast controlled by the secure runtime gate.",
   },
   {
     product: "treasury",

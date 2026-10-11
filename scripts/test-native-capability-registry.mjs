@@ -7,8 +7,8 @@ const liveAgents = entries.filter((entry) => entry.status === "mainnet_live" && 
 const verifiedDevnet = entries.filter((entry) => entry.status === "devnet_verified");
 const verifiedPayroll = verifiedDevnet.filter((entry) => entry.product === "payroll");
 
-assert.equal(entries.length, 187, "unexpected native capability matrix size");
-assert.equal(verified.length, 40, "only evidence-backed testnet verification and organizational rows should be verified");
+assert.equal(entries.length, 204, "unexpected native capability matrix size");
+assert.equal(verified.length, 41, "only evidence-backed testnet verification and organizational rows should be verified");
 assert.equal(liveAgents.length, 2, "the two live Agent Exchange rows must be runtime-verified");
 assert.equal(verifiedPayroll.length, 2, "only Payroll calculation and approval remain enabled on Solana Devnet");
 assert.equal(verifiedDevnet.length, 6, "Solana Devnet must include enabled Payroll plus the evidenced governance, treasury, and auction lanes");
@@ -92,7 +92,12 @@ assert.equal(zcashGovernance[0].provider, "privatedao-kernel-policy");
 const solanaPolicyRows = entries.filter((entry) => entry.network === "solana-devnet" && ["blind-verification", "record-verification"].includes(entry.product) && entry.declared);
 assert.ok(solanaPolicyRows.length >= 3, "Solana verification workflows must be available through the Kernel policy provider");
 assert.equal(solanaPolicyRows.every((entry) => entry.status === "testnet_ready" && entry.evidence === "kernel-policy-testnet"), true, "Solana verification policy rows must not claim on-chain E2E");
-assert.equal(entries.some((entry) => entry.product === "payroll" && entry.capability === "payroll.settle"), false, "Payroll settlement must not be advertised without a native provider");
+const zcashPayrollSettlement = entries.find((entry) => entry.product === "payroll" && entry.capability === "payroll.settle" && entry.network === "zcash-testnet");
+assert(zcashPayrollSettlement, "Zcash payroll settlement must be advertised after confirmed Testnet E2E");
+assert.equal(zcashPayrollSettlement.status, "testnet_verified");
+assert.equal(zcashPayrollSettlement.evidence, "testnet-e2e");
+assert.equal(zcashPayrollSettlement.supportsPrivateSettlement, true);
+assert.equal(entries.some((entry) => entry.product === "payroll" && entry.capability === "payroll.settle" && entry.network === "solana-devnet" && entry.declared), false, "Solana payroll settlement must remain outside the catalog while Umbra is disabled");
 
 assert.equal(entries.some((entry) => entry.network === "wormhole-integration"), false, "bridge network must not be present");
 console.log(`[native-capability-registry] rows=${entries.length} verified=${verified.length} bridge-free=true`);

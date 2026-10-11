@@ -20,7 +20,7 @@ for (const productId of kernelProducts) {
   const product = PRODUCT_CATALOG.find((entry) => entry.id === productId);
   assert(product, `missing product ${productId}`);
   for (const capability of product.capabilities) {
-    for (const network of targetNetworks) {
+    for (const network of capability.networks) {
       assert(capability.networks.includes(network), `missing catalog network ${productId}/${capability.id}/${network}`);
       const binding = APPLICATION_CAPABILITY_BINDINGS.find(
         (entry) => entry.product === productId && entry.capability === capability.id && entry.network === network,
