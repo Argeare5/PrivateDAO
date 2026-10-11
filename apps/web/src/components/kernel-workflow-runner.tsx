@@ -137,7 +137,19 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
       };
     }
     if (capability === "treasury.policy.check") return { amountCents: 100, budgetCents: 1000, requestedAsset: "USDC", allowedAsset: "USDC" };
-    if (capability === "verification.blind.prove") return { workflowId: `demo-${network}`, privateInputs: { approved: true, budgetCents: 1000 } };
+    if (capability === "verification.blind.prove") {
+      return {
+        workflowId: `demo-${network}`,
+        privateInputs: {
+          organizationId: "demo-organization",
+          subjectId: "demo-subject-redacted",
+          membershipVerified: true,
+          records: [{ amountUsd: 8800 }, { amountUsd: 9400 }, { amountUsd: 9200 }],
+          riskScore: 84,
+          liabilitiesUsd: 2400,
+        },
+      };
+    }
     if (capability === "verification.record.create") return { schemaVersion: "1", recordType: "private-workflow", recordId: `demo-${Date.now()}`, issuer: "PrivateDAO", issuedAt: new Date().toISOString(), payload: { outcome: "approved" }, publicFieldPaths: ["outcome"] };
     if (capability === "auction.bid.commit") return { config: { auctionId: `demo-${network}`, asset: "USDC" }, privateBids: [{ bidderRef: "demo-bidder", amountCents: 100 }] };
     if (capability === "auction.settle") return { metadata: { auctionId: `demo-${network}`, policy: "highest-valid-bid" }, bids: [{ bidderRef: "demo-bidder", amountCents: 100 }] };
