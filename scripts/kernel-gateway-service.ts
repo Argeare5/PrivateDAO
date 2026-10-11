@@ -50,6 +50,7 @@ const PUBLIC_EVM_TESTNET_RPC_URLS: Partial<Record<NetworkId, string>> = {
   "arbitrum-sepolia": "https://sepolia-rollup.arbitrum.io/rpc",
   "tempo-testnet": "https://rpc.moderato.tempo.xyz",
   "base-sepolia": "https://sepolia.base.org",
+  "robinhood-testnet": "https://rpc.testnet.chain.robinhood.com",
   // HyperEVM is the EVM surface of Hyperliquid. HyperCore remains a separate
   // native exchange surface and is intentionally not routed through this map.
   "hyperliquid-testnet": "https://rpc.hyperliquid-testnet.xyz/evm",
