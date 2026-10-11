@@ -49,6 +49,9 @@ const PUBLIC_EVM_TESTNET_RPC_URLS: Partial<Record<NetworkId, string>> = {
   "arbitrum-sepolia": "https://sepolia-rollup.arbitrum.io/rpc",
   "tempo-testnet": "https://rpc.moderato.tempo.xyz",
   "base-sepolia": "https://sepolia.base.org",
+  // HyperEVM is the EVM surface of Hyperliquid. HyperCore remains a separate
+  // native exchange surface and is intentionally not routed through this map.
+  "hyperliquid-testnet": "https://rpc.hyperliquid-testnet.xyz/evm",
 };
 
 type EvmProviderEntry = {
@@ -104,8 +107,16 @@ export class KernelGatewayService {
     this.requiredToken = options.requiredToken ?? process.env.PDAO_KERNEL_GATEWAY_TOKEN?.trim() ?? "";
     this.maxBodyBytes = options.maxBodyBytes || Number(process.env.PDAO_KERNEL_GATEWAY_MAX_BODY_BYTES || 1_000_000);
 
-    const evmNetworks: readonly NetworkId[] = ["solana-devnet", "ethereum-sepolia", "arbitrum-sepolia", "tempo-testnet", "base-sepolia"];
-    const kernelNetworks: readonly NetworkId[] = [...evmNetworks, "zcash-testnet", "robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"];
+    const evmNetworks: readonly NetworkId[] = [
+      "solana-devnet",
+      "ethereum-sepolia",
+      "arbitrum-sepolia",
+      "tempo-testnet",
+      "base-sepolia",
+      "robinhood-testnet",
+      "hyperliquid-testnet",
+    ];
+    const kernelNetworks: readonly NetworkId[] = [...evmNetworks, "zcash-testnet", "hypercore-testnet"];
     const zcashConfigured = Boolean(
       process.env.PDAO_ZCASH_ZALLET_BINARY?.trim()
       && process.env.PDAO_ZCASH_ZALLET_DATA_DIR?.trim()
@@ -165,8 +176,10 @@ export class KernelGatewayService {
     if (!serverEnabled && !browserEnabled) return;
 
     const account = serverEnabled ? this.serverEvmAccount() : undefined;
+    const configuredSelection = (process.env.PDAO_KERNEL_EVM_NETWORKS || "").trim();
+    const selectionIsExplicit = configuredSelection.length > 0;
     const selected = new Set(
-      (process.env.PDAO_KERNEL_EVM_NETWORKS || "")
+      configuredSelection
         .split(",")
         .map((value) => value.trim())
         .filter(Boolean),
@@ -179,7 +192,14 @@ export class KernelGatewayService {
       const config = EVM_NETWORK_CONFIGS.find((entry) => entry.network === network);
       if (!config || config.environment !== "testnet" || !selected.has(network)) continue;
       const rpcUrl = process.env[config.rpcUrlEnv]?.trim() || (!serverEnabled ? PUBLIC_EVM_TESTNET_RPC_URLS[network] : undefined);
-      if (!rpcUrl || !/^https:\/\//i.test(rpcUrl)) {
+      if (!rpcUrl) {
+        // Future lanes remain visible through the Kernel policy providers until
+        // an operator supplies the network's RPC. An explicit selection is a
+        // configuration error; an implicit selection is simply not configured.
+        if (selectionIsExplicit) throw new Error(`${config.rpcUrlEnv} is required when ${network} is explicitly enabled.`);
+        continue;
+      }
+      if (!/^https:\/\//i.test(rpcUrl)) {
         throw new Error(`${config.rpcUrlEnv} must be an HTTPS testnet RPC URL when ${network} is enabled.`);
       }
 
@@ -265,11 +285,12 @@ export class KernelGatewayService {
           network,
           provider: network === "zcash-testnet"
             ? this.zcashAdapter?.id || "privatedao-kernel-policy"
-            : ["robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"].includes(network)
-              ? "privatedao-kernel-policy"
             : network === "solana-devnet"
               ? "kernel-native"
-            : this.evmProviders.get(network)?.id || "kernel-native",
+            : this.evmProviders.get(network)?.id
+              || (["robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"].includes(network)
+                ? "privatedao-kernel-policy"
+                : "kernel-native"),
           onchainAdapter: network === "zcash-testnet"
             ? Boolean(this.zcashAdapter)
             : network === "solana-devnet"

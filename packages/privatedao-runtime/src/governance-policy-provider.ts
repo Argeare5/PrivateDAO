@@ -116,8 +116,9 @@ function parsePayload(value: unknown): GovernancePolicyPayload {
   if (typeof payload.proposalId !== "string" || payload.proposalId.length === 0) throw new Error("proposalId is required.");
   if (typeof payload.proposalHash !== "string" || payload.proposalHash.length === 0) throw new Error("proposalHash is required.");
   if (typeof payload.policyHash !== "string" || payload.policyHash.length === 0) throw new Error("policyHash is required.");
-  if (!Number.isSafeInteger(payload.requiredApprovals) || payload.requiredApprovals < 1) throw new Error("requiredApprovals must be a positive integer.");
-  return { proposalId: payload.proposalId, proposalHash: payload.proposalHash, policyHash: payload.policyHash, requiredApprovals: payload.requiredApprovals };
+  const requiredApprovals = payload.requiredApprovals;
+  if (typeof requiredApprovals !== "number" || !Number.isSafeInteger(requiredApprovals) || requiredApprovals < 1) throw new Error("requiredApprovals must be a positive integer.");
+  return { proposalId: payload.proposalId, proposalHash: payload.proposalHash, policyHash: payload.policyHash, requiredApprovals };
 }
 
 function parseSignature<TUnsigned>(value: TUnsigned): GovernancePolicySignature {
