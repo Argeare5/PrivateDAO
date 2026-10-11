@@ -192,6 +192,15 @@ export const NETWORK_MATRIX: readonly NetworkDescriptor[] = [
     explorerBaseUrl: "https://www.hyperscan.com/",
     adapterId: "evm-hyperliquid-testnet",
   },
+  {
+    id: "hypercore-testnet",
+    label: "HyperCore Testnet",
+    family: "exchange",
+    stage: "available",
+    environment: "testnet",
+    finalityModel: "HyperCore state/API confirmation",
+    adapterId: "hyperliquid-core-testnet",
+  },
 ];
 
 export function getNetwork(networkId: NetworkId): NetworkDescriptor {

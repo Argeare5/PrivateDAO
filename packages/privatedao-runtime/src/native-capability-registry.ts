@@ -366,8 +366,8 @@ function applySolanaKernelPolicyReadiness(entry: NativeCapabilityEntry): NativeC
   };
 }
 
-function applyFutureEvmKernelPolicyReadiness(entry: NativeCapabilityEntry): NativeCapabilityEntry {
-  if (!["robinhood-testnet", "hyperliquid-testnet"].includes(entry.network)) return entry;
+function applyFutureKernelPolicyReadiness(entry: NativeCapabilityEntry): NativeCapabilityEntry {
+  if (!["robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"].includes(entry.network)) return entry;
   if (!["verification.blind.prove", "verification.record.create", "verification.record.verify", "payroll.calculate", "payroll.approve", "treasury.policy.check", "governance.proposal.execute", "auction.bid.commit", "auction.settle"].includes(entry.capability)) return entry;
   return {
     ...entry,
@@ -502,8 +502,8 @@ export function buildNativeCapabilityRegistry(): readonly NativeCapabilityEntry[
         const withZcash = applyZcashTestnetEvidence(withPayrollEvm);
         const withTempo = applyTempoTestnetEvidence(withZcash);
         const withSolanaPolicy = applySolanaKernelPolicyReadiness(withTempo);
-        const withFutureEvmPolicy = applyFutureEvmKernelPolicyReadiness(withSolanaPolicy);
-        const withSolanaOrg = applySolanaDevnetOrganizationalEvidence(withFutureEvmPolicy);
+        const withFuturePolicy = applyFutureKernelPolicyReadiness(withSolanaPolicy);
+        const withSolanaOrg = applySolanaDevnetOrganizationalEvidence(withFuturePolicy);
         return applyOrganizationalEvidence(withSolanaOrg);
       }),
     ),

@@ -105,7 +105,7 @@ export class KernelGatewayService {
     this.maxBodyBytes = options.maxBodyBytes || Number(process.env.PDAO_KERNEL_GATEWAY_MAX_BODY_BYTES || 1_000_000);
 
     const evmNetworks: readonly NetworkId[] = ["solana-devnet", "ethereum-sepolia", "arbitrum-sepolia", "tempo-testnet", "base-sepolia"];
-    const kernelNetworks: readonly NetworkId[] = [...evmNetworks, "zcash-testnet", "robinhood-testnet", "hyperliquid-testnet"];
+    const kernelNetworks: readonly NetworkId[] = [...evmNetworks, "zcash-testnet", "robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"];
     const zcashConfigured = Boolean(
       process.env.PDAO_ZCASH_ZALLET_BINARY?.trim()
       && process.env.PDAO_ZCASH_ZALLET_DATA_DIR?.trim()
@@ -129,7 +129,7 @@ export class KernelGatewayService {
         new AuctionOutcomeProofProvider(),
       ];
       for (const provider of providers) registry.register(scopedProvider(provider, network));
-      if (["zcash-testnet", "robinhood-testnet", "hyperliquid-testnet"].includes(network)) registry.register(new GovernancePolicyProvider(network));
+      if (["zcash-testnet", "robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"].includes(network)) registry.register(new GovernancePolicyProvider(network));
     }
     registry.register(new AgentDiscoveryProvider());
     registry.register(new SolanaBrowserExecutionProvider());
@@ -265,7 +265,7 @@ export class KernelGatewayService {
           network,
           provider: network === "zcash-testnet"
             ? this.zcashAdapter?.id || "privatedao-kernel-policy"
-            : ["robinhood-testnet", "hyperliquid-testnet"].includes(network)
+            : ["robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"].includes(network)
               ? "privatedao-kernel-policy"
             : network === "solana-devnet"
               ? "kernel-native"
