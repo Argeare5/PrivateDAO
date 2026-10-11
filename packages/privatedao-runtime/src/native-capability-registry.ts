@@ -287,7 +287,7 @@ function applyPayrollDevnetEvidence(entry: NativeCapabilityEntry): NativeCapabil
 
 function applyPayrollEvmPolicyEvidence(entry: NativeCapabilityEntry): NativeCapabilityEntry {
   if (entry.product !== "payroll" || !["payroll.calculate", "payroll.approve"].includes(entry.capability)) return entry;
-  if (!["ethereum-sepolia", "tempo-testnet", "base-sepolia"].includes(entry.network)) return entry;
+  if (!["ethereum-sepolia", "arbitrum-sepolia", "tempo-testnet", "base-sepolia"].includes(entry.network)) return entry;
   return {
     ...entry,
     provider: "privatedao-payroll-kernel",

@@ -180,7 +180,7 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
     entrypoint: "kernel://payroll.approve",
     note: "Kernel-backed Maker/Checker policy gate; wallet/network adapter must verify the supplied checker signature before production promotion.",
   },
-  ...(["ethereum-sepolia", "tempo-testnet", "base-sepolia"] as NetworkId[]).flatMap((network) => [
+  ...(["ethereum-sepolia", "arbitrum-sepolia", "tempo-testnet", "base-sepolia"] as NetworkId[]).flatMap((network) => [
     {
       product: "payroll" as ProductId,
       capability: "payroll.calculate" as CapabilityId,

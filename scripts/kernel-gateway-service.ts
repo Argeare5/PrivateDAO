@@ -46,6 +46,7 @@ const EVM_KERNEL_CAPABILITIES = [
 
 const PUBLIC_EVM_TESTNET_RPC_URLS: Partial<Record<NetworkId, string>> = {
   "ethereum-sepolia": "https://ethereum-sepolia-rpc.publicnode.com",
+  "arbitrum-sepolia": "https://sepolia-rollup.arbitrum.io/rpc",
   "tempo-testnet": "https://rpc.moderato.tempo.xyz",
   "base-sepolia": "https://sepolia.base.org",
 };
@@ -103,7 +104,7 @@ export class KernelGatewayService {
     this.requiredToken = options.requiredToken ?? process.env.PDAO_KERNEL_GATEWAY_TOKEN?.trim() ?? "";
     this.maxBodyBytes = options.maxBodyBytes || Number(process.env.PDAO_KERNEL_GATEWAY_MAX_BODY_BYTES || 1_000_000);
 
-    const evmNetworks: readonly NetworkId[] = ["solana-devnet", "ethereum-sepolia", "tempo-testnet", "base-sepolia"];
+    const evmNetworks: readonly NetworkId[] = ["solana-devnet", "ethereum-sepolia", "arbitrum-sepolia", "tempo-testnet", "base-sepolia"];
     const kernelNetworks: readonly NetworkId[] = [...evmNetworks, "zcash-testnet"];
     const zcashConfigured = Boolean(
       process.env.PDAO_ZCASH_ZALLET_BINARY?.trim()

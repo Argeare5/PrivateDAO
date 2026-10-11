@@ -8,7 +8,7 @@ const verifiedDevnet = entries.filter((entry) => entry.status === "devnet_verifi
 const verifiedPayroll = verifiedDevnet.filter((entry) => entry.product === "payroll");
 
 assert.equal(entries.length, 176, "unexpected native capability matrix size");
-assert.equal(verified.length, 34, "only evidence-backed testnet verification and organizational rows should be verified");
+assert.equal(verified.length, 36, "only evidence-backed testnet verification and organizational rows should be verified");
 assert.equal(liveAgents.length, 2, "the two live Agent Exchange rows must be runtime-verified");
 assert.equal(verifiedPayroll.length, 2, "only Payroll calculation and approval remain enabled on Solana Devnet");
 assert.equal(verifiedDevnet.length, 6, "Solana Devnet must include enabled Payroll plus the evidenced governance, treasury, and auction lanes");
@@ -56,6 +56,7 @@ assert.equal(verified.filter((entry) => entry.provider === "evm-base-sepolia-org
 assert.equal(verified.filter((entry) => entry.provider === "evm-base-sepolia-organizational").every((entry) => entry.chainId === "84532"), true);
 assert.equal(verified.filter((entry) => entry.provider === "evm-arbitrum-sepolia").length, 3, "Arbitrum Sepolia must have three verified verification rows");
 assert.equal(verified.filter((entry) => entry.provider === "evm-arbitrum-sepolia-organizational").length, 4, "Arbitrum organizational evidence must cover treasury, governance, and auction lanes");
+assert.equal(verified.filter((entry) => entry.network === "arbitrum-sepolia" && entry.provider === "privatedao-payroll-kernel").length, 2, "Arbitrum Sepolia must have Kernel payroll policy lanes");
 assert.equal(verified.filter((entry) => entry.network === "arbitrum-sepolia").every((entry) => entry.chainId === "421614"), true);
 assert.equal(verifiedDevnet.filter((entry) => entry.provider === "solana-devnet").length, 4, "Solana organizational evidence must cover treasury, governance, and auction lanes");
 assert.equal(verifiedDevnet.filter((entry) => entry.provider === "solana-devnet").every((entry) => entry.network === "solana-devnet"), true);

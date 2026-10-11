@@ -1243,6 +1243,7 @@ export const runtimeCatalog = {
       "networks": [
         "solana-devnet",
         "ethereum-sepolia",
+        "arbitrum-sepolia",
         "tempo-testnet",
         "base-sepolia",
         "zcash-testnet"
@@ -1274,6 +1275,23 @@ export const runtimeCatalog = {
             },
             {
               "network": "ethereum-sepolia",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.calculate",
+              "method": null,
+              "note": "Kernel payroll calculation is network-selectable; no private settlement or wallet movement is performed by this capability.",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": false,
+              "supportedAssets": [
+                "ETH"
+              ],
+              "provider": "privatedao-payroll-kernel"
+            },
+            {
+              "network": "arbitrum-sepolia",
               "mode": "kernel-gateway",
               "entrypoint": "kernel://payroll.calculate",
               "method": null,
@@ -1419,18 +1437,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "421614",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "executable": true,
               "supportsProof": false,
-              "supportsReceipt": false,
+              "supportsReceipt": true,
               "supportsReconciliation": false,
               "supportedAssets": [
                 "ETH"
               ],
-              "provider": "evm-arbitrum-sepolia"
+              "provider": "privatedao-payroll-kernel"
             },
             {
               "network": "arbitrum-one",
@@ -1674,6 +1692,23 @@ export const runtimeCatalog = {
               "provider": "privatedao-payroll-kernel"
             },
             {
+              "network": "arbitrum-sepolia",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.approve",
+              "method": null,
+              "note": "Kernel Maker/Checker approval is network-selectable; settlement remains a separate network-specific gate.",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": false,
+              "supportedAssets": [
+                "ETH"
+              ],
+              "provider": "privatedao-payroll-kernel"
+            },
+            {
               "network": "tempo-testnet",
               "mode": "kernel-gateway",
               "entrypoint": "kernel://payroll.approve",
@@ -1803,18 +1838,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "421614",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "executable": true,
               "supportsProof": false,
-              "supportsReceipt": false,
+              "supportsReceipt": true,
               "supportsReconciliation": false,
               "supportedAssets": [
                 "ETH"
               ],
-              "provider": "evm-arbitrum-sepolia"
+              "provider": "privatedao-payroll-kernel"
             },
             {
               "network": "arbitrum-one",

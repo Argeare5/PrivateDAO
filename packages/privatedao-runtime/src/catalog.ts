@@ -64,10 +64,10 @@ export const PRODUCT_CATALOG: readonly ProductDescriptor[] = [
     // Calculation and approval are Kernel workflows and can run on every
     // configured test network. Private settlement is a separate capability
     // and is only exposed after its network-specific E2E gate passes.
-    networks: [solanaDevnet, ethereumSepolia, tempoTestnet, baseSepolia, zcashTestnet],
+    networks: [solanaDevnet, ethereumSepolia, arbitrumSepolia, tempoTestnet, baseSepolia, zcashTestnet],
     capabilities: [
-      capability("payroll.calculate", "payroll", false, true, [solanaDevnet, ethereumSepolia, tempoTestnet, baseSepolia, "zcash-testnet"]),
-      capability("payroll.approve", "payroll", true, true, [solanaDevnet, ethereumSepolia, tempoTestnet, baseSepolia, "zcash-testnet"]),
+      capability("payroll.calculate", "payroll", false, true, [solanaDevnet, ethereumSepolia, arbitrumSepolia, tempoTestnet, baseSepolia, "zcash-testnet"]),
+      capability("payroll.approve", "payroll", true, true, [solanaDevnet, ethereumSepolia, arbitrumSepolia, tempoTestnet, baseSepolia, "zcash-testnet"]),
     ],
   },
   {

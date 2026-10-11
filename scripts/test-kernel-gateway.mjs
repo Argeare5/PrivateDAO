@@ -43,7 +43,7 @@ try {
   const prefixedHealth = await request("GET", "/api/healthz");
   assert.equal(prefixedHealth.status, 200);
   const zcashConfigured = Boolean(process.env.PDAO_ZCASH_ZALLET_BINARY && process.env.PDAO_ZCASH_ZALLET_DATA_DIR && process.env.PDAO_ZCASH_ZALLET_CONFIG);
-  const expectedNetworks = ["solana-devnet", "ethereum-sepolia", "tempo-testnet", "base-sepolia", "zcash-testnet"];
+  const expectedNetworks = ["solana-devnet", "ethereum-sepolia", "arbitrum-sepolia", "tempo-testnet", "base-sepolia", "zcash-testnet"];
   assert.deepEqual(health.networks, expectedNetworks);
   assert.equal(health.networkModes.length, expectedNetworks.length);
   for (const network of expectedNetworks) {
