@@ -28,7 +28,13 @@ and disabled Mainnet records; configuration presence is not support evidence.
 
 `PRODUCT_CATALOG` is the single customer-executable capability surface for the current release. It lists the product/network contracts, while the generated native capability registry applies the stricter evidence gate before a lane is advertised as executable. Current evidence-backed lanes include Solana Devnet payroll calculation/approval and governance/auction runtime paths, Ethereum Sepolia, Tempo Testnet, and Base Sepolia verification plus organizational treasury/governance/auction paths. Zcash Testnet exposes Kernel-only policy, verification, and commitment workflows, while its private payroll settlement lane remains gated by the live Zallet/Zebra health check. Umbra is not an active product binding. Each row remains limited to the product, action, asset, receipt, and reconciliation behavior actually evidenced for that network; a network appearing in the catalog alone is not a claim of on-chain settlement support.
 
-Robinhood Testnet and Hyperliquid Testnet now have explicit Kernel policy lanes for the supported organizational workflows. These lanes provide network-scoped validation, approvals, commitments, and receipt-shaped outcomes through the Kernel, but remain policy-only until each network has a real funded adapter, independent transaction evidence, confirmation, and reconciliation. They are therefore not advertised as on-chain settlement or mainnet support.
+Robinhood Testnet has verified organizational E2E evidence for Treasury,
+Governance, and Auctions, while its Blind Verification, Record Verification,
+and Payroll lanes remain explicit Kernel policy paths. Hyperliquid Testnet has
+explicit Kernel policy lanes for the supported organizational workflows. These
+policy lanes provide network-scoped validation, approvals, commitments, and
+receipt-shaped outcomes through the Kernel, but are not advertised as on-chain
+settlement or mainnet support without independent funded adapter evidence.
 
 For Hyperliquid, `hyperliquid-testnet` refers to HyperEVM (chain ID 998), the EVM execution surface. HyperCore is the native Hyperliquid trading/state layer, not a second EVM network. PrivateDAO must keep these surfaces separate: HyperCore data or trading actions require a dedicated native API/precompile adapter and independent evidence; they must not be inferred from HyperEVM RPC health or policy-lane readiness.
 

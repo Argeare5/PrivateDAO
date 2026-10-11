@@ -38,10 +38,13 @@ Treasury, or Auctions from the Kernel product surface.
 
 Ethereum Sepolia, Base Sepolia, Tempo Testnet, Arbitrum Sepolia, Solana Devnet,
 and the Zcash Testnet policy lane have committed evidence at different levels.
-Robinhood Testnet, Hyperliquid HyperEVM, and HyperCore currently expose
-network-scoped Kernel policy/readiness paths; they are not advertised as
-funded on-chain settlement until independent transaction, confirmation, and
-reconciliation evidence exists.
+Robinhood Testnet now has verified organizational E2E evidence for Treasury,
+Governance, and Auctions; its Blind Verification, Record Verification, and
+Payroll lanes remain Kernel policy paths until independently evidenced.
+Hyperliquid HyperEVM and HyperCore currently expose network-scoped
+Kernel policy/readiness paths; they are not advertised as funded on-chain
+settlement until independent transaction, confirmation, and reconciliation
+evidence exists.
 
 The application binding ledger is authoritative for whether a route is
 `kernel-gateway`, `legacy-provider`, or `unbound`. Only a `kernel-gateway`
