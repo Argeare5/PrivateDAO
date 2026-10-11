@@ -143,6 +143,7 @@ try {
     ["auction", "auction.bid.commit"],
     ["auction", "auction.settle"],
   ];
+  let stellarGatewayCapabilities = 0;
   for (const [product, capability] of stellarProductIntents) {
     const requestId = `gateway-stellar-${capability}`;
     const intentPayload = capability === "governance.proposal.execute"
@@ -177,7 +178,9 @@ try {
     const status = await request("GET", `/v1/executions/${encodeURIComponent(prepared.body.executionId)}/status`);
     assert.equal(status.status, 200);
     assert.equal(status.body.state, "awaiting_signature");
+    stellarGatewayCapabilities += 1;
   }
+  assert.equal(stellarGatewayCapabilities, 9);
 
   const governanceRequest = "gateway-zcash-governance";
   const governanceIntent = {
@@ -208,7 +211,7 @@ try {
   assert.equal(malformed.status, 400);
   const missing = await request("GET", "/v1/executions/missing/status");
   assert.equal(missing.status, 400);
-  console.log("KERNEL_GATEWAY_TEST: PASS");
+  console.log(`KERNEL_GATEWAY_TEST: PASS stellar_product_capabilities=${stellarGatewayCapabilities}`);
 } finally {
   try { process.kill(-child.pid, "SIGTERM"); } catch {}
   await new Promise((resolve) => setTimeout(resolve, 100));
