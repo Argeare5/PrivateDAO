@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { EvmNetworkAdapter, EVM_NETWORK_CONFIGS, ZcashNetworkAdapter, ZCASH_NETWORK_CONFIGS } from "../packages/privatedao-runtime/src/index.ts";
+import { EvmNetworkAdapter, EVM_NETWORK_CONFIGS, HyperCoreNetworkAdapter, ZcashNetworkAdapter, ZCASH_NETWORK_CONFIGS } from "../packages/privatedao-runtime/src/index.ts";
 
 const session = (network, address) => ({
   address,
@@ -101,4 +101,16 @@ const wrongZcashAdapter = new ZcashNetworkAdapter({
 });
 await assert.rejects(() => wrongZcashAdapter.connectWallet(), /different Zcash network/);
 
-console.log("WALLET_RECOVERY: PASS evm-chain-check=PASS zcash-testnet-check=PASS wrong-network-rejection=PASS");
+let hypercoreCalls = 0;
+const hypercore = new HyperCoreNetworkAdapter({
+  apiUrl: "https://api.hyperliquid-testnet.xyz/info",
+  fetchImpl: async () => {
+    hypercoreCalls += 1;
+    return new Response(JSON.stringify({ universe: [{ name: "ETH" }] }), { status: 200 });
+  },
+});
+assert.equal((await hypercore.health()).ok, true);
+assert.equal((await hypercore.health()).ok, true);
+assert.equal(hypercoreCalls, 2, "HyperCore recovery must remain stateless and reconnect per health check");
+
+console.log("WALLET_RECOVERY: PASS evm-chain-check=PASS zcash-testnet-check=PASS hypercore-stateless-recovery=PASS wrong-network-rejection=PASS");
