@@ -6,15 +6,15 @@ PrivateDAO products, dependencies, partnerships, or verified capabilities.
 
 ## Supplied Reference Set
 
-| Ecosystem reference | Networks named in the supplied material | PrivateDAO interpretation |
-|---|---|---|
-| BNB Agent Studio | BSC | External agent tooling reference only |
-| BNB Agent SDK | BSC, opBNB | External SDK reference only |
-| Greenfield SDK | Greenfield | External storage reference only |
-| MCP & Ask AI | BSC, opBNB, Greenfield | Documentation/distribution reference; not a dependency of PrivateDAO MCP |
-| MPP SDK | BSC, opBNB | Future machine-payment research; not enabled as a payment rail |
-| Scaled UI Amount / ERC-8056 | BSC | Presentation/attribution research; no current binding |
-| Privacy at Scale | BSC | Research reference; no implementation claim |
+| Ecosystem reference | Networks named in the supplied material | Reference card | PrivateDAO interpretation |
+|---|---|---|---|
+| BNB Agent Studio | BSC | `bnbchain-studio/` | External agent tooling reference only |
+| BNB Agent SDK | BSC, opBNB | `bnbagent-sdk/` | External SDK reference only |
+| Greenfield SDK | Greenfield | `greenfield-sdk/` | External storage reference only |
+| MCP & Ask AI | BSC, opBNB, Greenfield | `mcp/` | Documentation/distribution reference; not a dependency of PrivateDAO MCP |
+| MPP SDK | BSC, opBNB | `mpp-sdk/` | Future machine-payment research; not enabled as a payment rail |
+| Scaled UI Amount / ERC-8056 | BSC | `scaled-ui-amount/` | Presentation/attribution research; no current binding |
+| Privacy at Scale | BSC | `privacy-at-scale/` | Research reference; no implementation claim |
 
 ## What Is Actually Integrated
 

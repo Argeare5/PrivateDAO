@@ -106,9 +106,10 @@ The current BNB deployer balance was read-only verified at
 
 The BNB ecosystem references supplied by the user, including Agent Studio,
 Agent SDK, Greenfield, MCP/Ask AI, MPP, ERC-8056, and Privacy at Scale, are
-documented as external references only. They are not declared PrivateDAO
-products, dependencies, or partnerships without repository implementation and
-independent evidence.
+documented with their supplied reference-card paths in
+`docs/integrations/bnb-ecosystem-reference.md`. They remain external
+references only, not declared PrivateDAO products, dependencies, or
+partnerships without repository implementation and independent evidence.
 
 ## Recovery, Replay, and Resilience
 
