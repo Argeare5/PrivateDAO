@@ -327,7 +327,7 @@ assert.equal(listApplicationBindings().find((entry) => entry.capability === "age
 assert.equal(listApplicationBindings().find((entry) => entry.capability === "verification.blind.prove")?.mode, "kernel-gateway");
 assert.equal(listApplicationBindings().find((entry) => entry.capability === "auction.settle" && entry.network === "ethereum-sepolia")?.mode, "kernel-gateway");
 assert.equal(listApplicationBindings().find((entry) => entry.capability === "auction.bid.commit" && entry.network === "ethereum-sepolia")?.mode, "kernel-gateway");
-assert.equal(listApplicationBindings().find((entry) => entry.capability === "auction.settle" && entry.network === "solana-devnet")?.mode, "unbound");
+assert.equal(listApplicationBindings().find((entry) => entry.capability === "auction.settle" && entry.network === "solana-devnet")?.mode, "kernel-gateway");
 
 let currentTime = "2026-09-09T00:00:00.000Z";
 const expiredKernel = new PrivateDaoKernel(registry, { now: () => currentTime });
