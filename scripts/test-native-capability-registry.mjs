@@ -8,7 +8,7 @@ const verifiedDevnet = entries.filter((entry) => entry.status === "devnet_verifi
 const verifiedPayroll = verifiedDevnet.filter((entry) => entry.product === "payroll");
 
 assert.equal(entries.length, 176, "unexpected native capability matrix size");
-assert.equal(verified.length, 28, "only evidence-backed testnet verification and organizational rows should be verified");
+assert.equal(verified.length, 34, "only evidence-backed testnet verification and organizational rows should be verified");
 assert.equal(liveAgents.length, 2, "the two live Agent Exchange rows must be runtime-verified");
 assert.equal(verifiedPayroll.length, 2, "only Payroll calculation and approval remain enabled on Solana Devnet");
 assert.equal(verifiedDevnet.length, 6, "Solana Devnet must include enabled Payroll plus the evidenced governance, treasury, and auction lanes");
@@ -31,12 +31,14 @@ for (const entry of liveAgents) {
   assert.ok(entry.lastVerifiedTimestamp);
 }
 for (const entry of verified) {
-  assert.equal(entry.evidence, "testnet-e2e");
+  assert.ok(["testnet-e2e", "kernel-policy-testnet"].includes(entry.evidence));
   assert.equal(entry.supportsExecution, true);
   assert.equal(entry.supportsReceipt, true);
   assert.equal(entry.supportsMainnet, false);
-  assert.ok(entry.lastVerifiedCommit);
-  assert.ok(entry.lastVerifiedTimestamp);
+  if (entry.evidence === "testnet-e2e") {
+    assert.ok(entry.lastVerifiedCommit);
+    assert.ok(entry.lastVerifiedTimestamp);
+  }
 }
 for (const entry of verified.filter((candidate) => candidate.network === "tempo-testnet" && candidate.provider === "evm-tempo-testnet")) {
   assert.ok(["blind-verification", "record-verification"].includes(entry.product));
@@ -63,7 +65,12 @@ assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && 
 assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && entry.product === "record-verification")?.nativeAsset, "HYPE", "HyperEVM native asset must be HYPE");
 assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && entry.product === "record-verification")?.status, "planned", "HyperEVM must remain unverified until E2E evidence exists");
 
-assert.equal(entries.some((entry) => entry.network === "zcash-testnet" && entry.product === "payroll" && entry.declared), false, "Zcash must not be customer-facing in the current Payroll release");
+assert.equal(entries.some((entry) => entry.network === "zcash-testnet" && entry.product === "payroll" && entry.declared), true, "Zcash Kernel payroll policy workflows must be declared");
+for (const product of ["blind-verification", "record-verification", "treasury", "auction"]) {
+  const zcashRows = entries.filter((entry) => entry.network === "zcash-testnet" && entry.product === product && entry.declared);
+  assert.ok(zcashRows.length > 0, `${product} must expose a Zcash Kernel policy workflow`);
+  assert.equal(zcashRows.every((entry) => entry.status === "implementation" && entry.evidence === "runtime-only"), true, `${product} Zcash policy rows must not claim E2E`);
+}
 assert.equal(entries.some((entry) => entry.product === "payroll" && entry.capability === "payroll.settle"), false, "Payroll settlement must not be advertised without a native provider");
 
 assert.equal(entries.some((entry) => entry.network === "wormhole-integration"), false, "bridge network must not be present");

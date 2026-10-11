@@ -12,7 +12,8 @@ export const runtimeCatalog = {
         "ethereum-sepolia",
         "arbitrum-sepolia",
         "tempo-testnet",
-        "base-sepolia"
+        "base-sepolia",
+        "zcash-testnet"
       ],
       "capabilities": [
         {
@@ -106,6 +107,23 @@ export const runtimeCatalog = {
                 "ETH"
               ],
               "provider": "evm-base-sepolia"
+            },
+            {
+              "network": "zcash-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://verification.blind.prove",
+              "method": null,
+              "note": "Zcash Testnet blind verification runs through the Kernel policy provider; no Zcash settlement or wallet movement is implied.",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "TAZ"
+              ],
+              "provider": "privatedao-kernel-policy"
             }
           ],
           "networkAvailability": [
@@ -366,18 +384,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": null,
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "TAZ"
               ],
-              "provider": "zcash-testnet-zallet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "hyperliquid-testnet",
@@ -410,7 +428,8 @@ export const runtimeCatalog = {
         "ethereum-sepolia",
         "arbitrum-sepolia",
         "tempo-testnet",
-        "base-sepolia"
+        "base-sepolia",
+        "zcash-testnet"
       ],
       "capabilities": [
         {
@@ -504,6 +523,23 @@ export const runtimeCatalog = {
                 "ETH"
               ],
               "provider": "evm-base-sepolia"
+            },
+            {
+              "network": "zcash-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://verification.record.create",
+              "method": null,
+              "note": "Zcash Testnet record creation is a Kernel verification artifact; the source record remains off-chain and no Zcash transaction is implied.",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "TAZ"
+              ],
+              "provider": "privatedao-kernel-policy"
             }
           ],
           "networkAvailability": [
@@ -764,18 +800,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": null,
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "TAZ"
               ],
-              "provider": "zcash-testnet-zallet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "hyperliquid-testnet",
@@ -888,6 +924,23 @@ export const runtimeCatalog = {
                 "ETH"
               ],
               "provider": "evm-base-sepolia"
+            },
+            {
+              "network": "zcash-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://verification.record.verify",
+              "method": null,
+              "note": "Zcash Testnet record verification is performed by the Kernel without exposing source data or requiring a wallet transaction.",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "TAZ"
+              ],
+              "provider": "privatedao-kernel-policy"
             }
           ],
           "networkAvailability": [
@@ -1148,18 +1201,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": null,
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "TAZ"
               ],
-              "provider": "zcash-testnet-zallet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "hyperliquid-testnet",
@@ -1188,7 +1241,11 @@ export const runtimeCatalog = {
       "name": "Confidential Payroll",
       "availability": "available",
       "networks": [
-        "solana-devnet"
+        "solana-devnet",
+        "ethereum-sepolia",
+        "tempo-testnet",
+        "base-sepolia",
+        "zcash-testnet"
       ],
       "capabilities": [
         {
@@ -1212,6 +1269,74 @@ export const runtimeCatalog = {
               "supportsReconciliation": false,
               "supportedAssets": [
                 "WSOL"
+              ],
+              "provider": "privatedao-payroll-kernel"
+            },
+            {
+              "network": "ethereum-sepolia",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.calculate",
+              "method": null,
+              "note": "Kernel payroll calculation is network-selectable; no private settlement or wallet movement is performed by this capability.",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": false,
+              "supportedAssets": [
+                "ETH"
+              ],
+              "provider": "privatedao-payroll-kernel"
+            },
+            {
+              "network": "tempo-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.calculate",
+              "method": null,
+              "note": "Kernel payroll calculation is network-selectable; no private settlement or wallet movement is performed by this capability.",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": false,
+              "supportedAssets": [
+                "USD"
+              ],
+              "provider": "privatedao-payroll-kernel"
+            },
+            {
+              "network": "base-sepolia",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.calculate",
+              "method": null,
+              "note": "Kernel payroll calculation is network-selectable; no private settlement or wallet movement is performed by this capability.",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": false,
+              "supportedAssets": [
+                "ETH"
+              ],
+              "provider": "privatedao-payroll-kernel"
+            },
+            {
+              "network": "zcash-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.calculate",
+              "method": null,
+              "note": "Zcash Testnet payroll calculation is Kernel-only until the Zallet/Zebra compatibility gate enables the network.",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "TAZ"
               ],
               "provider": "privatedao-payroll-kernel"
             }
@@ -1258,18 +1383,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "11155111",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "executable": true,
               "supportsProof": false,
-              "supportsReceipt": false,
+              "supportsReceipt": true,
               "supportsReconciliation": false,
               "supportedAssets": [
                 "ETH"
               ],
-              "provider": "evm-ethereum-sepolia"
+              "provider": "privatedao-payroll-kernel"
             },
             {
               "network": "ethereum-mainnet",
@@ -1366,18 +1491,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "84532",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "executable": true,
               "supportsProof": false,
-              "supportsReceipt": false,
+              "supportsReceipt": true,
               "supportsReconciliation": false,
               "supportedAssets": [
                 "ETH"
               ],
-              "provider": "evm-base-sepolia"
+              "provider": "privatedao-payroll-kernel"
             },
             {
               "network": "base-mainnet",
@@ -1438,18 +1563,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "42431",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "executable": true,
               "supportsProof": false,
-              "supportsReceipt": false,
+              "supportsReceipt": true,
               "supportsReconciliation": false,
               "supportedAssets": [
                 "USD"
               ],
-              "provider": "evm-tempo-testnet"
+              "provider": "privatedao-payroll-kernel"
             },
             {
               "network": "tempo-mainnet",
@@ -1474,8 +1599,8 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": null,
-              "declared": false,
-              "mode": "unbound",
+              "declared": true,
+              "mode": "kernel-gateway",
               "evidenceStatus": "implementation",
               "evidence": "runtime-only",
               "executable": false,
@@ -1530,6 +1655,74 @@ export const runtimeCatalog = {
                 "WSOL"
               ],
               "provider": "privatedao-payroll-kernel"
+            },
+            {
+              "network": "ethereum-sepolia",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.approve",
+              "method": null,
+              "note": "Kernel Maker/Checker approval is network-selectable; settlement remains a separate network-specific gate.",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": false,
+              "supportedAssets": [
+                "ETH"
+              ],
+              "provider": "privatedao-payroll-kernel"
+            },
+            {
+              "network": "tempo-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.approve",
+              "method": null,
+              "note": "Kernel Maker/Checker approval is network-selectable; settlement remains a separate network-specific gate.",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": false,
+              "supportedAssets": [
+                "USD"
+              ],
+              "provider": "privatedao-payroll-kernel"
+            },
+            {
+              "network": "base-sepolia",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.approve",
+              "method": null,
+              "note": "Kernel Maker/Checker approval is network-selectable; settlement remains a separate network-specific gate.",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": false,
+              "supportedAssets": [
+                "ETH"
+              ],
+              "provider": "privatedao-payroll-kernel"
+            },
+            {
+              "network": "zcash-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.approve",
+              "method": null,
+              "note": "Zcash Testnet Maker/Checker approval is Kernel-only until wallet recovery and settlement pass independent E2E.",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "TAZ"
+              ],
+              "provider": "privatedao-payroll-kernel"
             }
           ],
           "networkAvailability": [
@@ -1574,18 +1767,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "11155111",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "executable": true,
               "supportsProof": false,
-              "supportsReceipt": false,
+              "supportsReceipt": true,
               "supportsReconciliation": false,
               "supportedAssets": [
                 "ETH"
               ],
-              "provider": "evm-ethereum-sepolia"
+              "provider": "privatedao-payroll-kernel"
             },
             {
               "network": "ethereum-mainnet",
@@ -1682,18 +1875,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "84532",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "executable": true,
               "supportsProof": false,
-              "supportsReceipt": false,
+              "supportsReceipt": true,
               "supportsReconciliation": false,
               "supportedAssets": [
                 "ETH"
               ],
-              "provider": "evm-base-sepolia"
+              "provider": "privatedao-payroll-kernel"
             },
             {
               "network": "base-mainnet",
@@ -1754,18 +1947,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "42431",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "kernel-policy-testnet",
+              "executable": true,
               "supportsProof": false,
-              "supportsReceipt": false,
+              "supportsReceipt": true,
               "supportsReconciliation": false,
               "supportedAssets": [
                 "USD"
               ],
-              "provider": "evm-tempo-testnet"
+              "provider": "privatedao-payroll-kernel"
             },
             {
               "network": "tempo-mainnet",
@@ -1790,8 +1983,8 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": null,
-              "declared": false,
-              "mode": "unbound",
+              "declared": true,
+              "mode": "kernel-gateway",
               "evidenceStatus": "implementation",
               "evidence": "runtime-only",
               "executable": false,
@@ -1834,7 +2027,8 @@ export const runtimeCatalog = {
         "ethereum-sepolia",
         "arbitrum-sepolia",
         "tempo-testnet",
-        "base-sepolia"
+        "base-sepolia",
+        "zcash-testnet"
       ],
       "capabilities": [
         {
@@ -1928,6 +2122,23 @@ export const runtimeCatalog = {
                 "ETH"
               ],
               "provider": "evm-base-sepolia-organizational"
+            },
+            {
+              "network": "zcash-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://treasury.policy.check",
+              "method": null,
+              "note": "Zcash Testnet Treasury policy checks run in the Kernel; this binding does not claim Zcash treasury settlement.",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "TAZ"
+              ],
+              "provider": "privatedao-kernel-policy"
             }
           ],
           "networkAvailability": [
@@ -2188,18 +2399,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": null,
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
               "executable": false,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "TAZ"
               ],
-              "provider": "zcash-testnet-zallet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "hyperliquid-testnet",
@@ -2630,7 +2841,8 @@ export const runtimeCatalog = {
         "ethereum-sepolia",
         "arbitrum-sepolia",
         "tempo-testnet",
-        "base-sepolia"
+        "base-sepolia",
+        "zcash-testnet"
       ],
       "capabilities": [
         {
@@ -2724,6 +2936,23 @@ export const runtimeCatalog = {
                 "ETH"
               ],
               "provider": "evm-base-sepolia-organizational"
+            },
+            {
+              "network": "zcash-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://auction.bid.commit",
+              "method": null,
+              "note": "Zcash Testnet sealed-bid commitments are computed in the Kernel; this binding does not claim on-chain Zcash auction settlement.",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "TAZ"
+              ],
+              "provider": "privatedao-kernel-policy"
             }
           ],
           "networkAvailability": [
@@ -2984,18 +3213,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": null,
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "TAZ"
               ],
-              "provider": "zcash-testnet-zallet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "hyperliquid-testnet",
@@ -3108,6 +3337,23 @@ export const runtimeCatalog = {
                 "ETH"
               ],
               "provider": "evm-base-sepolia-organizational"
+            },
+            {
+              "network": "zcash-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://auction.settle",
+              "method": null,
+              "note": "Zcash Testnet auction outcome proofs are Kernel artifacts; no Zcash financial settlement is implied.",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "TAZ"
+              ],
+              "provider": "privatedao-kernel-policy"
             }
           ],
           "networkAvailability": [
@@ -3368,18 +3614,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": null,
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "implementation",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "TAZ"
               ],
-              "provider": "zcash-testnet-zallet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "hyperliquid-testnet",

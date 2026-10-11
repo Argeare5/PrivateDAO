@@ -39,7 +39,7 @@ export interface NativeCapabilityEntry {
   status: NativeCapabilityStatus;
   lastVerifiedCommit: string | null;
   lastVerifiedTimestamp: string | null;
-  evidence: "none" | "runtime-only" | "devnet-e2e" | "testnet-e2e";
+  evidence: "none" | "runtime-only" | "kernel-policy-testnet" | "devnet-e2e" | "testnet-e2e";
 }
 
 const ETHEREUM_SEPOLIA_EVIDENCE = {
@@ -285,7 +285,48 @@ function applyPayrollDevnetEvidence(entry: NativeCapabilityEntry): NativeCapabil
   };
 }
 
+function applyPayrollEvmPolicyEvidence(entry: NativeCapabilityEntry): NativeCapabilityEntry {
+  if (entry.product !== "payroll" || !["payroll.calculate", "payroll.approve"].includes(entry.capability)) return entry;
+  if (!["ethereum-sepolia", "tempo-testnet", "base-sepolia"].includes(entry.network)) return entry;
+  return {
+    ...entry,
+    provider: "privatedao-payroll-kernel",
+    contracts: [],
+    walletModel: "none",
+    supportsExecution: true,
+    supportsPrivateExecution: false,
+    supportsPrivateSettlement: false,
+    supportsProof: false,
+    supportsReceipt: true,
+    supportsReconciliation: false,
+    status: "testnet_verified",
+    evidence: "kernel-policy-testnet",
+  };
+}
+
 function applyZcashTestnetEvidence(entry: NativeCapabilityEntry): NativeCapabilityEntry {
+  if (entry.network === "zcash-testnet" && [
+    "verification.blind.prove",
+    "verification.record.create",
+    "verification.record.verify",
+    "treasury.policy.check",
+    "auction.bid.commit",
+    "auction.settle",
+  ].includes(entry.capability)) {
+    return {
+      ...entry,
+      provider: "privatedao-kernel-policy",
+      walletModel: "none",
+      supportsExecution: true,
+      supportsPrivateExecution: false,
+      supportsPrivateSettlement: false,
+      supportsProof: entry.capability !== "treasury.policy.check",
+      supportsReceipt: true,
+      supportsReconciliation: true,
+      status: "implementation",
+      evidence: "runtime-only",
+    };
+  }
   if (entry.product !== "payroll" || entry.network !== "zcash-testnet") return entry;
   if (entry.capability === "payroll.calculate" || entry.capability === "payroll.approve") {
     return {
@@ -433,7 +474,8 @@ export function buildNativeCapabilityRegistry(): readonly NativeCapabilityEntry[
         const withArbitrum = applyArbitrumSepoliaEvidence(withBase);
         const withAgent = applyAgentMainnetEvidence(withArbitrum);
         const withPayroll = applyPayrollDevnetEvidence(withAgent);
-        const withZcash = applyZcashTestnetEvidence(withPayroll);
+        const withPayrollEvm = applyPayrollEvmPolicyEvidence(withPayroll);
+        const withZcash = applyZcashTestnetEvidence(withPayrollEvm);
         const withTempo = applyTempoTestnetEvidence(withZcash);
         const withSolanaOrg = applySolanaDevnetOrganizationalEvidence(withTempo);
         return applyOrganizationalEvidence(withSolanaOrg);
