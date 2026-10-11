@@ -22,6 +22,7 @@ import {
   ZalletCliTransport,
   ZcashNetworkAdapter,
   ZCASH_NETWORK_CONFIGS,
+  HyperCoreNetworkAdapter,
   AgentDiscoveryProvider,
   SolanaBrowserExecutionProvider,
   createPrivateDaoRuntime,
@@ -100,6 +101,7 @@ export class KernelGatewayService {
   private readonly evmProviders = new Map<NetworkId, EvmProviderEntry>();
   private readonly evmAdapters = new Map<NetworkId, EvmNetworkAdapter>();
   private readonly zcashAdapter?: ZcashNetworkAdapter;
+  private readonly hypercoreAdapter?: HyperCoreNetworkAdapter;
   private readonly runtime;
 
   constructor(options: KernelGatewayServiceOptions = {}) {
@@ -125,6 +127,9 @@ export class KernelGatewayService {
     // Kernel policy and verification workflows do not require a Zcash wallet.
     // The wallet-backed settlement adapter remains conditional below.
     this.supportedNetworks = kernelNetworks;
+    if (process.env.PDAO_HYPERCORE_API_ENABLED === "1") {
+      this.hypercoreAdapter = new HyperCoreNetworkAdapter();
+    }
 
     const registry = new InMemoryProviderRegistry();
     this.registerConfiguredEvmAdapters(registry, evmNetworks);
@@ -271,9 +276,10 @@ export class KernelGatewayService {
     const incomingPath = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`).pathname.replace(/\/+$/, "") || "/";
     const path = incomingPath.startsWith("/api/") ? incomingPath.slice(4) : incomingPath;
     if (path === "/healthz" && req.method === "GET") {
-      const [evmReadiness, zcashReadiness] = await Promise.all([
+      const [evmReadiness, zcashReadiness, hypercoreReadiness] = await Promise.all([
         Promise.all([...this.evmAdapters.entries()].map(async ([network, adapter]) => [network, await this.probe(() => adapter.health())] as const)),
         this.zcashAdapter ? this.probe(() => this.zcashAdapter!.health()) : Promise.resolve(null),
+        this.hypercoreAdapter ? this.hypercoreAdapter.health() : Promise.resolve(null),
       ]);
       const evmReady = Object.fromEntries(evmReadiness.map(([network, result]) => [network, result.ok]));
       this.writeJson(res, 200, {
@@ -291,11 +297,13 @@ export class KernelGatewayService {
               || (["robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"].includes(network)
                 ? "privatedao-kernel-policy"
                 : "kernel-native"),
-          onchainAdapter: network === "zcash-testnet"
-            ? Boolean(this.zcashAdapter)
-            : network === "solana-devnet"
-              ? false
-            : this.evmProviders.has(network),
+            onchainAdapter: network === "zcash-testnet"
+              ? Boolean(this.zcashAdapter)
+              : network === "solana-devnet"
+                ? false
+              : this.evmProviders.has(network),
+            nativeReadAdapter: network === "hypercore-testnet" ? this.hypercoreAdapter?.id || null : null,
+            nativeReadReady: network === "hypercore-testnet" ? Boolean(hypercoreReadiness?.ok) : false,
           ready: network === "zcash-testnet"
             ? Boolean(zcashReadiness?.ok)
             : network === "solana-devnet"
@@ -317,6 +325,15 @@ export class KernelGatewayService {
           readinessReason: zcashReadiness?.reason || (zcashReadiness?.ok ? "ready" : this.zcashAdapter ? "rpc_unavailable" : "policy_only_wallet_not_configured"),
           testnetOnly: true,
           broadcastEnabled: process.env.PDAO_ZCASH_BROADCAST_ENABLED === "1",
+        },
+        hypercore: {
+          configured: Boolean(this.hypercoreAdapter),
+          nativeReadAdapter: this.hypercoreAdapter?.id || null,
+          ready: Boolean(hypercoreReadiness?.ok),
+          universeSize: hypercoreReadiness?.universeSize,
+          readinessReason: hypercoreReadiness?.reason || (hypercoreReadiness?.ok ? "ready" : this.hypercoreAdapter ? "api_unavailable" : "native_read_adapter_not_configured"),
+          testnetOnly: true,
+          executionEnabled: false,
         },
       });
       return true;
