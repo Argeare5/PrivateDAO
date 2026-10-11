@@ -108,6 +108,7 @@
     "test:runtime:evm-foundation": "node --import tsx scripts/test-evm-foundation.mjs",
     "test:runtime:evm-product-capabilities": "node --import tsx scripts/test-evm-gateway-product-capabilities.mjs",
     "test:runtime:stellar": "node --import tsx scripts/test-stellar-kernel.mjs",
+    "verify:public-game-removed": "node scripts/verify-public-game-surface-removed.mjs",
     "test:runtime:solana-browser": "node --import tsx scripts/test-solana-browser-provider.mjs",
     "test:runtime:wallet-recovery": "node --import tsx scripts/test-wallet-recovery.mjs",
     "verify:robinhood:evidence": "node scripts/verify-robinhood-organizational-evidence.mjs",
