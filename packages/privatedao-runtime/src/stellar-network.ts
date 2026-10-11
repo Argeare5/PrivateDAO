@@ -46,6 +46,15 @@ export interface StellarUnsignedPayload {
   product: string;
   payload: unknown;
   accounts: readonly { role: string; address: string }[];
+  transactionXdr?: string;
+  transactionKind?: "payment";
+}
+
+export interface StellarPaymentPayload {
+  kind: "stellar-payment";
+  destination: string;
+  amount: string;
+  memo?: string;
 }
 
 export interface StellarSignedPayload {
@@ -140,6 +149,12 @@ export class StellarHorizonTransport implements StellarTransport {
       payload: intent.payload,
       accounts: intent.accounts.map(({ role, address }) => ({ role, address })),
     };
+    const payment = parsePaymentPayload(intent.payload);
+    if (payment) {
+      const built = await this.buildPaymentTransaction(intent, payment);
+      unsignedPayload.transactionXdr = built.xdr;
+      unsignedPayload.transactionKind = "payment";
+    }
     this.records.set(executionId, { intent: intent as ExecutionIntent<unknown>, state: "awaiting_signature", preparedAt: new Date().toISOString() });
     return {
       executionId,
@@ -212,6 +227,32 @@ export class StellarHorizonTransport implements StellarTransport {
     return { network: "stellar-testnet", atomicAmount: fee, asset: "stroops", expiresAt: new Date(Date.now() + 60_000).toISOString() };
   }
 
+  private async buildPaymentTransaction(intent: ExecutionIntent<unknown>, payment: StellarPaymentPayload): Promise<{ xdr: string }> {
+    const payer = intent.accounts.find((account) => account.role === "payer" || account.role === "authority");
+    if (!payer) throw new Error("Stellar payment requires a payer or authority account.");
+    const { Keypair, Horizon, Memo, Networks, Operation, TransactionBuilder, Asset } = await import("@stellar/stellar-sdk");
+    try {
+      Keypair.fromPublicKey(payer.address);
+      Keypair.fromPublicKey(payment.destination);
+    } catch {
+      throw new Error("Stellar payment contains an invalid public account.");
+    }
+    const server = new Horizon.Server(this.horizonUrl);
+    const source = await server.loadAccount(payer.address);
+    const fee = await this.estimateFee(intent);
+    let builder = new TransactionBuilder(source, {
+      fee: fee.atomicAmount,
+      networkPassphrase: Networks.TESTNET,
+    }).addOperation(Operation.payment({
+      destination: payment.destination,
+      asset: Asset.native(),
+      amount: payment.amount,
+    }));
+    if (payment.memo) builder = builder.addMemo(Memo.text(payment.memo));
+    const transaction = builder.setTimeout(60).build();
+    return { xdr: transaction.toXDR() };
+  }
+
   private async transaction(hash: string): Promise<HorizonTransaction> {
     return this.request<HorizonTransaction>(`/transactions/${encodeURIComponent(hash)}`);
   }
@@ -222,6 +263,17 @@ export class StellarHorizonTransport implements StellarTransport {
     if (!response.ok) throw new Error(`Stellar Horizon HTTP ${response.status}`);
     return body as T;
   }
+}
+
+function parsePaymentPayload(payload: unknown): StellarPaymentPayload | undefined {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) return undefined;
+  const candidate = payload as Partial<StellarPaymentPayload>;
+  if (candidate.kind !== "stellar-payment") return undefined;
+  if (typeof candidate.destination !== "string" || typeof candidate.amount !== "string" || candidate.amount.length === 0) {
+    throw new Error("Stellar payment requires destination and amount.");
+  }
+  if (candidate.memo !== undefined && typeof candidate.memo !== "string") throw new Error("Stellar payment memo must be text.");
+  return { kind: "stellar-payment", destination: candidate.destination, amount: candidate.amount, memo: candidate.memo };
 }
 
 export class StellarAdapterError extends Error {

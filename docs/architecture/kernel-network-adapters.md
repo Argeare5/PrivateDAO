@@ -61,8 +61,10 @@ BNB Testnet uses tBNB gas. These differences stay behind the adapter.
 - Zcash Testnet is not represented as EVM. Shielded wallet state, notes,
   anchors, confirmation, and broadcast guards remain Zcash-specific.
 - Stellar Testnet is not represented as EVM. Horizon account/ledger data,
-  receipt lookup, and workflow preparation remain behind the Stellar adapter;
-  signed XDR broadcast is fail-closed until a reviewed signer path is enabled.
+  receipt lookup, and workflow preparation remain behind the Stellar adapter.
+  The official `@stellar/stellar-sdk` builds unsigned Testnet XDR for payment
+  intents; signing remains in the external wallet boundary and signed XDR
+  broadcast is fail-closed until a reviewed signer path is enabled.
 - HyperCore is not HyperEVM. The current adapter is intentionally read-only;
   no financial execution claim is made for HyperCore.
 
