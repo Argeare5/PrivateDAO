@@ -13,6 +13,8 @@ const suites = [
   ["capability-matrix", ["npm", "run", "verify:native-capability-matrix"]],
   ["engineer-index", ["npm", "run", "verify:engineer-index"]],
   ["application-bindings", ["npm", "run", "verify:application-bindings"]],
+  ["bnb-evidence", ["npm", "run", "verify:bnb:evidence"]],
+  ["bnb-organizational-evidence", ["npm", "run", "verify:bnb:organizational-evidence"]],
   ["tracked-secrets", ["npm", "run", "verify:tracked-secrets"]],
   ["agent-mcp", ["npm", "run", "test:agent-mcp"]],
   ["social-previews", ["npm", "run", "verify:social-previews"]],
