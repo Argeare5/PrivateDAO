@@ -99,6 +99,8 @@
     "test:native-capability-registry": "node --import tsx scripts/test-native-capability-registry.mjs",
     "build:native-capability-matrix": "node --import tsx scripts/build-native-capability-matrix.mjs",
     "verify:native-capability-matrix": "node --import tsx scripts/verify-native-capability-matrix.mjs",
+    "build:engineer-index": "node --import tsx scripts/build-engineer-architecture-index.mjs",
+    "verify:engineer-index": "node --import tsx scripts/verify-engineer-architecture-index.mjs",
     "test:payment-rails": "node scripts/test-payment-rails.mjs",
     "test:vendored-bigint-buffer": "node scripts/test-vendored-bigint-buffer.mjs",
     "test:runtime:http-runtime": "node --import tsx scripts/test-runtime-http-runtime.mjs",

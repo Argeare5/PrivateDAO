@@ -14,6 +14,7 @@ product bindings, and independent on-chain evidence.
 | Which products enter the Kernel on which networks? | [`../../packages/privatedao-runtime/src/application-bindings.ts`](../../packages/privatedao-runtime/src/application-bindings.ts) |
 | What family, chain ID, finality, and adapter are used? | [`../../packages/privatedao-runtime/src/networks.ts`](../../packages/privatedao-runtime/src/networks.ts) |
 | What is independently proven? | [`product-network-evidence.md`](product-network-evidence.md) and [`../../docs/generated/native-capability-matrix-20260911.json`](../generated/native-capability-matrix-20260911.json) |
+| What is the machine-readable architecture manifest? | [`../generated/engineer-architecture-index.json`](../generated/engineer-architecture-index.json) |
 | How is BNB verified? | [`../integrations/bnb-testnet-e2e.md`](../integrations/bnb-testnet-e2e.md) |
 
 ## Architecture Tree
@@ -66,6 +67,14 @@ are the proof. The current matrix contains 204 product/network entries, 52
 `testnet_verified` entries, 6 `devnet_verified` entries, and 2 `mainnet_live`
 entries. Those counts are not a universal claim that every product runs on
 every network.
+
+The machine-readable architecture manifest is generated from `catalog.ts`,
+`networks.ts`, `application-bindings.ts`, and the native capability registry:
+
+```bash
+npm run build:engineer-index
+npm run verify:engineer-index
+```
 
 For a specific claim, require all of the following:
 
