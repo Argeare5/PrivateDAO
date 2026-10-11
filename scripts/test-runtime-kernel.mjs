@@ -96,7 +96,8 @@ const protocolRegistry = runtime.protocols;
 const registrations = protocolRegistry.list();
 const expectedRegistrationCount = products.reduce((count, product) => count + product.capabilities.length, 0);
 assert.equal(registrations.length, expectedRegistrationCount);
-assert.equal(protocolRegistry.list("payroll").length, 2);
+assert.equal(protocolRegistry.list("payroll").length, 3);
+assert.equal(protocolRegistry.list("payroll").some((entry) => entry.capability.id === "payroll.settle"), true);
 assert.equal(protocolRegistry.authorize("payroll.approve", "execution.submit", "checker"), true);
 assert.equal(protocolRegistry.authorize("payroll.approve", "execution.submit", "auditor"), false);
 
