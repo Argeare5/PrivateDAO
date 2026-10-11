@@ -16,6 +16,9 @@ const EVM_EXECUTABLE_SERVICES = new Set([
   "token.intelligence",
   "risk.score",
   "wallet.intelligence",
+  "contract.inspect",
+  "launch.check",
+  "forensics.trace",
   "transaction.simulate",
 ]);
 
@@ -219,6 +222,40 @@ export async function executeEvmService(config, serviceId, input = {}) {
     };
     if (block.result !== undefined) evidence.block_number = block.result;
     return evidence;
+  }
+  if (["contract.inspect", "launch.check"].includes(serviceId)) {
+    const evidence = await tokenCalls(config, network, input.asset || input.token || input.contract || input.mint || input.program || input.address);
+    if (serviceId === "contract.inspect") return {
+      network,
+      address: evidence.asset,
+      exists: evidence.contract_present,
+      owner: null,
+      executable: evidence.contract_present,
+      bytecode_bytes: evidence.bytecode_bytes,
+      provider_class: evidence.provider_class,
+      evidence_confidence: evidence.evidence_confidence,
+      observed_at: new Date().toISOString(),
+    };
+    return {
+      network,
+      asset: evidence.asset,
+      valid: evidence.contract_present,
+      authority_flags: { contract_present: evidence.contract_present, standard_metadata_available: Boolean(evidence.decimals && evidence.total_supply) },
+      evidence_confidence: evidence.evidence_confidence,
+      provider_class: evidence.provider_class,
+      observed_at: new Date().toISOString(),
+    };
+  }
+  if (serviceId === "forensics.trace") {
+    const address = input.wallet || input.address;
+    if (!hexAddress.test(address || "")) throw new Error("valid EVM address is required");
+    const [balance, nonce, block, transfers] = await Promise.all([
+      read(config, network, "eth_getBalance", [address, "latest"]),
+      read(config, network, "eth_getTransactionCount", [address, "latest"]),
+      read(config, network, "eth_blockNumber"),
+      alchemyData(config, network, "alchemy_getAssetTransfers", [{ fromAddress: address, category: ["external", "erc20", "erc721", "erc1155"], withMetadata: true, maxCount: "0x32" }]),
+    ]);
+    return { network, address, native_balance_wei: decodeUint(balance.result), transaction_count: Number.parseInt(nonce.result, 16), block_number: block.result, transfers: transfers?.transfers || null, provider_class: balance.providerClass, evidence_confidence: "rpc-confirmed", observed_at: new Date().toISOString() };
   }
   if (serviceId === "transaction.simulate") {
     const tx = input.transaction || input.unsignedTransaction;

@@ -17,6 +17,7 @@ test("human root is HTML while machine surfaces remain available", async () => {
   assert.match(root.headers["content-type"], /^text\/html/);
   assert.match(root.body, /PrivateDAO Agents/);
   assert.match(root.body, /Evidence for/);
+  assert.match(root.body, /If you or your agent hold at least \$25 worth of PDAO token/);
   assert.match(root.body, /DISCOVER/);
   assert.match(root.body, /IBM watsonx/);
   assert.match(root.body, /pdao-language-picker/);
@@ -97,6 +98,19 @@ test("human root is HTML while machine surfaces remain available", async () => {
   const walletService = catalog.services.find((service) => service.id === "wallet.intelligence");
   assert.deepEqual(walletService.input_schema.required, ["network"]);
   assert.ok(walletService.input_schema.anyOf.some((branch) => branch.required.includes("wallet")));
+  const botService = catalog.services.find((service) => service.id === "wallet.bot.classify");
+  assert.equal(botService.price, 1);
+  assert.deepEqual(botService.supported_target_networks, ["solana-mainnet-beta", "ethereum-mainnet", "base-mainnet", "arbitrum-mainnet"]);
+  assert.ok(botService.input_schema.anyOf.some((branch) => branch.required.includes("wallet")));
+  const botPage = await request("/services/wallet-bot-classify");
+  assert.equal(botPage.statusCode, 200);
+  assert.match(botPage.body, /Choose a wallet/);
+  assert.match(botPage.body, /Open Phantom Mobile/);
+  assert.match(botPage.body, /Open Solflare Mobile/);
+  assert.match(botPage.body, /onlyIfTrusted:false/);
+  assert.match(botPage.body, /provider\.connect\(\)/);
+  assert.match(botPage.body, /Target network/);
+  assert.match(botPage.body, /If you or your agent hold at least \$25 worth of PDAO token/);
   const portfolioService = catalog.services.find((service) => service.id === "portfolio.intelligence");
   assert.deepEqual(portfolioService.input_schema.properties.assets.minItems, 1);
   const simulationService = catalog.services.find((service) => service.id === "transaction.simulate");
@@ -321,9 +335,8 @@ test("paid jobs validate before quoting and separate payment from target network
     service_id: "launch.check",
     input: { network: "ethereum-mainnet", asset: "0x0000000000000000000000000000000000000001" },
   });
-  assert.equal(unsupportedEvm.statusCode, 400);
-  assert.match(unsupportedEvm.body, /launch\.check is not implemented on ethereum-mainnet/);
-  assert.doesNotMatch(unsupportedEvm.body, /payment_intent/);
+  assert.equal(unsupportedEvm.statusCode, 402);
+  assert.match(unsupportedEvm.body, /payment_intent/);
 });
 
 test("transaction simulation rejects a transaction hash before payment", async () => {
@@ -343,7 +356,7 @@ test("every paid job retains its validated input for post-payment execution", as
   resetForTests();
   const created = await request("/api/jobs", "POST", {
     service_id: "forensics.trace",
-    input: { wallet: "11111111111111111111111111111111", limit: 3 },
+    input: { network: "solana-mainnet-beta", wallet: "11111111111111111111111111111111", limit: 3 },
   });
   assert.equal(created.statusCode, 402);
   const quote = JSON.parse(created.body);
@@ -352,7 +365,7 @@ test("every paid job retains its validated input for post-payment execution", as
   assert.equal(persisted.statusCode, 200);
   const publicStatus = JSON.parse(persisted.body);
   assert.equal(publicStatus.execution_input, undefined);
-  assert.equal(publicStatus.target_network, null);
+  assert.equal(publicStatus.target_network, "solana-mainnet-beta");
   assert.match(publicStatus.input_hash, /^[a-f0-9]{64}$/);
 });
 
@@ -381,7 +394,7 @@ test("payment cannot replace the input bound to a paid quote", async () => {
   resetForTests();
   const created = await request("/api/jobs", "POST", {
     service_id: "forensics.trace",
-    input: { wallet: "11111111111111111111111111111111", limit: 3 },
+    input: { network: "solana-mainnet-beta", wallet: "11111111111111111111111111111111", limit: 3 },
   });
   const jobId = JSON.parse(created.body).payment_intent.jobId;
   const tampered = await request(`/api/jobs/${jobId}/payment`, "POST", {
