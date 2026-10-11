@@ -318,7 +318,7 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
     entrypoint: "kernel://governance.proposal.execute",
     note: "Zcash Testnet governance is a Kernel policy approval with an auditable receipt; it does not claim Zcash on-chain governance settlement.",
   },
-  ...(["robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"] as NetworkId[]).flatMap((network) => [
+  ...(["bnb-testnet", "robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"] as NetworkId[]).flatMap((network) => [
     {
       product: "blind-verification" as ProductId,
       capability: "verification.blind.prove" as CapabilityId,

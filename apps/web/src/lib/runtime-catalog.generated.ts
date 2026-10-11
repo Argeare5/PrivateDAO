@@ -13,6 +13,7 @@ export const runtimeCatalog = {
         "arbitrum-sepolia",
         "tempo-testnet",
         "base-sepolia",
+        "bnb-testnet",
         "zcash-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
@@ -110,6 +111,23 @@ export const runtimeCatalog = {
                 "ETH"
               ],
               "provider": "evm-base-sepolia"
+            },
+            {
+              "network": "bnb-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://verification.blind.prove",
+              "method": null,
+              "note": "This network uses the Kernel policy verification path; no contract write or settlement claim is made before funded E2E evidence.",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "testnet-e2e",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "BNB"
+              ],
+              "provider": "evm-bnb-testnet"
             },
             {
               "network": "zcash-testnet",
@@ -294,14 +312,14 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "97",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "testnet-e2e",
+              "executable": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "BNB"
               ],
@@ -501,6 +519,7 @@ export const runtimeCatalog = {
         "arbitrum-sepolia",
         "tempo-testnet",
         "base-sepolia",
+        "bnb-testnet",
         "zcash-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
@@ -598,6 +617,23 @@ export const runtimeCatalog = {
                 "ETH"
               ],
               "provider": "evm-base-sepolia"
+            },
+            {
+              "network": "bnb-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://verification.record.create",
+              "method": null,
+              "note": "Record creation is routed through the Kernel policy provider; the source record remains off-chain until network E2E is verified.",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "testnet-e2e",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "BNB"
+              ],
+              "provider": "evm-bnb-testnet"
             },
             {
               "network": "zcash-testnet",
@@ -782,14 +818,14 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "97",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "testnet-e2e",
+              "executable": true,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "BNB"
               ],
@@ -1070,6 +1106,23 @@ export const runtimeCatalog = {
               "provider": "evm-base-sepolia"
             },
             {
+              "network": "bnb-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://verification.record.verify",
+              "method": null,
+              "note": "Record verification is routed through the Kernel without exposing source data or claiming a chain anchor.",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "testnet-e2e",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "BNB"
+              ],
+              "provider": "evm-bnb-testnet"
+            },
+            {
               "network": "zcash-testnet",
               "mode": "kernel-gateway",
               "entrypoint": "kernel://verification.record.verify",
@@ -1252,14 +1305,14 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "97",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_verified",
+              "evidence": "testnet-e2e",
+              "executable": true,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "BNB"
               ],
@@ -1459,6 +1512,7 @@ export const runtimeCatalog = {
         "arbitrum-sepolia",
         "tempo-testnet",
         "base-sepolia",
+        "bnb-testnet",
         "zcash-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
@@ -1556,6 +1610,23 @@ export const runtimeCatalog = {
                 "ETH"
               ],
               "provider": "privatedao-payroll-kernel"
+            },
+            {
+              "network": "bnb-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.calculate",
+              "method": null,
+              "note": "Payroll calculation is network-selectable through the Kernel; private settlement remains separately gated.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "BNB"
+              ],
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "zcash-testnet",
@@ -1740,18 +1811,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "97",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "BNB"
               ],
-              "provider": "evm-bnb-testnet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "bnb-mainnet",
@@ -2028,6 +2099,23 @@ export const runtimeCatalog = {
               "provider": "privatedao-payroll-kernel"
             },
             {
+              "network": "bnb-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.approve",
+              "method": null,
+              "note": "Payroll Maker/Checker approval is network-selectable through the Kernel; settlement remains separately gated.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "BNB"
+              ],
+              "provider": "privatedao-kernel-policy"
+            },
+            {
               "network": "zcash-testnet",
               "mode": "kernel-gateway",
               "entrypoint": "kernel://payroll.approve",
@@ -2210,18 +2298,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "97",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "BNB"
               ],
-              "provider": "evm-bnb-testnet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "bnb-mainnet",
@@ -2751,6 +2839,7 @@ export const runtimeCatalog = {
         "arbitrum-sepolia",
         "tempo-testnet",
         "base-sepolia",
+        "bnb-testnet",
         "zcash-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
@@ -2848,6 +2937,23 @@ export const runtimeCatalog = {
                 "ETH"
               ],
               "provider": "evm-base-sepolia-organizational"
+            },
+            {
+              "network": "bnb-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://treasury.policy.check",
+              "method": null,
+              "note": "Treasury policy checks run through the Kernel; no asset movement or settlement is implied.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "BNB"
+              ],
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "zcash-testnet",
@@ -3032,18 +3138,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "97",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "BNB"
               ],
-              "provider": "evm-bnb-testnet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "bnb-mainnet",
@@ -3239,6 +3345,7 @@ export const runtimeCatalog = {
         "arbitrum-sepolia",
         "tempo-testnet",
         "base-sepolia",
+        "bnb-testnet",
         "zcash-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
@@ -3336,6 +3443,23 @@ export const runtimeCatalog = {
                 "ETH"
               ],
               "provider": "evm-base-sepolia-organizational"
+            },
+            {
+              "network": "bnb-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://governance.proposal.execute",
+              "method": null,
+              "note": "Governance authority approval runs through the Kernel policy provider; on-chain execution awaits funded E2E evidence.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "BNB"
+              ],
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "zcash-testnet",
@@ -3520,18 +3644,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "97",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "BNB"
               ],
-              "provider": "evm-bnb-testnet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "bnb-mainnet",
@@ -3727,6 +3851,7 @@ export const runtimeCatalog = {
         "arbitrum-sepolia",
         "tempo-testnet",
         "base-sepolia",
+        "bnb-testnet",
         "zcash-testnet",
         "robinhood-testnet",
         "hyperliquid-testnet",
@@ -3824,6 +3949,23 @@ export const runtimeCatalog = {
                 "ETH"
               ],
               "provider": "evm-base-sepolia-organizational"
+            },
+            {
+              "network": "bnb-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://auction.bid.commit",
+              "method": null,
+              "note": "Sealed-bid commitment runs through the Kernel; financial bid settlement is not claimed.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "BNB"
+              ],
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "zcash-testnet",
@@ -4008,18 +4150,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "97",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "BNB"
               ],
-              "provider": "evm-bnb-testnet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "bnb-mainnet",
@@ -4296,6 +4438,23 @@ export const runtimeCatalog = {
               "provider": "evm-base-sepolia-organizational"
             },
             {
+              "network": "bnb-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://auction.settle",
+              "method": null,
+              "note": "Auction outcome proof runs through the Kernel; financial settlement is not claimed.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "BNB"
+              ],
+              "provider": "privatedao-kernel-policy"
+            },
+            {
               "network": "zcash-testnet",
               "mode": "kernel-gateway",
               "entrypoint": "kernel://auction.settle",
@@ -4478,18 +4637,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "97",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "BNB"
               ],
-              "provider": "evm-bnb-testnet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "bnb-mainnet",

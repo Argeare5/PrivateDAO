@@ -6,6 +6,7 @@ const targetNetworks = [
   "solana-devnet",
   "ethereum-sepolia",
   "base-sepolia",
+  "bnb-testnet",
   "tempo-testnet",
   "zcash-testnet",
   "arbitrum-sepolia",

@@ -65,6 +65,17 @@ const BASE_SEPOLIA_EVIDENCE = {
   timestamp: "2026-09-17T00:39:48.896Z",
 } as const;
 
+const BNB_TESTNET_EVIDENCE = {
+  verifier: "0x26e3515d02bb3d8122fad109d159f43e81e8beeb",
+  contracts: [
+    "0xdd01da1b53ba46bf1ce8c71bc1c5e86e8784694b",
+    "0x6f813e1221cb5f760bb5c467983c014bbe4b3b5c",
+  ],
+  provider: "evm-bnb-testnet",
+  commit: "9755727ba",
+  timestamp: "2026-10-11T15:16:22.645Z",
+} as const;
+
 const ARBITRUM_SEPOLIA_EVIDENCE = {
   verifier: "0x53aa3e1d6c7a0844c900c5f4e0d4b5967a3367dc",
   contracts: [
@@ -255,6 +266,27 @@ function applyArbitrumSepoliaEvidence(entry: NativeCapabilityEntry): NativeCapab
   };
 }
 
+function applyBnbTestnetEvidence(entry: NativeCapabilityEntry): NativeCapabilityEntry {
+  const isBlind = entry.product === "blind-verification" && entry.capability === "verification.blind.prove";
+  const isRecord = entry.product === "record-verification" && ["verification.record.create", "verification.record.verify"].includes(entry.capability);
+  if (entry.network !== "bnb-testnet" || (!isBlind && !isRecord)) return entry;
+  return {
+    ...entry,
+    provider: BNB_TESTNET_EVIDENCE.provider,
+    contracts: BNB_TESTNET_EVIDENCE.contracts,
+    verifier: BNB_TESTNET_EVIDENCE.verifier,
+    walletModel: "provider-wallet",
+    supportsExecution: true,
+    supportsProof: isBlind,
+    supportsReceipt: true,
+    supportsReconciliation: true,
+    status: "testnet_verified",
+    lastVerifiedCommit: BNB_TESTNET_EVIDENCE.commit,
+    lastVerifiedTimestamp: BNB_TESTNET_EVIDENCE.timestamp,
+    evidence: "testnet-e2e",
+  };
+}
+
 function applyAgentMainnetEvidence(entry: NativeCapabilityEntry): NativeCapabilityEntry {
   if (entry.product !== "agent" || entry.network !== "solana-mainnet-beta") return entry;
   const isDiscovery = entry.capability === "agent.discover";
@@ -378,7 +410,7 @@ function applySolanaKernelPolicyReadiness(entry: NativeCapabilityEntry): NativeC
 }
 
 function applyFutureKernelPolicyReadiness(entry: NativeCapabilityEntry): NativeCapabilityEntry {
-  if (!["robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"].includes(entry.network)) return entry;
+  if (!["bnb-testnet", "robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"].includes(entry.network)) return entry;
   if (!["verification.blind.prove", "verification.record.create", "verification.record.verify", "payroll.calculate", "payroll.approve", "treasury.policy.check", "governance.proposal.execute", "auction.bid.commit", "auction.settle"].includes(entry.capability)) return entry;
   return {
     ...entry,
@@ -515,7 +547,8 @@ export function buildNativeCapabilityRegistry(): readonly NativeCapabilityEntry[
         const withSolanaPolicy = applySolanaKernelPolicyReadiness(withTempo);
         const withFuturePolicy = applyFutureKernelPolicyReadiness(withSolanaPolicy);
         const withSolanaOrg = applySolanaDevnetOrganizationalEvidence(withFuturePolicy);
-        return applyOrganizationalEvidence(withSolanaOrg);
+        const withBnb = applyBnbTestnetEvidence(withSolanaOrg);
+        return applyOrganizationalEvidence(withBnb);
       }),
     ),
   );

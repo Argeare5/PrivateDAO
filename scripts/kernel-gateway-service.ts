@@ -50,6 +50,7 @@ const PUBLIC_EVM_TESTNET_RPC_URLS: Partial<Record<NetworkId, string>> = {
   "arbitrum-sepolia": "https://sepolia-rollup.arbitrum.io/rpc",
   "tempo-testnet": "https://rpc.moderato.tempo.xyz",
   "base-sepolia": "https://sepolia.base.org",
+  "bnb-testnet": "https://bsc-testnet-dataseed.bnbchain.org",
   "robinhood-testnet": "https://rpc.testnet.chain.robinhood.com",
   // HyperEVM is the EVM surface of Hyperliquid. HyperCore remains a separate
   // native exchange surface and is intentionally not routed through this map.
@@ -130,6 +131,7 @@ export class KernelGatewayService {
       "arbitrum-sepolia",
       "tempo-testnet",
       "base-sepolia",
+      "bnb-testnet",
       "robinhood-testnet",
       "hyperliquid-testnet",
     ];
@@ -320,7 +322,7 @@ export class KernelGatewayService {
             : network === "solana-devnet"
               ? "kernel-native"
             : this.evmProviders.get(network)?.id
-              || (["robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"].includes(network)
+              || (["bnb-testnet", "robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"].includes(network)
                 ? "privatedao-kernel-policy"
                 : "kernel-native"),
             onchainAdapter: network === "zcash-testnet"
