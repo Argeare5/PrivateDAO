@@ -366,6 +366,24 @@ function applySolanaKernelPolicyReadiness(entry: NativeCapabilityEntry): NativeC
   };
 }
 
+function applyFutureEvmKernelPolicyReadiness(entry: NativeCapabilityEntry): NativeCapabilityEntry {
+  if (!["robinhood-testnet", "hyperliquid-testnet"].includes(entry.network)) return entry;
+  if (!["verification.blind.prove", "verification.record.create", "verification.record.verify", "payroll.calculate", "payroll.approve", "treasury.policy.check", "governance.proposal.execute", "auction.bid.commit", "auction.settle"].includes(entry.capability)) return entry;
+  return {
+    ...entry,
+    provider: "privatedao-kernel-policy",
+    walletModel: "none",
+    supportsExecution: true,
+    supportsPrivateExecution: false,
+    supportsPrivateSettlement: false,
+    supportsProof: !["treasury.policy.check", "payroll.calculate", "payroll.approve"].includes(entry.capability),
+    supportsReceipt: true,
+    supportsReconciliation: true,
+    status: "testnet_ready",
+    evidence: "runtime-only",
+  };
+}
+
 function applySolanaDevnetOrganizationalEvidence(entry: NativeCapabilityEntry): NativeCapabilityEntry {
   if (entry.network !== "solana-devnet") return entry;
   const isTreasury = entry.product === "treasury" && entry.capability === "treasury.policy.check";
@@ -484,7 +502,8 @@ export function buildNativeCapabilityRegistry(): readonly NativeCapabilityEntry[
         const withZcash = applyZcashTestnetEvidence(withPayrollEvm);
         const withTempo = applyTempoTestnetEvidence(withZcash);
         const withSolanaPolicy = applySolanaKernelPolicyReadiness(withTempo);
-        const withSolanaOrg = applySolanaDevnetOrganizationalEvidence(withSolanaPolicy);
+        const withFutureEvmPolicy = applyFutureEvmKernelPolicyReadiness(withSolanaPolicy);
+        const withSolanaOrg = applySolanaDevnetOrganizationalEvidence(withFutureEvmPolicy);
         return applyOrganizationalEvidence(withSolanaOrg);
       }),
     ),

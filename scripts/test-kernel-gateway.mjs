@@ -43,7 +43,7 @@ try {
   const prefixedHealth = await request("GET", "/api/healthz");
   assert.equal(prefixedHealth.status, 200);
   const zcashConfigured = Boolean(process.env.PDAO_ZCASH_ZALLET_BINARY && process.env.PDAO_ZCASH_ZALLET_DATA_DIR && process.env.PDAO_ZCASH_ZALLET_CONFIG);
-  const expectedNetworks = ["solana-devnet", "ethereum-sepolia", "arbitrum-sepolia", "tempo-testnet", "base-sepolia", "zcash-testnet"];
+  const expectedNetworks = ["solana-devnet", "ethereum-sepolia", "arbitrum-sepolia", "tempo-testnet", "base-sepolia", "zcash-testnet", "robinhood-testnet", "hyperliquid-testnet"];
   assert.deepEqual(health.networks, expectedNetworks);
   assert.equal(health.networkModes.length, expectedNetworks.length);
   for (const network of expectedNetworks) {
@@ -52,6 +52,10 @@ try {
     if (network === "zcash-testnet") {
       assert.equal(mode.provider, zcashConfigured ? "privatedao-zcash-testnet-zallet" : "privatedao-kernel-policy");
       assert.equal(mode.onchainAdapter, zcashConfigured);
+      assert.equal(mode.ready, false);
+    } else if (["robinhood-testnet", "hyperliquid-testnet"].includes(network)) {
+      assert.equal(mode.provider, "privatedao-kernel-policy");
+      assert.equal(mode.onchainAdapter, false);
       assert.equal(mode.ready, false);
     } else if (network === "solana-devnet") {
       assert.equal(mode.provider, "kernel-native");

@@ -13,7 +13,9 @@ export const runtimeCatalog = {
         "arbitrum-sepolia",
         "tempo-testnet",
         "base-sepolia",
-        "zcash-testnet"
+        "zcash-testnet",
+        "robinhood-testnet",
+        "hyperliquid-testnet"
       ],
       "capabilities": [
         {
@@ -124,6 +126,40 @@ export const runtimeCatalog = {
                 "TAZ"
               ],
               "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "robinhood-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://verification.blind.prove",
+              "method": null,
+              "note": "This network uses the Kernel policy verification path; no contract write or settlement claim is made before funded E2E evidence.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "ETH"
+              ],
+              "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "hyperliquid-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://verification.blind.prove",
+              "method": null,
+              "note": "This network uses the Kernel policy verification path; no contract write or settlement claim is made before funded E2E evidence.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "HYPE"
+              ],
+              "provider": "privatedao-kernel-policy"
             }
           ],
           "networkAvailability": [
@@ -312,18 +348,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "46630",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "ETH"
               ],
-              "provider": "evm-robinhood-testnet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "robinhood-mainnet",
@@ -402,18 +438,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "998",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "HYPE"
               ],
-              "provider": "evm-hyperliquid-testnet"
+              "provider": "privatedao-kernel-policy"
             }
           ]
         }
@@ -429,7 +465,9 @@ export const runtimeCatalog = {
         "arbitrum-sepolia",
         "tempo-testnet",
         "base-sepolia",
-        "zcash-testnet"
+        "zcash-testnet",
+        "robinhood-testnet",
+        "hyperliquid-testnet"
       ],
       "capabilities": [
         {
@@ -540,6 +578,40 @@ export const runtimeCatalog = {
                 "TAZ"
               ],
               "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "robinhood-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://verification.record.create",
+              "method": null,
+              "note": "Record creation is routed through the Kernel policy provider; the source record remains off-chain until network E2E is verified.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "ETH"
+              ],
+              "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "hyperliquid-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://verification.record.create",
+              "method": null,
+              "note": "Record creation is routed through the Kernel policy provider; the source record remains off-chain until network E2E is verified.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "HYPE"
+              ],
+              "provider": "privatedao-kernel-policy"
             }
           ],
           "networkAvailability": [
@@ -728,18 +800,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "46630",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "ETH"
               ],
-              "provider": "evm-robinhood-testnet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "robinhood-mainnet",
@@ -818,18 +890,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "998",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "HYPE"
               ],
-              "provider": "evm-hyperliquid-testnet"
+              "provider": "privatedao-kernel-policy"
             }
           ]
         },
@@ -941,6 +1013,40 @@ export const runtimeCatalog = {
                 "TAZ"
               ],
               "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "robinhood-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://verification.record.verify",
+              "method": null,
+              "note": "Record verification is routed through the Kernel without exposing source data or claiming a chain anchor.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "ETH"
+              ],
+              "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "hyperliquid-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://verification.record.verify",
+              "method": null,
+              "note": "Record verification is routed through the Kernel without exposing source data or claiming a chain anchor.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "HYPE"
+              ],
+              "provider": "privatedao-kernel-policy"
             }
           ],
           "networkAvailability": [
@@ -1129,18 +1235,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "46630",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "ETH"
               ],
-              "provider": "evm-robinhood-testnet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "robinhood-mainnet",
@@ -1219,18 +1325,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "998",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "HYPE"
               ],
-              "provider": "evm-hyperliquid-testnet"
+              "provider": "privatedao-kernel-policy"
             }
           ]
         }
@@ -1246,7 +1352,9 @@ export const runtimeCatalog = {
         "arbitrum-sepolia",
         "tempo-testnet",
         "base-sepolia",
-        "zcash-testnet"
+        "zcash-testnet",
+        "robinhood-testnet",
+        "hyperliquid-testnet"
       ],
       "capabilities": [
         {
@@ -1355,6 +1463,40 @@ export const runtimeCatalog = {
               "supportsReconciliation": true,
               "supportedAssets": [
                 "TAZ"
+              ],
+              "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "robinhood-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.calculate",
+              "method": null,
+              "note": "Payroll calculation is network-selectable through the Kernel; private settlement remains separately gated.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "ETH"
+              ],
+              "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "hyperliquid-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.calculate",
+              "method": null,
+              "note": "Payroll calculation is network-selectable through the Kernel; private settlement remains separately gated.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "HYPE"
               ],
               "provider": "privatedao-kernel-policy"
             }
@@ -1545,18 +1687,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "46630",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "ETH"
               ],
-              "provider": "evm-robinhood-testnet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "robinhood-mainnet",
@@ -1635,18 +1777,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "998",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "HYPE"
               ],
-              "provider": "evm-hyperliquid-testnet"
+              "provider": "privatedao-kernel-policy"
             }
           ]
         },
@@ -1758,6 +1900,40 @@ export const runtimeCatalog = {
                 "TAZ"
               ],
               "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "robinhood-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.approve",
+              "method": null,
+              "note": "Payroll Maker/Checker approval is network-selectable through the Kernel; settlement remains separately gated.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "ETH"
+              ],
+              "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "hyperliquid-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.approve",
+              "method": null,
+              "note": "Payroll Maker/Checker approval is network-selectable through the Kernel; settlement remains separately gated.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "HYPE"
+              ],
+              "provider": "privatedao-kernel-policy"
             }
           ],
           "networkAvailability": [
@@ -1946,18 +2122,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "46630",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "ETH"
               ],
-              "provider": "evm-robinhood-testnet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "robinhood-mainnet",
@@ -2036,18 +2212,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "998",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "HYPE"
               ],
-              "provider": "evm-hyperliquid-testnet"
+              "provider": "privatedao-kernel-policy"
             }
           ]
         }
@@ -2063,7 +2239,9 @@ export const runtimeCatalog = {
         "arbitrum-sepolia",
         "tempo-testnet",
         "base-sepolia",
-        "zcash-testnet"
+        "zcash-testnet",
+        "robinhood-testnet",
+        "hyperliquid-testnet"
       ],
       "capabilities": [
         {
@@ -2174,6 +2352,40 @@ export const runtimeCatalog = {
                 "TAZ"
               ],
               "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "robinhood-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://treasury.policy.check",
+              "method": null,
+              "note": "Treasury policy checks run through the Kernel; no asset movement or settlement is implied.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "ETH"
+              ],
+              "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "hyperliquid-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://treasury.policy.check",
+              "method": null,
+              "note": "Treasury policy checks run through the Kernel; no asset movement or settlement is implied.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "HYPE"
+              ],
+              "provider": "privatedao-kernel-policy"
             }
           ],
           "networkAvailability": [
@@ -2362,18 +2574,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "46630",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "ETH"
               ],
-              "provider": "evm-robinhood-testnet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "robinhood-mainnet",
@@ -2452,18 +2664,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "998",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "HYPE"
               ],
-              "provider": "evm-hyperliquid-testnet"
+              "provider": "privatedao-kernel-policy"
             }
           ]
         }
@@ -2479,7 +2691,9 @@ export const runtimeCatalog = {
         "arbitrum-sepolia",
         "tempo-testnet",
         "base-sepolia",
-        "zcash-testnet"
+        "zcash-testnet",
+        "robinhood-testnet",
+        "hyperliquid-testnet"
       ],
       "capabilities": [
         {
@@ -2590,6 +2804,40 @@ export const runtimeCatalog = {
                 "TAZ"
               ],
               "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "robinhood-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://governance.proposal.execute",
+              "method": null,
+              "note": "Governance authority approval runs through the Kernel policy provider; on-chain execution awaits funded E2E evidence.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "ETH"
+              ],
+              "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "hyperliquid-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://governance.proposal.execute",
+              "method": null,
+              "note": "Governance authority approval runs through the Kernel policy provider; on-chain execution awaits funded E2E evidence.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "HYPE"
+              ],
+              "provider": "privatedao-kernel-policy"
             }
           ],
           "networkAvailability": [
@@ -2778,18 +3026,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "46630",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "ETH"
               ],
-              "provider": "evm-robinhood-testnet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "robinhood-mainnet",
@@ -2868,18 +3116,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "998",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "HYPE"
               ],
-              "provider": "evm-hyperliquid-testnet"
+              "provider": "privatedao-kernel-policy"
             }
           ]
         }
@@ -2895,7 +3143,9 @@ export const runtimeCatalog = {
         "arbitrum-sepolia",
         "tempo-testnet",
         "base-sepolia",
-        "zcash-testnet"
+        "zcash-testnet",
+        "robinhood-testnet",
+        "hyperliquid-testnet"
       ],
       "capabilities": [
         {
@@ -3006,6 +3256,40 @@ export const runtimeCatalog = {
                 "TAZ"
               ],
               "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "robinhood-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://auction.bid.commit",
+              "method": null,
+              "note": "Sealed-bid commitment runs through the Kernel; financial bid settlement is not claimed.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "ETH"
+              ],
+              "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "hyperliquid-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://auction.bid.commit",
+              "method": null,
+              "note": "Sealed-bid commitment runs through the Kernel; financial bid settlement is not claimed.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "HYPE"
+              ],
+              "provider": "privatedao-kernel-policy"
             }
           ],
           "networkAvailability": [
@@ -3194,18 +3478,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "46630",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "ETH"
               ],
-              "provider": "evm-robinhood-testnet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "robinhood-mainnet",
@@ -3284,18 +3568,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "998",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "HYPE"
               ],
-              "provider": "evm-hyperliquid-testnet"
+              "provider": "privatedao-kernel-policy"
             }
           ]
         },
@@ -3407,6 +3691,40 @@ export const runtimeCatalog = {
                 "TAZ"
               ],
               "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "robinhood-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://auction.settle",
+              "method": null,
+              "note": "Auction outcome proof runs through the Kernel; financial settlement is not claimed.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "ETH"
+              ],
+              "provider": "privatedao-kernel-policy"
+            },
+            {
+              "network": "hyperliquid-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://auction.settle",
+              "method": null,
+              "note": "Auction outcome proof runs through the Kernel; financial settlement is not claimed.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "HYPE"
+              ],
+              "provider": "privatedao-kernel-policy"
             }
           ],
           "networkAvailability": [
@@ -3595,18 +3913,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "46630",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "ETH"
               ],
-              "provider": "evm-robinhood-testnet"
+              "provider": "privatedao-kernel-policy"
             },
             {
               "network": "robinhood-mainnet",
@@ -3685,18 +4003,18 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "998",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
+              "supportsProof": true,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
               "supportedAssets": [
                 "HYPE"
               ],
-              "provider": "evm-hyperliquid-testnet"
+              "provider": "privatedao-kernel-policy"
             }
           ]
         }

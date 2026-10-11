@@ -6,6 +6,7 @@ import type {
   PreparedExecution,
   ProviderId,
 } from "./index.js";
+import type { NetworkId } from "./index.js";
 
 export interface GovernancePolicyPayload {
   proposalId: string;
@@ -34,9 +35,14 @@ type GovernanceRecord = {
  * emits an auditable receipt; it never signs, broadcasts, or settles on-chain.
  */
 export class GovernancePolicyProvider implements KernelProvider {
-  readonly id: ProviderId = "privatedao-governance-policy";
-  readonly networks = ["zcash-testnet"] as const;
+  readonly id: ProviderId;
+  readonly networks: readonly NetworkId[];
   private readonly records = new Map<string, GovernanceRecord>();
+
+  constructor(network: NetworkId) {
+    this.id = `privatedao-governance-policy-${network}`;
+    this.networks = [network];
+  }
 
   supports(capability: string): boolean {
     return capability === "governance.proposal.execute";

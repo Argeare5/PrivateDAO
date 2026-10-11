@@ -64,7 +64,12 @@ assert.equal(entries.find((entry) => entry.network === "tempo-testnet" && entry.
 assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && entry.product === "record-verification")?.networkFamily, "evm", "HyperEVM must use the EVM adapter family");
 assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && entry.product === "record-verification")?.chainId, "998", "HyperEVM testnet chain ID must be 998");
 assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && entry.product === "record-verification")?.nativeAsset, "HYPE", "HyperEVM native asset must be HYPE");
-assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && entry.product === "record-verification")?.status, "planned", "HyperEVM must remain unverified until E2E evidence exists");
+assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && entry.product === "record-verification")?.status, "testnet_ready", "HyperEVM policy paths must be ready without claiming on-chain E2E");
+for (const network of ["robinhood-testnet", "hyperliquid-testnet"]) {
+  const policyRows = entries.filter((entry) => entry.network === network && entry.declared && entry.product !== "agent");
+  assert.equal(policyRows.length, 9, `${network} must expose all Kernel policy product lanes`);
+  assert.equal(policyRows.every((entry) => entry.status === "testnet_ready" && entry.evidence === "runtime-only"), true, `${network} policy rows must not claim on-chain E2E`);
+}
 
 assert.equal(entries.some((entry) => entry.network === "zcash-testnet" && entry.product === "payroll" && entry.declared), true, "Zcash Kernel payroll policy workflows must be declared");
 for (const product of ["blind-verification", "record-verification", "treasury", "auction"]) {
