@@ -83,7 +83,7 @@ const HYPERLIQUID_TESTNET_EVIDENCE = {
     "0x6f813e1221cb5f760bb5c467983c014bbE4B3B5c",
   ],
   provider: "evm-hyperliquid-testnet",
-  commit: "f2ef80d81",
+  commit: "8449317fc",
   timestamp: "2026-10-11T14:08:00.682Z",
 } as const;
 
