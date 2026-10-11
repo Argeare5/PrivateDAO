@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
 import { encodeFunctionData, parseAbi } from "viem";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { PublicKey } from "@solana/web3.js";
 import { auctionWriteAbi, getEvmProductContracts, governanceWriteAbi } from "@/lib/evm-contract-config";
+import { buildExecuteProposalTransaction, PRIVATE_DAO_PROGRAM_ID } from "@/lib/dao-bootstrap";
 
 type KernelWorkflowRunnerProps = {
   product: string;
@@ -64,6 +67,11 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
   const [evmCommitment, setEvmCommitment] = useState("");
   const [evmWalletAddress, setEvmWalletAddress] = useState<string | null>(null);
   const [evmWalletChain, setEvmWalletChain] = useState<string | null>(null);
+  const [solanaDaoAddress, setSolanaDaoAddress] = useState("");
+  const [solanaProposalAddress, setSolanaProposalAddress] = useState("");
+  const [solanaTreasuryRecipient, setSolanaTreasuryRecipient] = useState("");
+  const { connection } = useConnection();
+  const { connected: solanaConnected, publicKey: solanaPublicKey, sendTransaction } = useWallet();
 
   async function connectEvmWallet() {
     const provider = getEvmProvider();
@@ -98,6 +106,25 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
       const manifestCommitment = await digestHex(`PrivateDAO:${batchId}:payroll-demo`);
       const recipientHash = await digestHex(`PrivateDAO:${batchId}:recipient-demo`);
       return { kind: "umbra-payroll", manifestCommitment, recipientHash, recipientCount: 1, totalAmount: "0.001", asset: "WSOL", batchId, sensitive: true };
+    }
+    if (network === "solana-devnet" && capability === "governance.proposal.execute") {
+      if (!solanaConnected || !solanaPublicKey) throw new Error("Connect a Solana Devnet wallet before preparing governance execution.");
+      try {
+        new PublicKey(solanaDaoAddress.trim());
+        new PublicKey(solanaProposalAddress.trim());
+        if (solanaTreasuryRecipient.trim()) new PublicKey(solanaTreasuryRecipient.trim());
+      } catch {
+        throw new Error("Enter valid Solana DAO and proposal addresses.");
+      }
+      return {
+        kind: "solana-browser-transaction",
+        operation: "governance.proposal.execute",
+        account: solanaPublicKey.toBase58(),
+        programId: PRIVATE_DAO_PROGRAM_ID.toBase58(),
+        daoAddress: solanaDaoAddress.trim(),
+        proposalAddress: solanaProposalAddress.trim(),
+        treasuryRecipient: solanaTreasuryRecipient.trim() || solanaPublicKey.toBase58(),
+      };
     }
     const evmContracts = getEvmProductContracts(network);
     if (evmContracts && capability === "governance.proposal.execute") {
@@ -219,13 +246,29 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
       if (prepared.signingMode === "browser") {
         const provider = getEvmProvider();
         const payload = prepared.unsignedPayload;
-        if (!provider || !payload || typeof payload.address !== "string" || typeof payload.account !== "string" || typeof payload.functionName !== "string" || !Array.isArray(payload.abi) || !Array.isArray(payload.args)) {
-          throw new Error("The prepared browser-wallet transaction is incomplete.");
+        if (payload?.kind === "solana-browser-transaction") {
+          if (!solanaConnected || !solanaPublicKey) throw new Error("Connect a Solana Devnet wallet before signing.");
+          if (solanaPublicKey.toBase58() !== payload.account || typeof payload.daoAddress !== "string" || typeof payload.proposalAddress !== "string") {
+            throw new Error("The connected Solana wallet does not match the prepared governance execution.");
+          }
+          const built = await buildExecuteProposalTransaction({
+            connection,
+            daoAddress: new PublicKey(payload.daoAddress),
+            executor: solanaPublicKey,
+            proposalAddress: new PublicKey(payload.proposalAddress),
+            treasuryRecipient: new PublicKey(typeof payload.treasuryRecipient === "string" ? payload.treasuryRecipient : payload.account),
+          });
+          const signature = await sendTransaction(built.transaction, connection, { skipPreflight: false, preflightCommitment: "confirmed" });
+          signedPayload = { kind: "browser-solana-transaction", signature };
+        } else {
+          if (!provider || !payload || typeof payload.address !== "string" || typeof payload.account !== "string" || typeof payload.functionName !== "string" || !Array.isArray(payload.abi) || !Array.isArray(payload.args)) {
+            throw new Error("The prepared browser-wallet transaction is incomplete.");
+          }
+          const data = encodeFunctionData({ abi: parseAbi(payload.abi as string[]), functionName: payload.functionName, args: payload.args });
+          const hash = await provider.request({ method: "eth_sendTransaction", params: [{ from: payload.account, to: payload.address, data }] });
+          if (typeof hash !== "string" || !/^0x[0-9a-fA-F]{64}$/.test(hash)) throw new Error("The wallet did not return a valid transaction hash.");
+          signedPayload = { kind: "browser-evm-transaction", hash };
         }
-        const data = encodeFunctionData({ abi: parseAbi(payload.abi as string[]), functionName: payload.functionName, args: payload.args });
-        const hash = await provider.request({ method: "eth_sendTransaction", params: [{ from: payload.account, to: payload.address, data }] });
-        if (typeof hash !== "string" || !/^0x[0-9a-fA-F]{64}$/.test(hash)) throw new Error("The wallet did not return a valid transaction hash.");
-        signedPayload = { kind: "browser-evm-transaction", hash };
       }
       const submitResponse = await fetch(`${RUNTIME_API_BASE}/v1/executions/submit`, {
         method: "POST",
@@ -268,6 +311,11 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
           <button type="button" onClick={() => void connectEvmWallet().catch((cause) => setError(cause instanceof Error ? cause.message : "Wallet connection failed."))} className="inline-flex min-h-10 items-center rounded-[9px] border border-[#175cd3] px-3 py-2 text-xs font-semibold text-[#175cd3]">{evmWalletAddress ? `Connected ${evmWalletAddress.slice(0, 6)}…${evmWalletAddress.slice(-4)}` : "Connect EVM wallet"}</button>
         </div>
         {evmWalletAddress && evmWalletChain?.toLowerCase() === chainHex(network).toLowerCase() ? <div className="mt-2 text-xs text-[#1a7f5a]">Wallet ready on {networkLabel}.</div> : null}
+      </div> : null}
+      {network === "solana-devnet" && capability === "governance.proposal.execute" ? <div className="mt-5 grid gap-3 rounded-[14px] border border-[#d7e2f0] bg-white p-4 sm:grid-cols-3">
+        <label className="text-xs font-semibold text-[#40536d]">DAO address<input value={solanaDaoAddress} onChange={(event) => setSolanaDaoAddress(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-mono font-normal" autoComplete="off" placeholder="Solana Devnet address" /></label>
+        <label className="text-xs font-semibold text-[#40536d]">Proposal address<input value={solanaProposalAddress} onChange={(event) => setSolanaProposalAddress(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-mono font-normal" autoComplete="off" placeholder="Solana Devnet address" /></label>
+        <label className="text-xs font-semibold text-[#40536d]">Treasury recipient<input value={solanaTreasuryRecipient} onChange={(event) => setSolanaTreasuryRecipient(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-mono font-normal" autoComplete="off" placeholder="Optional; defaults to wallet" /></label>
       </div> : null}
       {getEvmProductContracts(network) && capability === "governance.proposal.execute" ? <div className="mt-3 grid gap-3 rounded-[14px] border border-[#d7e2f0] bg-white p-4 sm:grid-cols-2">
         <label className="text-xs font-semibold text-[#40536d]">Proposal ID (bytes32)<input value={evmProposalId} onChange={(event) => setEvmProposalId(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-mono font-normal" autoComplete="off" placeholder="0x..." /></label>

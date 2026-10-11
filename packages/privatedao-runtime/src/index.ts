@@ -134,6 +134,8 @@ export interface ProtocolReceipt<TResult = unknown> extends ExecutionReceipt<TRe
 }
 
 export { InMemoryProviderRegistry, KernelError, PrivateDaoKernel, reconcileSettlements } from "./kernel.js";
+export { SolanaBrowserExecutionProvider } from "./solana-browser-execution-provider.js";
+export type { SolanaBrowserExecutionPayload, SolanaBrowserSignedPayload } from "./solana-browser-execution-provider.js";
 export { SolanaPayrollSettlementProvider } from "./solana-payroll-settlement-provider.js";
 export type { SolanaPayrollSettlementPayload } from "./solana-payroll-settlement-provider.js";
 export type {

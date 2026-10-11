@@ -200,8 +200,9 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
     product: "governance",
     capability: "governance.proposal.execute",
     network: "solana-devnet",
-    mode: "unbound",
-    note: "Solana governance currently uses its wallet-first program route; it is not yet exposed through the unified Kernel gateway.",
+    mode: "kernel-gateway",
+    entrypoint: "kernel://governance.proposal.execute",
+    note: "Solana Devnet governance uses the existing PrivateDAO program transaction builder through the browser-signing Kernel boundary.",
   },
   {
     product: "governance",

@@ -22,6 +22,7 @@ import {
   ZcashNetworkAdapter,
   ZCASH_NETWORK_CONFIGS,
   AgentDiscoveryProvider,
+  SolanaBrowserExecutionProvider,
   createPrivateDaoRuntime,
   type ExecutionIntent,
   type KernelProvider,
@@ -125,6 +126,7 @@ export class KernelGatewayService {
       for (const provider of providers) registry.register(scopedProvider(provider, network));
     }
     registry.register(new AgentDiscoveryProvider());
+    registry.register(new SolanaBrowserExecutionProvider());
 
     if (zcashConfigured) {
       const config = ZCASH_NETWORK_CONFIGS.find((entry) => entry.network === "zcash-testnet");
