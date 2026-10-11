@@ -103,6 +103,7 @@
     "test:runtime:evm-foundation": "node --import tsx scripts/test-evm-foundation.mjs",
     "test:runtime:evm-product-capabilities": "node --import tsx scripts/test-evm-gateway-product-capabilities.mjs",
     "test:runtime:solana-browser": "node --import tsx scripts/test-solana-browser-provider.mjs",
+    "test:runtime:solana-auction": "node --import tsx scripts/test-solana-auction-kernel-provider.mjs",
     "test:runtime:zcash-foundation": "node --import tsx scripts/test-zcash-foundation.mjs",
     "test:zcash:e2e-runner": "node scripts/test-zcash-e2e-runner.mjs",
     "test:zcash:wait-ready": "node scripts/test-zcash-wait-ready.mjs",
