@@ -302,6 +302,19 @@ assert.throws(
   () => gateway.prepare({ ...intent, context: { ...intent.context, product: "payroll", capability: "payroll.approve" } }, "auditor"),
   (error) => error?.code === "INVALID_INTENT",
 );
+await assert.rejects(
+  () => gateway.prepare({
+    ...intent,
+    context: {
+      ...intent.context,
+      requestId: "solana-payroll-settlement-rejected",
+      idempotencyKey: "solana-payroll-settlement-rejected",
+      product: "payroll",
+      capability: "payroll.settle",
+    },
+  }, "maker"),
+  (error) => error?.code === "UNSUPPORTED_NETWORK",
+);
 
 const emptyRuntime = createPrivateDaoRuntime(new InMemoryProviderRegistry());
 await assert.rejects(
