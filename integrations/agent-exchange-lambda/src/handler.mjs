@@ -55,6 +55,7 @@ function secretMatches(supplied, storedHash) {
 }
 const MARKETPLACE_POLICY_ID = "platform_settings_marketplace";
 const SELLER_TERMS_VERSION = "seller-marketplace-v1";
+const COMMERCIAL_HOLDER_OFFER = "If you or your agent hold at least $25 worth of PDAO token 9isGuumtaqvJeJeyLF44fvfskk2cv5mYsopexMBfpump in your wallet, you enjoy all verification services for one month without usage limits. Buy PDAO and save payments for one month.";
 const DEFAULT_MARKETPLACE_POLICY = {
   version: 2,
   listing_fee_usd: 10,
@@ -1052,6 +1053,9 @@ function capabilityStatus(serviceId) {
 function serviceExample(service) {
   if (service.id === "transaction.simulate") return { network: "ethereum-mainnet", transaction: { to: "0x0000000000000000000000000000000000000000", data: "0x" } };
   if (service.id === "swap.quote") return { network: "solana-mainnet-beta", inputMint: "So11111111111111111111111111111111111111112", outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", amount: "1000000", slippageBps: 50 };
+  if (service.id === "contract.inspect") return { network: "ethereum-mainnet", asset: "0x0000000000000000000000000000000000000000" };
+  if (service.id === "launch.check") return { network: "ethereum-mainnet", asset: "0x0000000000000000000000000000000000000000" };
+  if (service.id === "forensics.trace") return { network: "ethereum-mainnet", wallet: "0x0000000000000000000000000000000000000000" };
   if (service.input.includes("token identifier")) return { network: "ethereum-mainnet", asset: "0x0000000000000000000000000000000000000000" };
   if (service.input.includes("mint")) return { network: "solana-mainnet-beta", mint: "YOUR_SOLANA_MINT" };
   if (service.input.includes("wallet")) return { network: "solana-mainnet-beta", wallet: "YOUR_SOLANA_WALLET" };
@@ -1129,22 +1133,28 @@ function serviceInputSchema(service) {
   if (id === "contract.inspect") return {
     type: "object",
     properties: {
+      network: NETWORK_SCHEMA(service),
       program: { type: "string", pattern: ADDRESS_PATTERN, description: "Solana program address." },
       address: { type: "string", pattern: ADDRESS_PATTERN, description: "Alias for program." },
+      asset: { type: "string", pattern: ADDRESS_PATTERN, description: "EVM contract address." },
+      contract: { type: "string", pattern: ADDRESS_PATTERN, description: "Alias for an EVM contract." },
     },
-    anyOf: [{ required: ["program"] }, { required: ["address"] }],
+    required: ["network"],
+    anyOf: [{ required: ["program"] }, { required: ["address"] }, { required: ["asset"] }, { required: ["contract"] }],
     additionalProperties: false,
   };
   if (id === "launch.check") return {
     type: "object",
     properties: {
+      network: NETWORK_SCHEMA(service),
       mint: { type: "string", pattern: ADDRESS_PATTERN, description: "Solana mint address." },
       asset: { type: "string", pattern: ADDRESS_PATTERN, description: "Alias for mint." },
     },
+    required: ["network"],
     anyOf: [{ required: ["mint"] }, { required: ["asset"] }],
     additionalProperties: false,
   };
-  if (["wallet.intelligence", "research.wallet"].includes(id)) return walletSchema(service);
+  if (["wallet.intelligence", "research.wallet", "wallet.bot.classify", "forensics.trace"].includes(id)) return walletSchema(service);
   if (["anomaly.detect", "agent.research.report"].includes(id)) return subjectSchema(service, "Asset or wallet subject for analysis");
   if (id === "portfolio.intelligence") return {
     type: "object",
@@ -1179,7 +1189,8 @@ function serviceInputSchema(service) {
   };
   if (id === "forensics.trace") return {
     type: "object",
-    properties: { wallet: { type: "string", pattern: ADDRESS_PATTERN }, address: { type: "string", pattern: ADDRESS_PATTERN }, limit: { type: "integer", minimum: 1, maximum: 100 } },
+    properties: { network: NETWORK_SCHEMA(service), wallet: { type: "string", pattern: ADDRESS_PATTERN }, address: { type: "string", pattern: ADDRESS_PATTERN }, limit: { type: "integer", minimum: 1, maximum: 100 } },
+    required: ["network"],
     anyOf: [{ required: ["wallet"] }, { required: ["address"] }],
     additionalProperties: false,
   };
@@ -1259,9 +1270,9 @@ function validateServiceInput(serviceId, input = {}) {
     throw new Error(`${serviceId} is not implemented on ${network}`);
   const subject = input.asset || input.mint || input.token || input.contract || input.program || input.address || input.wallet;
   const addressValid = isEvm ? evm.test(String(subject || "")) : solana.test(String(subject || ""));
-  if (["token.intelligence", "risk.score", "market.snapshot", "research.asset", "contract.explain"].includes(serviceId) && !addressValid)
+  if (["token.intelligence", "risk.score", "market.snapshot", "research.asset", "contract.explain", "contract.inspect", "launch.check"].includes(serviceId) && !addressValid)
     throw new Error(isEvm ? "valid EVM asset address is required" : "valid Solana asset address is required");
-  if (["wallet.intelligence", "research.wallet"].includes(serviceId))
+  if (["wallet.intelligence", "wallet.bot.classify", "research.wallet", "forensics.trace"].includes(serviceId))
     if (!(isEvm ? evm.test(String(input.wallet || input.address || "")) : solana.test(String(input.wallet || input.address || ""))))
       throw new Error(isEvm ? "valid EVM wallet address is required" : "valid Solana wallet address is required");
   if (["anomaly.detect", "agent.research.report"].includes(serviceId) && !addressValid)
@@ -1284,6 +1295,9 @@ function injectLanguageWidget(html) {
   return html
     .replaceAll('href="/"', 'href="https://privatedao.org/?lang=en"')
     .replace("</body>", `${languageWidget()}</body>`);
+}
+function commercialOfferBanner() {
+  return `<aside class="pdao-offer" aria-label="PDAO holder offer" style="margin:0 0 22px;padding:14px 16px;border:1px solid #b9d3f2;border-radius:14px;background:#f5f9ff;color:#174a83;line-height:1.5"><b style="display:block;margin-bottom:4px">PDAO holder offer</b><span>${escapeHtml(COMMERCIAL_HOLDER_OFFER)}</span></aside>`;
 }
 function serviceDetailPageBase(service) {
   const status = capabilityStatus(service.id);
@@ -1320,7 +1334,7 @@ if(payButton)payButton.onclick=async()=>{payButton.disabled=true;try{if(!jobId)t
 function serviceCheckoutPageV2(service) {
   const paid = Boolean(service.price), serviceId = JSON.stringify(service.id);
   const example = escapeHtml(JSON.stringify(serviceExample(service), null, 2));
-  const subjectMode = ["wallet.intelligence", "research.wallet"].includes(service.id) ? "wallet" : ["token.intelligence", "risk.score", "market.snapshot", "research.asset", "contract.explain", "launch.check"].includes(service.id) ? "asset" : null;
+  const subjectMode = ["wallet.intelligence", "wallet.bot.classify", "research.wallet", "forensics.trace"].includes(service.id) ? "wallet" : ["token.intelligence", "risk.score", "market.snapshot", "research.asset", "contract.explain", "contract.inspect", "launch.check"].includes(service.id) ? "asset" : null;
   const subjectLabel = subjectMode === "wallet" ? "Wallet address" : "Asset / contract address";
   const subjectPlaceholder = subjectMode === "wallet" ? "Paste the wallet address for the selected network" : "Paste the asset or contract address for the selected network";
   const subjectKey = subjectMode === "wallet" ? "wallet" : service.id === "launch.check" ? "mint" : service.id === "contract.explain" ? "contract" : "asset";
@@ -1333,9 +1347,9 @@ const $=id=>document.querySelector(id),status=$("servicePaymentStatus"),chooser=
 let jobId="",payerAddress="",provider=null;
 const show=value=>status.textContent=typeof value==="string"?value:JSON.stringify(value,null,2);
 const read=async response=>{const value=await response.json();if(!response.ok&&response.status!==402)throw new Error(value.message||value.error||"request failed");return {response,value};};
-const providers=()=>{const found=[];const add=(name,p)=>{if(p&&typeof p.connect==="function"&&!found.some(x=>x.provider===p))found.push({name,provider:p});};add("Phantom",window.phantom?.solana);add("Solflare",window.solflare);add("Backpack",window.backpack?.solana||window.backpack);add("Detected Solana wallet",window.solana);return found;};
+const providers=()=>{const found=[];const add=(name,p)=>{if(p&&typeof p.connect==="function"&&!found.some(x=>x.provider===p))found.push({name,provider:p});};add("Phantom",window.phantom?.solana);add("Solflare",window.solflare?.solana||window.solflare);add("Backpack",window.backpack?.solana||window.backpack);add("Detected Solana wallet",window.solana);return found;};
 const renderWallets=()=>{$("browserWallets").innerHTML="";const found=providers();if(!found.length){$("browserWallets").innerHTML='<span class="muted">No browser wallet detected. Use a mobile wallet button or install a Solana wallet extension.</span>';return;}found.forEach(item=>{const button=document.createElement("button");button.type="button";button.className="wallet-option";button.textContent="Use "+item.name;button.onclick=()=>connect(item);$("browserWallets").append(button);});};
-const connect=async item=>{try{provider=item.provider;const result=await provider.connect({onlyIfTrusted:false});payerAddress=result.publicKey?.toString()||provider.publicKey?.toString();if(!payerAddress)throw new Error("Wallet did not return a public address");walletLabel.textContent="Connected wallet: "+payerAddress+" · "+item.name;$("connectWallet").textContent="Wallet connected";$("holderAccess").disabled=false;if(jobId)$("payService").disabled=false;chooser.hidden=true;show("Wallet connected. No transaction has been signed.");}catch(error){provider=null;show("WALLET ERROR: "+(error.message||String(error)));}};
+const connect=async item=>{try{provider=item.provider;let result;try{result=await provider.connect({onlyIfTrusted:false});}catch(firstError){result=await provider.connect();}payerAddress=result?.publicKey?.toString()||provider.publicKey?.toString();if(!payerAddress)throw new Error("Wallet did not return a public address");walletLabel.textContent="Connected wallet: "+payerAddress+" · "+item.name;$("connectWallet").textContent="Wallet connected";$("holderAccess").disabled=false;if(jobId)$("payService").disabled=false;chooser.hidden=true;show("Wallet connected. No transaction has been signed.");}catch(error){provider=null;show("WALLET ERROR: "+(error.message||String(error)));}};
 $("connectWallet")?.addEventListener("click",()=>{chooser.hidden=false;renderWallets();});$("closeWallets")?.addEventListener("click",()=>chooser.hidden=true);document.querySelectorAll("[data-mobile-wallet]").forEach(button=>button.addEventListener("click",()=>{const target=encodeURIComponent(location.href);const ref=encodeURIComponent(location.origin);const url=button.dataset.mobileWallet==="phantom"?"https://phantom.app/ul/browse/"+target+"?ref="+ref:"https://solflare.com/ul/v1/browse/"+target+"?ref="+ref;show("Opening "+button.textContent+". Approve the page in the wallet app, then tap Connect your wallet.");location.href=url;}));
 function input(){let value;try{value=JSON.parse($("serviceInput").value);}catch(error){throw new Error("Service input JSON must be valid JSON");}const subject=$("serviceSubject")?.value.trim();if(subject)value={...value,["${subjectKey}"]:subject};const network=$("serviceNetwork")?.value;if(network)value={...value,network};return value;}
 $("requestService").onclick=async()=>{const button=$("requestService");button.disabled=true;try{const result=await read(await fetch("/api/jobs",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({service_id:serviceId,input:input()})}));if(result.response.status===402){jobId=result.value.payment_intent.jobId;$("payService").disabled=!payerAddress;show({status:"quote_ready",job_id:jobId,payment_intent:result.value.payment_intent,next:payerAddress?"Review the exact quote, then choose Pay quoted USDC.":"Choose Connect your wallet, then review the exact quote before paying."});}else show(result.value);}catch(error){show("ERROR: "+(error.message||String(error)));}finally{button.disabled=false;}};
@@ -1345,7 +1359,7 @@ $("payService")?.addEventListener("click",async()=>{const button=$("payService")
 }
 function serviceDetailPage(service) {
   const checkout = serviceCheckoutPageV2(service);
-  return serviceDetailPageBase(service).replace("</main>", `${checkout}</main>`);
+  return serviceDetailPageBase(service).replace("</header>", `</header>${commercialOfferBanner()}`).replace("</main>", `${checkout}</main>`);
 }
 function publicReceiptPage(receipt, verified = false) {
   const rows = [
@@ -1374,7 +1388,7 @@ async function marketplacePage() {
     }).join("");
     return `<section class="category"><div class="category-head"><div><p class="eyebrow">${escapeHtml(category.id)}</p><h2>${escapeHtml(category.id)}</h2></div><p>${escapeHtml(category.description)}</p></div><div class="grid">${serviceCards}</div></section>`;
   }).join("");
-  const terms = `<article class="integration"><div class="eyebrow">Seller Marketplace</div><h3>List, execute, promote</h3><strong>Listing fee: $${escapeHtml(String(policy.listing_fee_usd))} one time · up to ${escapeHtml(String(policy.max_services_per_seller))} services</strong><p>Platform fee: ${escapeHtml(String(policy.platform_fee_bps / 100))}% per paid execution · seller receives ${escapeHtml(String(100 - policy.platform_fee_bps / 100))}% net</p><small>Holder access: 30 days when the signed wallet holds at least $25 of the exact PDAO mint. Ordinary services use finalized USDC on Solana Mainnet. Featured Listing: $${escapeHtml(String(policy.promotion_packages.featured_listing.price_usd))} · Ecosystem Campaign: $${escapeHtml(String(policy.promotion_packages.ecosystem_campaign.price_usd))}. Final terms are quote-first and shown before payment.</small></article>`;
+  const terms = `<article class="integration"><div class="eyebrow">Seller Marketplace</div><h3>List, execute, promote</h3><strong>Listing fee: $${escapeHtml(String(policy.listing_fee_usd))} one time · up to ${escapeHtml(String(policy.max_services_per_seller))} services</strong><p>Platform fee: ${escapeHtml(String(policy.platform_fee_bps / 100))}% per paid execution · seller receives ${escapeHtml(String(100 - policy.platform_fee_bps / 100))}% net</p><small>Holder access: 30 days when the signed wallet holds at least $25 of the exact PDAO mint. Ordinary services use finalized USDC on Solana Mainnet. Featured Listing: $${escapeHtml(String(policy.promotion_packages.featured_listing.price_usd))} · Ecosystem Campaign: $${escapeHtml(String(policy.promotion_packages.ecosystem_campaign.price_usd))}. Final terms are quote-first and shown before payment.</small><small style="display:block;margin-top:10px">${escapeHtml(COMMERCIAL_HOLDER_OFFER)}</small></article>`;
   const integrations = integrationDirectory().map(integrationCard).join("") + terms;
   return injectLanguageWidget(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent Marketplace | PrivateDAO</title><meta name="description" content="Discover PrivateDAO services for verification, evidence and agent workflows."><style>
 :root{color-scheme:light;--ink:#081b33;--muted:#52657c;--line:#dbe5f0;--blue:#1769e0;--pale:#f5f9ff;--green:#087f5b}*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;color:var(--ink);background:#fff;line-height:1.5}main{max-width:1180px;margin:0 auto;padding:28px 24px 72px}header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:76px}header a{color:var(--ink);text-decoration:none;font-weight:700}.brand{display:flex;align-items:center;gap:10px}.mark{width:28px;height:28px;border:2px solid var(--blue);border-radius:9px;display:grid;place-items:center;color:var(--blue);font-weight:900}.nav{display:flex;gap:18px;color:var(--muted);font-size:.93rem}.nav a{color:var(--muted)}.eyebrow{color:var(--blue);font-size:.76rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.hero h1{font-size:clamp(2.8rem,7vw,5.8rem);line-height:.98;letter-spacing:-.055em;max-width:820px;margin:16px 0 22px}.hero h1 span{color:var(--blue)}.intro{max-width:660px;color:var(--muted);font-size:1.15rem}.hero{display:flex;justify-content:space-between;gap:40px;align-items:end;margin-bottom:62px}.hero-copy{flex:1}.hero-note{max-width:280px;border-left:3px solid var(--blue);padding:6px 0 6px 18px;color:var(--muted)}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.button,.action{display:inline-flex;align-items:center;justify-content:space-between;gap:14px;border-radius:999px;padding:12px 18px;text-decoration:none;font-weight:750}.button{background:var(--ink);color:#fff}.button.alt{background:var(--pale);color:var(--ink);border:1px solid var(--line)}.section-head,.category-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin:0 0 18px}.section-head p,.category-head>p{color:var(--muted);margin:0}.category{border-top:1px solid var(--line);padding-top:28px;margin-top:34px}.category-head h2{margin:4px 0 0;font-size:1.8rem}.category-head>p{max-width:470px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.card{border:1px solid var(--line);border-radius:18px;padding:22px;background:#fff;min-height:290px;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(14,42,78,.05)}.card:hover,.integration:hover{border-color:#9ebeea;box-shadow:0 16px 34px rgba(14,42,78,.1)}.card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.tag{color:var(--blue);font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.price{font-size:.8rem;font-weight:800;color:var(--green)}.card h3{font-size:1.24rem;margin:10px 0 8px}.card p{color:var(--muted);margin:0 0 12px}.card .value{color:var(--green);font-size:.88rem;font-weight:700}.card dl{border-top:1px solid var(--line);margin:5px 0 0;padding-top:12px;display:grid;gap:8px;color:var(--muted);font-size:.84rem}.card dl div{display:flex;justify-content:space-between;gap:12px}.card dt{font-weight:700}.card dd{margin:0;text-align:right;text-transform:capitalize}.action{margin-top:auto;padding:10px 0 0;color:var(--blue)}.integrations{border-top:1px solid var(--line);margin-top:64px;padding-top:28px}.integration-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.integration{border:1px solid var(--line);border-radius:16px;padding:18px;background:var(--pale)}.integration h3{margin:5px 0}.integration strong{display:block;color:var(--ink)}.integration p{margin:8px 0;color:var(--green);font-weight:700}.integration small{display:block;color:var(--muted)}footer{border-top:1px solid var(--line);margin-top:58px;padding-top:20px;color:var(--muted);font-size:.9rem;display:flex;justify-content:space-between;gap:20px}footer a{color:var(--blue)}@media(max-width:760px){main{padding:20px 16px 48px}header{padding-bottom:48px}.nav{gap:10px;font-size:.8rem}.hero{display:block}.hero-note{margin-top:28px}.grid,.integration-grid{grid-template-columns:1fr}.category-head{display:block}.category-head>p{margin-top:8px}h1{font-size:clamp(3rem,16vw,5rem)}footer{display:block}footer p{margin:6px 0}}
@@ -1433,7 +1447,7 @@ function commercialHomePage() {
 </style></head><body><main><header><a class="brand" href="/">PrivateDAO Agent Exchange</a><nav class="nav"><a href="/marketplace">Marketplace</a><a href="/connect">Connect</a><a href="/mcp">MCP</a></nav></header><section class="hero"><div><p class="eyebrow">PrivateDAO Agent Exchange</p><h1>Services for agents.<br><em>Evidence for decisions.</em></h1><p class="lead">A commercial service layer for AI agents. Discover a capability, request the work, pay only when required, and receive evidence that can be checked independently.</p><div class="actions"><a class="button" href="/marketplace">Explore services →</a><a class="button alt" href="/connect">Connect an agent</a></div></div><p class="side-note"><strong>Free to start.</strong><br>Paid services are quote-first.<br>Payment is finalized on Solana Mainnet USDC.<br>Completed work returns a verifiable receipt.</p></section><section class="flow" aria-label="Agent Exchange lifecycle"><div><b>1. DISCOVER</b><span>Choose a capability.</span></div><div><b>2. REQUEST</b><span>Send structured input.</span></div><div><b>3. EXECUTE</b><span>Read-only evidence work.</span></div><div><b>4. PAY</b><span>Only when a quote requires it.</span></div><div><b>5. VERIFY</b><span>Inspect the receipt.</span></div></section><section class="section"><p class="eyebrow">What can an agent use?</p><h2>One exchange. Six clear service families.</h2><p>Start with verification, add intelligence and risk context, simulate transactions, or coordinate with other agents.</p><div class="category-grid">${categories}</div><p><a href="/marketplace">See every service, price and input →</a></p></section><section class="section"><p class="eyebrow">Connected ecosystem</p><h2>Enterprise AI and agent interoperability in one place.</h2><p>PrivateDAO connects commercial workflows to the tools and ecosystems agents already use, with relationship status stated clearly.</p><div class="integration-grid">${integrations}</div><p><a href="/api/integrations">View integration details →</a></p></section><section class="section"><p class="eyebrow">For autonomous agents</p><h2>Detailed enough for independent execution.</h2><p>Use the MCP endpoint to inspect the full catalog, get a task recommendation, understand payment, execute a job, retrieve a result and verify its receipt.</p><p><a href="/mcp">Open the MCP guide →</a> · <a href="/.well-known/agent-card.json">Read the Agent Card</a></p></section><footer class="footer"><span>PrivateDAO Agent Exchange · part of the PrivateDAO ecosystem</span><span><a href="/marketplace">Services</a> · <a href="/connect">Connect</a> · <a href="/openapi.json">OpenAPI</a></span></footer></main></body></html>`;
 }
 function commercialHomePageWithOffer() {
-  const offer = `<section class="section"><p class="eyebrow">Commercial model</p><h2>Built for a service economy.</h2><p>Developers list once, buyers pay only for completed work, and every commercial outcome carries a receipt and accounting trail.</p><div class="category-grid"><article class="category"><span>Seller onboarding</span><h3>$10 once per agent</h3><p>One listing fee covers the agent and its first five commercial services. It is separate from GitHub Marketplace billing.</p></article><article class="category"><span>Execution economics</span><h3>10% platform fee · 90% seller net</h3><p>Applied to successfully completed paid executions and shown in the quote, receipt, and settlement record.</p></article><article class="category"><span>Holder access</span><h3>30 days at $25 PDAO value</h3><p>The exact PDAO mint is checked from the signed wallet at every request. No transaction is sent for eligibility.</p></article></div></section>`;
+  const offer = `<section class="section"><p class="eyebrow">Commercial model</p><h2>Built for a service economy.</h2><p>${escapeHtml(COMMERCIAL_HOLDER_OFFER)}</p><p>Developers list once, buyers pay only for completed work, and every commercial outcome carries a receipt and accounting trail.</p><div class="category-grid"><article class="category"><span>Seller onboarding</span><h3>$10 once per agent</h3><p>One listing fee covers the agent and its first five commercial services. It is separate from GitHub Marketplace billing.</p></article><article class="category"><span>Execution economics</span><h3>10% platform fee · 90% seller net</h3><p>Applied to successfully completed paid executions and shown in the quote, receipt, and settlement record.</p></article><article class="category"><span>Holder access</span><h3>30 days at $25 PDAO value</h3><p>The exact PDAO mint is checked from the signed wallet at every request. No transaction is sent for eligibility.</p></article></div></section>`;
   return commercialHomePage()
     .replace('<a href="/mcp">MCP</a>', '<a href="/mcp">MCP</a><a href="/a2a">A2A</a><a href="/sellers">Sell</a>')
     .replace('A commercial service layer for AI agents. Discover a capability, request the work, pay only when required, and receive evidence that can be checked independently.', 'A commercial service economy for people and autonomous agents. Discover a capability, request the work, use PDAO holder access when eligible or pay quoted USDC on Solana Mainnet, and receive independently verifiable evidence.')
@@ -2476,16 +2490,48 @@ async function matchRegisteredAgents(input = {}) {
   };
 }
 
+async function classifyWalletBot(config, input = {}) {
+  const wallet = String(input.wallet || input.address || "");
+  const evidence = await researchWallet(config, input);
+  const activity = evidence.facts || evidence;
+  const signatures = Array.isArray(activity.recent_signatures) ? activity.recent_signatures : [];
+  const observedTimes = signatures.map((item) => Date.parse(item.block_time || item.blockTime || "")).filter(Number.isFinite).sort((a, b) => a - b);
+  const spanHours = observedTimes.length > 1 ? Math.max((observedTimes.at(-1) - observedTimes[0]) / 3600000, 1 / 60) : null;
+  const ratePerHour = spanHours ? observedTimes.length / spanHours : 0;
+  const transactionCount = Number(activity.transaction_count || 0);
+  const isContract = Boolean(activity.is_contract);
+  const likelyAutomated = isContract || ratePerHour >= 20 || transactionCount >= 10000;
+  return {
+    network: evidence.network,
+    wallet,
+    classification: likelyAutomated ? "likely_automated_activity" : "no_strong_automation_signal",
+    bot_type: likelyAutomated ? "custom_or_unknown_bot" : "human_or_low_frequency_wallet",
+    named_bot: null,
+    confidence: likelyAutomated ? "low" : "medium",
+    evidence: {
+      sampled_signatures: signatures.length || null,
+      transaction_count: Number.isFinite(transactionCount) ? transactionCount : null,
+      activity_rate_per_hour: Number.isFinite(ratePerHour) ? Number(ratePerHour.toFixed(3)) : null,
+      is_contract: isContract,
+      provider: evidence.provider || evidence.provider_class || null,
+    },
+    limitations: "Public-chain behavior cannot prove whether a wallet is controlled by Axiom, Trojan, GMGN, Banana, or a custom bot. Named attribution requires a verified source or stable program evidence.",
+    evidence_confidence: evidence.evidence_confidence || "rpc-confirmed",
+    observed_at: new Date().toISOString(),
+  };
+}
+
 async function executeService(id, input) {
   if (id === "github.repository") return repositoryEvidence(config, input);
   const requestedNetwork = input?.network ? normalizeNetworkId(input.network) : "";
   const normalizedInput = requestedNetwork ? { ...input, network: requestedNetwork } : input;
   const service = serviceById(id);
-  if (["research.asset", "research.wallet", "contract.explain", "transaction.explain", "anomaly.detect", "agent.research.report", "portfolio.intelligence", "market.snapshot"].includes(id)) {
+  if (["research.asset", "research.wallet", "wallet.bot.classify", "contract.explain", "transaction.explain", "anomaly.detect", "agent.research.report", "portfolio.intelligence", "market.snapshot"].includes(id)) {
     if (!service?.supportedNetworks?.includes(requestedNetwork))
       throw new Error(`${id} is not supported on ${requestedNetwork || "this network"}`);
     if (id === "research.asset") return researchAsset(config, normalizedInput);
     if (id === "research.wallet") return researchWallet(config, normalizedInput);
+    if (id === "wallet.bot.classify") return classifyWalletBot(config, normalizedInput);
     if (id === "contract.explain") return explainContract(config, normalizedInput);
     if (id === "transaction.explain") return explainTransaction(config, normalizedInput);
     if (id === "anomaly.detect") return detectAnomaly(config, normalizedInput);
