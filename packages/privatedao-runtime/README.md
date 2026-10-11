@@ -26,7 +26,7 @@ and disabled Mainnet records; configuration presence is not support evidence.
 
 `HttpExecutionTransport` is the production HTTP implementation of that boundary. It maps a configured backend's prepare, submit, status, receipt, and fee-estimate endpoints into the same transport contract, enforces request timeouts, validates lifecycle responses, and fails closed on non-JSON or incomplete responses. It never creates a local execution id, signature, receipt, or success fallback. API authentication is injected through headers by the owning service and is never logged by this package.
 
-`PRODUCT_CATALOG` is the single customer-executable capability surface for the current release. It lists the product/network contracts, while the generated native capability registry applies the stricter evidence gate before a lane is advertised as executable. Current evidence-backed lanes include Solana Devnet payroll calculation/approval and governance/auction runtime paths, Ethereum Sepolia, Tempo Testnet, and Base Sepolia verification plus organizational treasury/governance/auction paths. Zcash Testnet exposes Kernel-only policy, verification, and commitment workflows, while its private payroll settlement lane remains gated by the live Zallet/Zebra health check. Umbra is not an active product binding. Each row remains limited to the product, action, asset, receipt, and reconciliation behavior actually evidenced for that network; a network appearing in the catalog alone is not a claim of on-chain settlement support.
+`PRODUCT_CATALOG` is the single customer-executable capability surface for the current release. It lists the product/network contracts, while the generated native capability registry applies the stricter evidence gate before a lane is advertised as executable. Current evidence-backed lanes include Solana Devnet payroll calculation/approval and governance/auction runtime paths, Ethereum Sepolia, Tempo Testnet, Base Sepolia, Arbitrum Sepolia, and Robinhood Testnet organizational paths. Zcash Testnet exposes Kernel policy, verification, commitment workflows, and a separately evidenced private payroll settlement lane through the Zallet/Zebra adapter. Umbra is not an active Solana product binding. Each row remains limited to the product, action, asset, receipt, and reconciliation behavior actually evidenced for that network; a network appearing in the catalog alone is not a claim of on-chain settlement support.
 
 Robinhood Testnet has verified organizational E2E evidence for Treasury,
 Governance, and Auctions, while its Blind Verification, Record Verification,
@@ -57,9 +57,10 @@ readiness lane in the current release, so it has no wallet recovery or signing
 claim until a native execution adapter is independently implemented and tested.
 
 The recovery contract is covered by `npm run test:runtime:wallet-recovery`.
-That test uses injected wallet/session boundaries and verifies successful EVM
-and Zcash reconnects plus fail-closed wrong-network rejection without keys,
-seed material, or network writes.
+That test uses injected wallet/session boundaries and verifies Solana browser
+reconnect/idempotency, EVM reconnects including HyperEVM, Zcash Testnet
+reconnects, HyperCore stateless health reconnects, and fail-closed
+wrong-network rejection without keys, seed material, or network writes.
 
 `createPrivateDaoRuntime` is the standard composition root for applications. It
 creates one protocol registry, registers the complete product catalog, and
