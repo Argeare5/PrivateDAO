@@ -150,6 +150,17 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
         },
       };
     }
+    if (capability === "verification.record.verify") {
+      const record = {
+        schemaVersion: "1" as const,
+        recordType: "private-workflow",
+        recordId: "demo-record-verification",
+        issuer: "PrivateDAO",
+        issuedAt: "2026-01-01T00:00:00.000Z",
+        payload: { outcome: "approved" },
+      };
+      return { record, expectedDigest: await digestHex(canonicalizeRecord(record)) };
+    }
     if (capability === "verification.record.create") return { schemaVersion: "1", recordType: "private-workflow", recordId: `demo-${Date.now()}`, issuer: "PrivateDAO", issuedAt: new Date().toISOString(), payload: { outcome: "approved" }, publicFieldPaths: ["outcome"] };
     if (capability === "auction.bid.commit") return { config: { auctionId: `demo-${network}`, asset: "USDC" }, privateBids: [{ bidderRef: "demo-bidder", amountCents: 100 }] };
     if (capability === "auction.settle") return { metadata: { auctionId: `demo-${network}`, policy: "highest-valid-bid" }, bids: [{ bidderRef: "demo-bidder", amountCents: 100 }] };
@@ -278,4 +289,36 @@ function requestIdForHash() {
 async function digestHex(value: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function canonicalizeRecord(record: {
+  schemaVersion: string;
+  recordType: string;
+  recordId: string;
+  issuer: string;
+  issuedAt: string;
+  payload: Record<string, unknown>;
+}) {
+  return canonicalizeValue({
+    schema_version: record.schemaVersion,
+    record_type: record.recordType,
+    record_id: record.recordId,
+    issuer: record.issuer,
+    issued_at: record.issuedAt,
+    effective_at: null,
+    payload: record.payload,
+    source_refs: [],
+  });
+}
+
+function canonicalizeValue(value: unknown): string {
+  if (value === null) return "null";
+  if (typeof value === "string") return JSON.stringify(value.normalize("NFC"));
+  if (typeof value === "boolean") return value ? "true" : "false";
+  if (typeof value === "number") return Number.isInteger(value) ? String(value) : String(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalizeValue).join(",")}]`;
+  if (typeof value === "object") {
+    return `{${Object.entries(value as Record<string, unknown>).sort(([left], [right]) => left.localeCompare(right)).map(([key, child]) => `${JSON.stringify(key.normalize("NFC"))}:${canonicalizeValue(child)}`).join(",")}}`;
+  }
+  throw new Error(`Unsupported record value type: ${typeof value}`);
 }
