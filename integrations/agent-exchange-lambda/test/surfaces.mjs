@@ -111,6 +111,9 @@ test("human root is HTML while machine surfaces remain available", async () => {
   assert.match(botPage.body, /provider\.connect\(\)/);
   assert.match(botPage.body, /Target network/);
   assert.match(botPage.body, /If you or your agent hold at least \$25 worth of PDAO token/);
+  assert.match(botPage.body, /href="#service-checkout-title">Request this service/);
+  assert.match(botPage.body, /if\(found\.length===1\)\{await connect\(found\[0\]\);return;\}/);
+  assert.match(botPage.body, /const signMessage=async/);
   const portfolioService = catalog.services.find((service) => service.id === "portfolio.intelligence");
   assert.deepEqual(portfolioService.input_schema.properties.assets.minItems, 1);
   const simulationService = catalog.services.find((service) => service.id === "transaction.simulate");
@@ -422,6 +425,8 @@ test("every catalog capability has a stable detail page", async () => {
       assert.match(response.body, /Open Solflare Mobile/, service.id);
       assert.match(response.body, /Use PDAO holder access/, service.id);
       assert.match(response.body, /walletChooser/, service.id);
+      assert.doesNotMatch(response.body, new RegExp(`href="/connect#${service.id}"`), service.id);
+      assert.match(response.body, /href="#service-checkout-title">Request this service/, service.id);
     }
   }
 });
@@ -444,6 +449,7 @@ test("MCP and A2A machine entrypoints remain callable", async () => {
     assert.match(page.headers["content-type"], /^text\/html/, path);
     assert.match(page.body, /agents\.privatedao\.org\/mcp/, path);
     assert.match(page.body, /streamable-http/, path);
+    assert.match(page.body, /If you or your agent hold at least \$25 worth of PDAO token/, path);
   }
   const hub = await request("/connect");
   assert.match(hub.body, /ChatGPT/);
