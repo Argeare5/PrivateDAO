@@ -15,6 +15,7 @@ product bindings, and independent on-chain evidence.
 | What family, chain ID, finality, and adapter are used? | [`../../packages/privatedao-runtime/src/networks.ts`](../../packages/privatedao-runtime/src/networks.ts) |
 | What is independently proven? | [`product-network-evidence.md`](product-network-evidence.md) and [`../../docs/generated/native-capability-matrix-20260911.json`](../generated/native-capability-matrix-20260911.json) |
 | What is the machine-readable architecture manifest? | [`../generated/engineer-architecture-index.json`](../generated/engineer-architecture-index.json) |
+| What is the current evidence snapshot? | [`current-state-20261011.md`](current-state-20261011.md) |
 | How is BNB verified? | [`../integrations/bnb-testnet-e2e.md`](../integrations/bnb-testnet-e2e.md) |
 
 ## Architecture Tree
