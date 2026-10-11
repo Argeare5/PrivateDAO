@@ -7,33 +7,52 @@ const session = (network, address) => ({
   connectedAt: "2026-10-11T00:00:00.000Z",
 });
 
+const evmNetworks = [
+  "ethereum-sepolia",
+  "arbitrum-sepolia",
+  "tempo-testnet",
+  "base-sepolia",
+  "robinhood-testnet",
+  "hyperliquid-testnet",
+];
+for (const network of evmNetworks) {
+  const evmConfig = EVM_NETWORK_CONFIGS.find((entry) => entry.network === network);
+  assert(evmConfig, `${network} EVM config is required for recovery coverage`);
+  let switchedChain;
+  const evmAdapter = new EvmNetworkAdapter({
+    id: `recovery-test-${network}`,
+    config: evmConfig,
+    capabilities: ["governance.proposal.execute"],
+    transport: {
+      health: async () => ({ ok: true, chainId: evmConfig.chainId, latencyMs: 1 }),
+      prepare: async () => { throw new Error("not used in recovery test"); },
+      submit: async () => { throw new Error("not used in recovery test"); },
+      status: async () => { throw new Error("not used in recovery test"); },
+      receipt: async () => { throw new Error("not used in recovery test"); },
+      estimateFee: async () => ({ network, atomicAmount: "0", asset: evmConfig.nativeAsset }),
+    },
+    wallet: {
+      connect: async () => session(network, "0x1111111111111111111111111111111111111111"),
+      switchChain: async (chainId) => { switchedChain = chainId; },
+      sign: async (payload) => payload,
+    },
+  });
+  const recoveredEvm = await evmAdapter.connectWallet();
+  assert.equal(recoveredEvm.network, network);
+  await evmAdapter.switchWalletChain();
+  assert.equal(switchedChain, evmConfig.chainId);
+}
+
 const evmConfig = EVM_NETWORK_CONFIGS.find((entry) => entry.network === "hyperliquid-testnet");
-assert(evmConfig, "Hyperliquid EVM config is required for recovery coverage");
-let switchedChain;
-const evmWallet = {
-  connect: async () => session("hyperliquid-testnet", "0x1111111111111111111111111111111111111111"),
-  switchChain: async (chainId) => { switchedChain = chainId; },
-  sign: async (payload) => payload,
-};
+assert(evmConfig, "Hyperliquid EVM config is required for wrong-network coverage");
 const evmTransport = {
-  health: async () => ({ ok: true, chainId: "998", latencyMs: 1 }),
+  health: async () => ({ ok: true, chainId: evmConfig.chainId, latencyMs: 1 }),
   prepare: async () => { throw new Error("not used in recovery test"); },
   submit: async () => { throw new Error("not used in recovery test"); },
   status: async () => { throw new Error("not used in recovery test"); },
   receipt: async () => { throw new Error("not used in recovery test"); },
-  estimateFee: async () => ({ network: "hyperliquid-testnet", atomicAmount: "0", asset: "HYPE" }),
+  estimateFee: async () => ({ network: evmConfig.network, atomicAmount: "0", asset: evmConfig.nativeAsset }),
 };
-const evmAdapter = new EvmNetworkAdapter({
-  id: "recovery-test-hyperliquid",
-  config: evmConfig,
-  capabilities: ["governance.proposal.execute"],
-  transport: evmTransport,
-  wallet: evmWallet,
-});
-const recoveredEvm = await evmAdapter.connectWallet();
-assert.equal(recoveredEvm.network, "hyperliquid-testnet");
-await evmAdapter.switchWalletChain();
-assert.equal(switchedChain, "998");
 
 const wrongEvmAdapter = new EvmNetworkAdapter({
   id: "recovery-test-wrong-evm",
@@ -41,8 +60,9 @@ const wrongEvmAdapter = new EvmNetworkAdapter({
   capabilities: ["governance.proposal.execute"],
   transport: evmTransport,
   wallet: {
-    ...evmWallet,
     connect: async () => session("ethereum-sepolia", "0x1111111111111111111111111111111111111111"),
+    switchChain: async () => undefined,
+    sign: async (payload) => payload,
   },
 });
 await assert.rejects(() => wrongEvmAdapter.connectWallet(), /different network/);
