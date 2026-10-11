@@ -20,7 +20,7 @@ export interface StellarNetworkConfig {
   horizonUrlEnv: string;
   explorerBaseUrl: string;
   nativeAsset: "XLM";
-  broadcastEnabled: false;
+  broadcastEnabled: boolean;
 }
 
 export const STELLAR_TESTNET_NETWORK_PASSPHRASE = "Test SDF Network ; September 2015";
@@ -121,11 +121,11 @@ export class StellarHorizonTransport implements StellarTransport {
   constructor(
     private readonly fetchImpl: FetchLike = fetch,
     horizonUrl = process.env.PDAO_STELLAR_TESTNET_HORIZON_URL?.trim() || DEFAULT_HORIZON_URL,
-    private readonly broadcastEnabled = process.env.PDAO_STELLAR_TESTNET_BROADCAST_ENABLED === "1",
+    private readonly broadcastEnabled = process.env.PDAO_STELLAR_TESTNET_BROADCAST_ENABLED === "1"
+      && process.env.PDAO_STELLAR_TESTNET_E2E_APPROVED === "1",
   ) {
     if (!/^https:\/\//i.test(horizonUrl)) throw new Error("Stellar Horizon must use HTTPS.");
     this.horizonUrl = horizonUrl.replace(/\/$/, "");
-    if (broadcastEnabled) throw new Error("Stellar Testnet broadcast is disabled in this release; use an explicitly reviewed signer path.");
   }
 
   async health(): Promise<{ ok: boolean; network: NetworkId; ledger?: string; latencyMs?: number; reason?: string }> {
@@ -204,12 +204,21 @@ export class StellarHorizonTransport implements StellarTransport {
   }
 
   async submit<TUnsigned>(execution: PreparedExecution<TUnsigned>, signedPayload: TUnsigned): Promise<{ executionId: string; signatures: string[] }> {
-    if (this.broadcastEnabled) throw new Error("Stellar Testnet broadcast is disabled by policy.");
     const payload = signedPayload as Partial<StellarSignedPayload>;
     if (payload.kind !== "stellar-signed-xdr" || payload.network !== "stellar-testnet" || typeof payload.signedTransactionXdr !== "string") {
       throw new Error("Stellar submit requires a signed Testnet XDR payload.");
     }
-    throw new Error("Stellar broadcast is disabled; no transaction was sent.");
+    if (!this.broadcastEnabled) throw new Error("Stellar broadcast is disabled; no transaction was sent.");
+    const record = this.records.get(execution.executionId);
+    if (!record) throw new Error("Unknown Stellar execution.");
+    if (record.transactionHash) return { executionId: execution.executionId, signatures: [record.transactionHash] };
+    const { Horizon, Networks, TransactionBuilder } = await import("@stellar/stellar-sdk");
+    const transaction = TransactionBuilder.fromXdr(payload.signedTransactionXdr, Networks.TESTNET);
+    const response = await new Horizon.Server(this.horizonUrl).submitTransaction(transaction);
+    if (typeof response.hash !== "string" || !/^[a-f0-9]{64}$/i.test(response.hash)) throw new Error("Stellar Horizon returned no valid transaction hash.");
+    record.transactionHash = response.hash;
+    record.state = "submitted";
+    return { executionId: execution.executionId, signatures: [response.hash] };
   }
 
   async observeConfirmedTransaction(executionId: string, transactionHash: string): Promise<void> {
@@ -330,7 +339,7 @@ export class StellarNetworkAdapter implements NetworkAdapter {
   constructor(input: { id: ProviderId; config: StellarNetworkConfig; capabilities: readonly CapabilityId[]; transport: StellarTransport }) {
     const descriptor = getNetwork(input.config.network);
     if (descriptor.family !== "stellar" || input.config.network !== "stellar-testnet") throw new StellarAdapterError("NETWORK_MISMATCH", "Stellar adapter requires Stellar Testnet.");
-    if (input.config.environment !== "testnet" || input.config.broadcastEnabled) throw new StellarAdapterError("NETWORK_MISMATCH", "Only the fail-closed Stellar Testnet lane is available.");
+    if (input.config.environment !== "testnet") throw new StellarAdapterError("NETWORK_MISMATCH", "Only Stellar Testnet is available.");
     if (input.capabilities.length === 0) throw new StellarAdapterError("UNSUPPORTED_CAPABILITY", "Stellar adapter requires explicit capabilities.");
     this.id = input.id;
     this.networks = [input.config.network];
