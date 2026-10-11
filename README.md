@@ -127,8 +127,10 @@ independent evidence.
 
 Engineer-facing architecture and BNB evidence:
 
+- [Engineering map and evidence rules](docs/architecture/README.md)
 - [Kernel and network adapter architecture](docs/architecture/kernel-network-adapters.md)
 - [BNB Testnet E2E boundary](docs/integrations/bnb-testnet-e2e.md)
+- [Integration evidence index](docs/integrations/README.md)
 - [Network capability matrix](NETWORK_CAPABILITY_MATRIX.md)
 
 ## Review and operating references
