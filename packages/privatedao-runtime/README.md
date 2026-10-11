@@ -40,6 +40,21 @@ The migration rule is strict: product code may depend on these contracts, but pr
 
 `ProductExecutionGateway` is the application boundary for those contracts. It checks product ownership and role permissions before delegating prepare, submit, status, or receipt work to `PrivateDaoKernel`; it does not bypass provider lifecycle checks or create synthetic receipts.
 
+## Wallet Recovery Boundary
+
+Recovery is network-family-specific and remains behind the Kernel boundary. EVM
+adapters recover an external wallet session and re-check the expected chain ID;
+Zcash adapters recover only a session that reports `zcash-testnet`; Solana uses
+the browser wallet adapter's reconnect/session boundary. A network mismatch is
+rejected before signing or submission. HyperCore is a stateless native API
+readiness lane in the current release, so it has no wallet recovery or signing
+claim until a native execution adapter is independently implemented and tested.
+
+The recovery contract is covered by `npm run test:runtime:wallet-recovery`.
+That test uses injected wallet/session boundaries and verifies successful EVM
+and Zcash reconnects plus fail-closed wrong-network rejection without keys,
+seed material, or network writes.
+
 `createPrivateDaoRuntime` is the standard composition root for applications. It
 creates one protocol registry, registers the complete product catalog, and
 connects it to one Kernel and gateway. Applications still must inject a real
