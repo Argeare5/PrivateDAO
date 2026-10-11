@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 
-import { APPLICATION_CAPABILITY_BINDINGS, PRODUCT_CATALOG, buildNativeCapabilityRegistry } from "../packages/privatedao-runtime/src/index.ts";
+import { APPLICATION_CAPABILITY_BINDINGS, getNetwork, PRODUCT_CATALOG, buildNativeCapabilityRegistry } from "../packages/privatedao-runtime/src/index.ts";
 
 const targetNetworks = [
   "solana-devnet",
@@ -19,6 +19,9 @@ const native = buildNativeCapabilityRegistry();
 for (const productId of kernelProducts) {
   const product = PRODUCT_CATALOG.find((entry) => entry.id === productId);
   assert(product, `missing product ${productId}`);
+  for (const network of targetNetworks) {
+    assert(product.networks.includes(network), `product is missing network ${productId}/${network}`);
+  }
   for (const capability of product.capabilities) {
     for (const network of capability.networks) {
       assert(capability.networks.includes(network), `missing catalog network ${productId}/${capability.id}/${network}`);
@@ -46,5 +49,9 @@ assert(
 const hypercoreEntries = native.filter((entry) => entry.network === "hypercore-testnet");
 assert(hypercoreEntries.length > 0, "HyperCore capability rows are missing");
 assert(hypercoreEntries.every((entry) => entry.networkFamily === "exchange"), "HyperCore must remain in the exchange family");
+assert.equal(getNetwork("hyperliquid-testnet").family, "evm", "Hyperliquid HyperEVM must remain in the EVM family");
+assert.equal(getNetwork("hyperliquid-testnet").adapterId, "evm-hyperliquid-testnet");
+assert.equal(getNetwork("hypercore-testnet").family, "exchange", "HyperCore must remain in the native exchange family");
+assert.equal(getNetwork("hypercore-testnet").adapterId, "hyperliquid-core-testnet");
 
 console.log(`[commercial-network-matrix] PASS products=${kernelProducts.length} networks=${targetNetworks.length} agent=external hypercore=exchange-readiness`);
