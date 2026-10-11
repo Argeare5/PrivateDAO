@@ -118,6 +118,15 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
       if (!evmWalletAddress) throw new Error("Connect your EVM wallet before preparing this workflow.");
       return { kind: "contract-write", address: evmContracts.governance, abi: governanceWriteAbi, functionName: "createProposal", args: [evmProposalId, evmActionHash, now + 120, now + 300, 1], account: evmWalletAddress };
     }
+    if (capability === "governance.proposal.execute") {
+      const proposalId = `policy-${network}-${requestIdForHash()}`;
+      return {
+        proposalId,
+        proposalHash: await digestHex(`PrivateDAO:${proposalId}:proposal`),
+        policyHash: await digestHex(`PrivateDAO:${proposalId}:policy`),
+        requiredApprovals: 1,
+      };
+    }
     if (evmContracts && capability === "auction.bid.commit") {
       if (!/^0x[0-9a-fA-F]{64}$/.test(evmAuctionId) || !/^0x[0-9a-fA-F]{64}$/.test(evmCommitment)) {
         throw new Error("Enter a 32-byte auction ID and bid commitment before preparing the workflow.");
@@ -200,6 +209,8 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
             payload: await buildPayload(),
             accounts: capability === "payroll.approve"
               ? [{ role: "authority", address: "demo-checker", network }]
+              : capability === "governance.proposal.execute" && !getEvmProductContracts(network)
+                ? [{ role: "authority", address: "browser-user", network }]
               : [],
           },
         }),
