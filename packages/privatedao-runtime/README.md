@@ -30,6 +30,8 @@ and disabled Mainnet records; configuration presence is not support evidence.
 
 Robinhood Testnet and Hyperliquid Testnet now have explicit Kernel policy lanes for the supported organizational workflows. These lanes provide network-scoped validation, approvals, commitments, and receipt-shaped outcomes through the Kernel, but remain policy-only until each network has a real funded adapter, independent transaction evidence, confirmation, and reconciliation. They are therefore not advertised as on-chain settlement or mainnet support.
 
+For Hyperliquid, `hyperliquid-testnet` refers to HyperEVM (chain ID 998), the EVM execution surface. HyperCore is the native Hyperliquid trading/state layer, not a second EVM network. PrivateDAO must keep these surfaces separate: HyperCore data or trading actions require a dedicated native API/precompile adapter and independent evidence; they must not be inferred from HyperEVM RPC health or policy-lane readiness.
+
 `NETWORK_MATRIX` records the requested network roadmap without making unsupported claims. Planned entries are metadata only and cannot be resolved by a provider registry until an adapter is implemented and tested.
 
 The migration rule is strict: product code may depend on these contracts, but provider-specific transaction construction belongs behind `KernelProvider` implementations. REST, SDK, MCP, and agent adapters should expose the same `ProtocolCapability` and receipt semantics.
