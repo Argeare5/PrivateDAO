@@ -25,6 +25,18 @@ export interface StellarNetworkConfig {
 
 export const STELLAR_TESTNET_NETWORK_PASSPHRASE = "Test SDF Network ; September 2015";
 
+export const STELLAR_KERNEL_CAPABILITIES: readonly CapabilityId[] = [
+  "verification.blind.prove",
+  "verification.record.create",
+  "verification.record.verify",
+  "payroll.calculate",
+  "payroll.approve",
+  "treasury.policy.check",
+  "governance.proposal.execute",
+  "auction.bid.commit",
+  "auction.settle",
+];
+
 export const STELLAR_NETWORK_CONFIGS: readonly StellarNetworkConfig[] = [
   {
     network: "stellar-testnet",
@@ -90,6 +102,7 @@ type HorizonFeeStats = { fee_charged?: { p10?: unknown }; max_fee?: { mode?: unk
 type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;
 
 export interface StellarTransport {
+  readonly broadcastEnabled: boolean;
   health(): Promise<{ ok: boolean; network: NetworkId; ledger?: string; latencyMs?: number; reason?: string }>;
   recoverAccount(publicKey: string): Promise<StellarRecoveredAccount>;
   prepare<TPayload, TUnsigned>(intent: ExecutionIntent<TPayload>): Promise<PreparedExecution<TUnsigned>>;
@@ -121,12 +134,14 @@ export class StellarHorizonTransport implements StellarTransport {
   constructor(
     private readonly fetchImpl: FetchLike = fetch,
     horizonUrl = process.env.PDAO_STELLAR_TESTNET_HORIZON_URL?.trim() || DEFAULT_HORIZON_URL,
-    private readonly broadcastEnabled = process.env.PDAO_STELLAR_TESTNET_BROADCAST_ENABLED === "1"
+    private readonly broadcastEnabledFlag = process.env.PDAO_STELLAR_TESTNET_BROADCAST_ENABLED === "1"
       && process.env.PDAO_STELLAR_TESTNET_E2E_APPROVED === "1",
   ) {
     if (!/^https:\/\//i.test(horizonUrl)) throw new Error("Stellar Horizon must use HTTPS.");
     this.horizonUrl = horizonUrl.replace(/\/$/, "");
   }
+
+  get broadcastEnabled(): boolean { return this.broadcastEnabledFlag; }
 
   async health(): Promise<{ ok: boolean; network: NetworkId; ledger?: string; latencyMs?: number; reason?: string }> {
     const started = Date.now();
@@ -208,12 +223,13 @@ export class StellarHorizonTransport implements StellarTransport {
     if (payload.kind !== "stellar-signed-xdr" || payload.network !== "stellar-testnet" || typeof payload.signedTransactionXdr !== "string") {
       throw new Error("Stellar submit requires a signed Testnet XDR payload.");
     }
-    if (!this.broadcastEnabled) throw new Error("Stellar broadcast is disabled; no transaction was sent.");
+    if (!this.broadcastEnabledFlag) throw new Error("Stellar broadcast is disabled; no transaction was sent.");
     const record = this.records.get(execution.executionId);
     if (!record) throw new Error("Unknown Stellar execution.");
     if (record.transactionHash) return { executionId: execution.executionId, signatures: [record.transactionHash] };
     const { Horizon, Networks, TransactionBuilder } = await import("@stellar/stellar-sdk");
     const transaction = TransactionBuilder.fromXdr(payload.signedTransactionXdr, Networks.TESTNET);
+    if (transaction.signatures.length === 0) throw new Error("Stellar submit requires at least one transaction signature.");
     const response = await new Horizon.Server(this.horizonUrl).submitTransaction(transaction);
     if (typeof response.hash !== "string" || !/^[a-f0-9]{64}$/i.test(response.hash)) throw new Error("Stellar Horizon returned no valid transaction hash.");
     record.transactionHash = response.hash;
@@ -368,6 +384,7 @@ export class StellarNetworkAdapter implements NetworkAdapter {
   receipt<TResult = unknown>(executionId: string): Promise<ExecutionReceipt<TResult>> { return this.transport.receipt<TResult>(executionId); }
   estimateFee<TPayload>(intent: ExecutionIntent<TPayload>): Promise<FeeEstimate> { this.assertIntent(intent); return this.transport.estimateFee(intent); }
   health() { return this.transport.health(); }
+  get broadcastEnabled(): boolean { return this.transport.broadcastEnabled; }
   recoverAccount(publicKey: string): Promise<StellarRecoveredAccount> { return this.transport.recoverAccount(publicKey); }
   explorerUrl(reference: string): string { return `${this.config.explorerBaseUrl}${encodeURIComponent(reference)}`; }
 

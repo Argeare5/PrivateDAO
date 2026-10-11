@@ -185,7 +185,7 @@ export { ZcashNetworkAdapter, ZcashAdapterError, ZCASH_NETWORK_CONFIGS } from ".
 export type { ZcashEnvironment, ZcashNetworkConfig, ZcashTransport, ZcashWalletAdapter } from "./zcash-network.js";
 export { ZalletCliTransport } from "./zallet-cli-transport.js";
 export type { ZalletCliTransportOptions, ZcashRecipient, ZcashSendPayload } from "./zallet-cli-transport.js";
-export { StellarNetworkAdapter, StellarAdapterError, StellarHorizonTransport, STELLAR_NETWORK_CONFIGS, STELLAR_TESTNET_NETWORK_PASSPHRASE } from "./stellar-network.js";
+export { StellarNetworkAdapter, StellarAdapterError, StellarHorizonTransport, STELLAR_NETWORK_CONFIGS, STELLAR_TESTNET_NETWORK_PASSPHRASE, STELLAR_KERNEL_CAPABILITIES } from "./stellar-network.js";
 export type { StellarEnvironment, StellarNetworkConfig, StellarTransport, StellarUnsignedPayload, StellarSignedPayload } from "./stellar-network.js";
 export { HyperCoreNetworkAdapter } from "./hypercore-network.js";
 export type { HyperCoreHealth, HyperCoreMetaSnapshot, HyperCoreNetworkId } from "./hypercore-network.js";

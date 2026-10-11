@@ -26,6 +26,7 @@ import {
   StellarHorizonTransport,
   StellarNetworkAdapter,
   STELLAR_NETWORK_CONFIGS,
+  STELLAR_KERNEL_CAPABILITIES,
   AgentDiscoveryProvider,
   SolanaBrowserExecutionProvider,
   createPrivateDaoRuntime,
@@ -159,17 +160,7 @@ export class KernelGatewayService {
     const stellarAdapter = new StellarNetworkAdapter({
       id: "privatedao-stellar-testnet-horizon",
       config: stellarConfig,
-      capabilities: [
-        "verification.blind.prove",
-        "verification.record.create",
-        "verification.record.verify",
-        "payroll.calculate",
-        "payroll.approve",
-        "treasury.policy.check",
-        "governance.proposal.execute",
-        "auction.bid.commit",
-        "auction.settle",
-      ],
+      capabilities: STELLAR_KERNEL_CAPABILITIES,
       transport: new StellarHorizonTransport(),
     });
     this.stellarAdapter = stellarAdapter;
@@ -390,7 +381,7 @@ export class KernelGatewayService {
           ready: Boolean(stellarReadiness?.ok),
           readinessReason: stellarReadiness?.reason || (stellarReadiness?.ok ? "ready" : "horizon_unavailable"),
           testnetOnly: true,
-          broadcastEnabled: false,
+          broadcastEnabled: Boolean(this.stellarAdapter?.broadcastEnabled),
         },
         hypercore: {
           configured: Boolean(this.hypercoreAdapter),

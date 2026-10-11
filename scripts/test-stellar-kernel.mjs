@@ -3,23 +3,14 @@ import {
   STELLAR_NETWORK_CONFIGS,
   StellarHorizonTransport,
   StellarNetworkAdapter,
+  STELLAR_KERNEL_CAPABILITIES,
 } from "../packages/privatedao-runtime/src/index.ts";
 
 const txHash = "591cb9a2bd0eba190a532b6592a7b277e6a24d84d7966d9b98c485dca1e0b769";
 const knownAccount = "GBBDH5SMLNRE5FSPNEGISMWSSZBV7OE4L5DUC7BRTWJCJSVYDODJK32L";
 const horizon = process.env.PDAO_STELLAR_TESTNET_HORIZON_URL?.replace(/\/$/, "") || "https://horizon-testnet.stellar.org";
 const config = STELLAR_NETWORK_CONFIGS[0];
-const capabilities = [
-  "verification.blind.prove",
-  "verification.record.create",
-  "verification.record.verify",
-  "payroll.calculate",
-  "payroll.approve",
-  "treasury.policy.check",
-  "governance.proposal.execute",
-  "auction.bid.commit",
-  "auction.settle",
-];
+const capabilities = STELLAR_KERNEL_CAPABILITIES;
 
 const transport = new StellarHorizonTransport(fetch, horizon);
 const adapter = new StellarNetworkAdapter({ id: "test-stellar", config, capabilities, transport });
