@@ -19,6 +19,8 @@ product page.
 6. [`../../docs/generated/native-capability-matrix-20260911.json`](../generated/native-capability-matrix-20260911.json)
    - machine-readable capability status generated from the runtime and
    evidence artifacts.
+7. [`product-network-evidence.md`](product-network-evidence.md) - concise
+   product/network status rules and the current evidence-backed lanes.
 
 ## What proves execution
 
@@ -65,9 +67,9 @@ variable `PDAO_EVM_BNB_TESTNET_RPC_URL`.
 - Blind Verification and Record Verification have independent real BNB
   Testnet evidence in
   [`phase-2-e2e-bnb-testnet.json`](../../packages/evm-verification/deployments/phase-2-e2e-bnb-testnet.json).
-- Treasury, Governance, and Sealed Auction now have organizational BNB
-  Testnet evidence through the Kernel. Payroll policy routes remain wired, but
-  Payroll settlement is a separate product gate.
+- Treasury, Confidential Payroll, Governance, and Sealed Auction now have
+  organizational BNB Testnet evidence through the Kernel. Payroll binds an
+  off-chain batch commitment to a dedicated settlement contract and receipt.
 - The first organizational attempt stopped before writing because funding was
   below the runner minimum. A later funded run completed and is recorded in
   `organizational-bnb-testnet.json`.
