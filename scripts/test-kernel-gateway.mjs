@@ -43,7 +43,7 @@ try {
   const prefixedHealth = await request("GET", "/api/healthz");
   assert.equal(prefixedHealth.status, 200);
   const zcashConfigured = Boolean(process.env.PDAO_ZCASH_ZALLET_BINARY && process.env.PDAO_ZCASH_ZALLET_DATA_DIR && process.env.PDAO_ZCASH_ZALLET_CONFIG);
-  const expectedNetworks = ["solana-devnet", "ethereum-sepolia", "arbitrum-sepolia", "tempo-testnet", "base-sepolia", "bnb-testnet", "robinhood-testnet", "hyperliquid-testnet", "zcash-testnet", "hypercore-testnet"];
+  const expectedNetworks = ["solana-devnet", "ethereum-sepolia", "arbitrum-sepolia", "tempo-testnet", "base-sepolia", "bnb-testnet", "robinhood-testnet", "hyperliquid-testnet", "zcash-testnet", "stellar-testnet", "hypercore-testnet"];
   assert.deepEqual(health.networks, expectedNetworks);
   assert.equal(health.networkModes.length, expectedNetworks.length);
   for (const network of expectedNetworks) {
@@ -57,6 +57,10 @@ try {
       assert.equal(mode.provider, "privatedao-kernel-policy");
       assert.equal(mode.onchainAdapter, false);
       assert.equal(mode.ready, false);
+    } else if (network === "stellar-testnet") {
+      assert.equal(mode.provider, "privatedao-stellar-testnet-horizon");
+      assert.equal(mode.onchainAdapter, true);
+      assert.equal(mode.ready, true);
     } else if (network === "solana-devnet") {
       assert.equal(mode.provider, "kernel-native");
       assert.equal(mode.onchainAdapter, false);
@@ -71,6 +75,10 @@ try {
   assert.equal(health.zcash.policyReady, true);
   assert.equal(health.zcash.testnetOnly, true);
   assert.equal(health.zcash.broadcastEnabled, false);
+  assert.equal(health.stellar.configured, true);
+  assert.equal(health.stellar.ready, true);
+  assert.equal(health.stellar.testnetOnly, true);
+  assert.equal(health.stellar.broadcastEnabled, false);
 
   const baseIntent = (network, requestId) => ({
     context: {
@@ -108,6 +116,13 @@ try {
     assert.equal(repeated.body.executionId, first.body.executionId);
 
     const submit = await request("POST", "/v1/executions/submit", { execution: first.body, signedPayload: null });
+    if (network === "stellar-testnet") {
+      assert.equal(submit.status, 400, "Stellar submit must remain fail-closed");
+      const status = await request("GET", `/v1/executions/${encodeURIComponent(first.body.executionId)}/status`);
+      assert.equal(status.status, 200);
+      assert.equal(status.body.state, "awaiting_signature");
+      continue;
+    }
     assert.equal(submit.status, 200, `${network} submit failed`);
     const status = await request("GET", `/v1/executions/${encodeURIComponent(first.body.executionId)}/status`);
     assert.equal(status.status, 200);
