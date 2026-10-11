@@ -10,7 +10,7 @@ receipt claim.
 | EVM | Arbitrum Sepolia | `packages/evm-verification/deployments/` | Funded E2E exists only where the linked artifact records it. |
 | EVM | Base Sepolia | `packages/evm-verification/deployments/` | Builder attribution is separate from historical E2E evidence. |
 | EVM | Tempo Testnet | `packages/evm-verification/deployments/phase-2-e2e-tempo-testnet.json` | Token-fee/payment behavior is Tempo-specific. |
-| EVM | BNB Testnet | `packages/evm-verification/deployments/phase-2-e2e-bnb-testnet.json` | Verification E2E is verified; organizational E2E awaits additional tBNB. |
+| EVM | BNB Testnet | `packages/evm-verification/deployments/phase-2-e2e-bnb-testnet.json`, `organizational-bnb-testnet.json` | Verification and Treasury/Governance/Auction organizational E2E are verified; Payroll settlement remains separate. |
 | EVM | Robinhood Testnet | `packages/evm-verification/deployments/` | Do not infer support from RPC health. |
 | EVM | Hyperliquid HyperEVM | `packages/evm-verification/deployments/` | EVM testnet boundary is distinct from HyperCore native APIs. |
 | Solana | Solana Devnet/Mainnet | runtime and Agent Exchange evidence | Wallet/commitment rules differ from EVM. |

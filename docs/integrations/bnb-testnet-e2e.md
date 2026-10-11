@@ -31,15 +31,23 @@ It records real BNB Testnet transactions for:
 
 The artifact also records contract deployments, block numbers, successful
 receipts, wrong-chain rejection, altered-proof rejection, expiry rejection,
-and disposable-entry revocation. The evidence does not claim that Treasury,
-Governance, Auction, or Payroll settlement has completed on BNB Testnet yet.
+and disposable-entry revocation.
 
-## Remaining BNB gate
+The artifact `packages/evm-verification/deployments/organizational-bnb-testnet.json`
+now records successful BNB Testnet organizational execution for Treasury,
+Governance, and Sealed Auction. Payroll settlement remains a separate product
+gate. Verify the organizational receipts and deployed contract bytecode with:
+
+```bash
+npm run verify:bnb:organizational-evidence
+```
+
+## BNB rerun safety
 
 The organizational E2E runner covers Treasury, Governance, and Sealed Auction.
-Its first attempt was correctly rejected before execution because the funded
-deployer balance was `0.0096602694 tBNB`, below the configured `0.01 tBNB`
-minimum. No false success was recorded. Re-run after funding:
+The first attempt was correctly rejected before execution because funding was
+below the configured minimum. It was later rerun after funding and completed
+successfully. Do not rerun it unless a new evidence packet is intended.
 
 Run the read-only readiness check first. It never broadcasts and reports the
 public deployer address, chain ID, balance, minimum, and write count without

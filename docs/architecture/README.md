@@ -65,11 +65,12 @@ variable `PDAO_EVM_BNB_TESTNET_RPC_URL`.
 - Blind Verification and Record Verification have independent real BNB
   Testnet evidence in
   [`phase-2-e2e-bnb-testnet.json`](../../packages/evm-verification/deployments/phase-2-e2e-bnb-testnet.json).
-- Treasury, Governance, Sealed Auction, and Payroll policy routes are wired
-  through the Kernel, but the BNB organizational E2E gate remains separate.
-- The first organizational attempt stopped before writing because the deployer
-  had `0.0096602694 tBNB`, below the runner's `0.01 tBNB` minimum. This is a
-  funding gate, not evidence of success.
+- Treasury, Governance, and Sealed Auction now have organizational BNB
+  Testnet evidence through the Kernel. Payroll policy routes remain wired, but
+  Payroll settlement is a separate product gate.
+- The first organizational attempt stopped before writing because funding was
+  below the runner minimum. A later funded run completed and is recorded in
+  `organizational-bnb-testnet.json`.
 - BNB is direct EVM execution. No bridge is used or implied by this adapter.
 
 Re-run the organizational test only after the test wallet has enough tBNB:

@@ -1,0 +1,55 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+
+const artifactPath = "packages/evm-verification/deployments/organizational-bnb-testnet.json";
+const artifact = JSON.parse(await readFile(artifactPath, "utf8"));
+assert.equal(artifact.network, "bnb-testnet");
+assert.equal(artifact.chainId, 97);
+assert.equal(artifact.environment, "testnet");
+assert.ok(artifact.contracts?.treasury?.address && artifact.contracts?.governance?.address && artifact.contracts?.auction?.address, "missing organizational contract addresses");
+assert.equal(artifact.evidence?.treasury?.status, "executed");
+assert.equal(artifact.evidence?.governance?.status, "passed");
+assert.equal(artifact.evidence?.auction?.status, "settled");
+
+const rpc = process.env.PDAO_EVM_BNB_TESTNET_RPC_URL || "https://bsc-testnet-dataseed.bnbchain.org";
+const call = async (method, params) => {
+  const response = await fetch(rpc, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) });
+  if (!response.ok) throw new Error(`RPC HTTP ${response.status}`);
+  const payload = await response.json();
+  if (payload.error) throw new Error(payload.error.message || "RPC error");
+  return payload.result;
+};
+const observedChainId = Number.parseInt(await call("eth_chainId", []), 16);
+assert.equal(observedChainId, 97);
+
+const transactions = [
+  ["treasury.checkerFundingHash", artifact.evidence.treasury.checkerFundingHash],
+  ["treasury.treasuryFundingHash", artifact.evidence.treasury.treasuryFundingHash],
+  ["treasury.requestedHash", artifact.evidence.treasury.requestedHash],
+  ["treasury.approvedHash", artifact.evidence.treasury.approvedHash],
+  ["treasury.executedHash", artifact.evidence.treasury.executedHash],
+  ["governance.proposalHash", artifact.evidence.governance.proposalHash],
+  ["governance.voteCommitHash", artifact.evidence.governance.voteCommitHash],
+  ["governance.voteRevealHash", artifact.evidence.governance.voteRevealHash],
+  ["governance.proposalFinalizeHash", artifact.evidence.governance.proposalFinalizeHash],
+  ["auction.auctionCreateHash", artifact.evidence.auction.auctionCreateHash],
+  ["auction.bidCommitHash", artifact.evidence.auction.bidCommitHash],
+  ["auction.bidRevealHash", artifact.evidence.auction.bidRevealHash],
+  ["auction.auctionFinalizeHash", artifact.evidence.auction.auctionFinalizeHash],
+  ["auction.auctionSettleHash", artifact.evidence.auction.auctionSettleHash],
+];
+assert.equal(new Set(transactions.map(([, hash]) => hash)).size, transactions.length, "duplicate organizational transaction hash");
+const receipts = [];
+for (const [label, hash] of transactions) {
+  const receipt = await call("eth_getTransactionReceipt", [hash]);
+  assert.ok(receipt?.blockNumber, `${label} receipt is missing`);
+  assert.equal(receipt.status, "0x1", `${label} transaction failed`);
+  receipts.push({ label, hash, blockNumber: Number.parseInt(receipt.blockNumber, 16), status: "success" });
+}
+const contracts = [];
+for (const [label, address] of Object.entries({ treasury: artifact.contracts.treasury.address, governance: artifact.contracts.governance.address, auction: artifact.contracts.auction.address })) {
+  const bytecode = await call("eth_getCode", [address, "latest"]);
+  assert.ok(bytecode && bytecode !== "0x", `${label} contract has no deployed bytecode`);
+  contracts.push({ label, address, deployed: true });
+}
+console.log(JSON.stringify({ status: "PASS", network: "bnb-testnet", chainId: 97, receiptCount: receipts.length, receipts, contracts, source: artifactPath }, null, 2));

@@ -183,6 +183,17 @@ const ORGANIZATIONAL_EVIDENCE = {
     commit: "65fe6957e",
     timestamp: "2026-09-19T14:01:22.656Z",
   },
+  "bnb-testnet": {
+    provider: "evm-bnb-testnet-organizational",
+    contracts: [
+      "0x5011c9c68006c2857eaea0f67401e9d58ff39770",
+      "0x57d5d75f81db5459d541891f4c1a20f51abe32fc",
+      "0x4dbe25b21607cf04bbf06b9b88927af3e381d373",
+    ],
+    assets: ["BNB"],
+    commit: "462dc66af",
+    timestamp: "2026-10-11T17:04:22.062Z",
+  },
 } as const;
 
 function nativeAsset(network: NetworkDescriptor): string | null {

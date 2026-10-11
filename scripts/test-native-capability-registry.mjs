@@ -8,7 +8,7 @@ const verifiedDevnet = entries.filter((entry) => entry.status === "devnet_verifi
 const verifiedPayroll = verifiedDevnet.filter((entry) => entry.product === "payroll");
 
 assert.equal(entries.length, 204, "unexpected native capability matrix size");
-assert.equal(verified.length, 44, "only evidence-backed testnet verification and organizational rows should be verified");
+assert.equal(verified.length, 48, "only evidence-backed testnet verification and organizational rows should be verified");
 assert.equal(liveAgents.length, 2, "the two live Agent Exchange rows must be runtime-verified");
 assert.equal(verifiedPayroll.length, 2, "only Payroll calculation and approval remain enabled on Solana Devnet");
 assert.equal(verifiedDevnet.length, 6, "Solana Devnet must include enabled Payroll plus the evidenced governance, treasury, and auction lanes");
@@ -60,6 +60,8 @@ assert.equal(verified.filter((entry) => entry.provider === "evm-arbitrum-sepolia
 assert.equal(verified.filter((entry) => entry.provider === "evm-arbitrum-sepolia-organizational").length, 4, "Arbitrum organizational evidence must cover treasury, governance, and auction lanes");
 assert.equal(verified.filter((entry) => entry.provider === "evm-bnb-testnet").length, 3, "BNB Testnet must have three verified verification rows");
 assert.equal(verified.filter((entry) => entry.provider === "evm-bnb-testnet").every((entry) => entry.chainId === "97"), true);
+assert.equal(verified.filter((entry) => entry.provider === "evm-bnb-testnet-organizational").length, 4, "BNB organizational evidence must cover Treasury, Governance, and Auction lanes");
+assert.equal(verified.filter((entry) => entry.provider === "evm-bnb-testnet-organizational").every((entry) => entry.chainId === "97"), true);
 assert.equal(verified.filter((entry) => entry.network === "arbitrum-sepolia" && entry.provider === "privatedao-payroll-kernel").length, 2, "Arbitrum Sepolia must have Kernel payroll policy lanes");
 assert.equal(verified.filter((entry) => entry.network === "arbitrum-sepolia").every((entry) => entry.chainId === "421614"), true);
 assert.equal(verifiedDevnet.filter((entry) => entry.provider === "solana-devnet").length, 4, "Solana organizational evidence must cover treasury, governance, and auction lanes");
@@ -74,7 +76,7 @@ assert.equal(entries.find((entry) => entry.network === "hypercore-testnet" && en
 for (const network of ["bnb-testnet", "robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"]) {
   const policyRows = entries.filter((entry) => entry.network === network && entry.declared && entry.product !== "agent");
   assert.equal(policyRows.length, 9, `${network} must expose all Kernel policy product lanes`);
-  const expectedPolicyRows = network === "robinhood-testnet" ? 5 : network === "bnb-testnet" ? 6 : 9;
+  const expectedPolicyRows = network === "robinhood-testnet" ? 5 : network === "bnb-testnet" ? 2 : 9;
   assert.equal(policyRows.filter((entry) => entry.status === "testnet_ready" && entry.evidence === "runtime-only").length, expectedPolicyRows, `${network} policy rows must not claim unsupported on-chain E2E`);
 }
 

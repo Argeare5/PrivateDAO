@@ -1,6 +1,6 @@
 {
   "schema": "privatedao.native-capability-matrix.v1",
-  "generatedAt": "2026-10-11T15:41:42.021Z",
+  "generatedAt": "2026-10-11T17:16:56.686Z",
   "bridgeFree": true,
   "entries": [
     {
@@ -3100,10 +3100,14 @@
       "supportedAssets": [
         "BNB"
       ],
-      "contracts": [],
+      "contracts": [
+        "0x5011c9c68006c2857eaea0f67401e9d58ff39770",
+        "0x57d5d75f81db5459d541891f4c1a20f51abe32fc",
+        "0x4dbe25b21607cf04bbf06b9b88927af3e381d373"
+      ],
       "verifier": null,
-      "provider": "privatedao-kernel-policy",
-      "walletModel": "none",
+      "provider": "evm-bnb-testnet-organizational",
+      "walletModel": "external-wallet",
       "supportsExecution": true,
       "supportsPrivateExecution": false,
       "supportsPrivateSettlement": false,
@@ -3111,10 +3115,10 @@
       "supportsReceipt": true,
       "supportsReconciliation": true,
       "supportsMainnet": false,
-      "status": "testnet_ready",
-      "lastVerifiedCommit": null,
-      "lastVerifiedTimestamp": null,
-      "evidence": "runtime-only"
+      "status": "testnet_verified",
+      "lastVerifiedCommit": "462dc66af",
+      "lastVerifiedTimestamp": "2026-10-11T17:04:22.062Z",
+      "evidence": "testnet-e2e"
     },
     {
       "product": "treasury",
@@ -3598,21 +3602,25 @@
       "supportedAssets": [
         "BNB"
       ],
-      "contracts": [],
+      "contracts": [
+        "0x5011c9c68006c2857eaea0f67401e9d58ff39770",
+        "0x57d5d75f81db5459d541891f4c1a20f51abe32fc",
+        "0x4dbe25b21607cf04bbf06b9b88927af3e381d373"
+      ],
       "verifier": null,
-      "provider": "privatedao-kernel-policy",
-      "walletModel": "none",
+      "provider": "evm-bnb-testnet-organizational",
+      "walletModel": "external-wallet",
       "supportsExecution": true,
       "supportsPrivateExecution": false,
       "supportsPrivateSettlement": false,
-      "supportsProof": true,
+      "supportsProof": false,
       "supportsReceipt": true,
       "supportsReconciliation": true,
       "supportsMainnet": false,
-      "status": "testnet_ready",
-      "lastVerifiedCommit": null,
-      "lastVerifiedTimestamp": null,
-      "evidence": "runtime-only"
+      "status": "testnet_verified",
+      "lastVerifiedCommit": "462dc66af",
+      "lastVerifiedTimestamp": "2026-10-11T17:04:22.062Z",
+      "evidence": "testnet-e2e"
     },
     {
       "product": "governance",
@@ -4096,21 +4104,25 @@
       "supportedAssets": [
         "BNB"
       ],
-      "contracts": [],
+      "contracts": [
+        "0x5011c9c68006c2857eaea0f67401e9d58ff39770",
+        "0x57d5d75f81db5459d541891f4c1a20f51abe32fc",
+        "0x4dbe25b21607cf04bbf06b9b88927af3e381d373"
+      ],
       "verifier": null,
-      "provider": "privatedao-kernel-policy",
-      "walletModel": "none",
+      "provider": "evm-bnb-testnet-organizational",
+      "walletModel": "external-wallet",
       "supportsExecution": true,
       "supportsPrivateExecution": false,
       "supportsPrivateSettlement": false,
-      "supportsProof": true,
+      "supportsProof": false,
       "supportsReceipt": true,
       "supportsReconciliation": true,
       "supportsMainnet": false,
-      "status": "testnet_ready",
-      "lastVerifiedCommit": null,
-      "lastVerifiedTimestamp": null,
-      "evidence": "runtime-only"
+      "status": "testnet_verified",
+      "lastVerifiedCommit": "462dc66af",
+      "lastVerifiedTimestamp": "2026-10-11T17:04:22.062Z",
+      "evidence": "testnet-e2e"
     },
     {
       "product": "auction",
@@ -4594,21 +4606,25 @@
       "supportedAssets": [
         "BNB"
       ],
-      "contracts": [],
+      "contracts": [
+        "0x5011c9c68006c2857eaea0f67401e9d58ff39770",
+        "0x57d5d75f81db5459d541891f4c1a20f51abe32fc",
+        "0x4dbe25b21607cf04bbf06b9b88927af3e381d373"
+      ],
       "verifier": null,
-      "provider": "privatedao-kernel-policy",
-      "walletModel": "none",
+      "provider": "evm-bnb-testnet-organizational",
+      "walletModel": "external-wallet",
       "supportsExecution": true,
       "supportsPrivateExecution": false,
       "supportsPrivateSettlement": false,
-      "supportsProof": true,
+      "supportsProof": false,
       "supportsReceipt": true,
       "supportsReconciliation": true,
       "supportsMainnet": false,
-      "status": "testnet_ready",
-      "lastVerifiedCommit": null,
-      "lastVerifiedTimestamp": null,
-      "evidence": "runtime-only"
+      "status": "testnet_verified",
+      "lastVerifiedCommit": "462dc66af",
+      "lastVerifiedTimestamp": "2026-10-11T17:04:22.062Z",
+      "evidence": "testnet-e2e"
     },
     {
       "product": "auction",
