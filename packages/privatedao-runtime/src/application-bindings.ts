@@ -303,6 +303,14 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
     note: "Base Sepolia commit/reveal governance passed real proposal creation, early-reveal rejection, vote reveal, finalization, receipt, and state checks in the committed E2E artifact.",
   },
   {
+    product: "governance",
+    capability: "governance.proposal.execute",
+    network: "zcash-testnet",
+    mode: "kernel-gateway",
+    entrypoint: "kernel://governance.proposal.execute",
+    note: "Zcash Testnet governance is a Kernel policy approval with an auditable receipt; it does not claim Zcash on-chain governance settlement.",
+  },
+  {
     product: "auction",
     capability: "auction.bid.commit",
     network: "solana-devnet",

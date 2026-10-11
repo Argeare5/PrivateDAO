@@ -81,8 +81,8 @@ export const PRODUCT_CATALOG: readonly ProductDescriptor[] = [
     id: "governance",
     name: "Private Governance",
     availability: "available",
-    networks: [solanaDevnet, ethereumSepolia, arbitrumSepolia, tempoTestnet, baseSepolia],
-    capabilities: [capability("governance.proposal.execute", "governance", true, true, [solanaDevnet, ethereumSepolia, arbitrumSepolia, tempoTestnet, baseSepolia])],
+    networks: [solanaDevnet, ethereumSepolia, arbitrumSepolia, tempoTestnet, baseSepolia, zcashTestnet],
+    capabilities: [capability("governance.proposal.execute", "governance", true, true, [solanaDevnet, ethereumSepolia, arbitrumSepolia, tempoTestnet, baseSepolia, zcashTestnet])],
   },
   {
     id: "auction",

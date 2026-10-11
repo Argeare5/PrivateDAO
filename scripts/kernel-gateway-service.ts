@@ -10,6 +10,7 @@ import {
   BlindPolicyProofProvider,
   InMemoryProviderRegistry,
   PayrollApprovalProvider,
+  GovernancePolicyProvider,
   PayrollCalculationProvider,
   RecordCreationProvider,
   RecordVerificationProvider,
@@ -127,6 +128,7 @@ export class KernelGatewayService {
         new AuctionOutcomeProofProvider(),
       ];
       for (const provider of providers) registry.register(scopedProvider(provider, network));
+      if (network === "zcash-testnet") registry.register(new GovernancePolicyProvider());
     }
     registry.register(new AgentDiscoveryProvider());
     registry.register(new SolanaBrowserExecutionProvider());

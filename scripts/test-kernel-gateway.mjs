@@ -113,6 +113,31 @@ try {
     assert.equal(receipt.body.network, network);
   }
 
+  const governanceRequest = "gateway-zcash-governance";
+  const governanceIntent = {
+    context: {
+      requestId: governanceRequest,
+      idempotencyKey: governanceRequest,
+      product: "governance",
+      capability: "governance.proposal.execute",
+      actorId: "gateway-test",
+      network: "zcash-testnet",
+    },
+    payload: { proposalId: "proposal-1", proposalHash: "hash-1", policyHash: "policy-1", requiredApprovals: 1 },
+    accounts: [{ role: "authority", address: "authority-1", network: "zcash-testnet" }],
+  };
+  const governancePrepared = await request("POST", "/v1/executions/prepare", { intent: governanceIntent });
+  assert.equal(governancePrepared.status, 200, "Zcash governance policy prepare failed");
+  const governanceSubmit = await request("POST", "/v1/executions/submit", {
+    execution: governancePrepared.body,
+    signedPayload: { actorId: "authority-1", decision: "approve", signature: "test-signature" },
+  });
+  assert.equal(governanceSubmit.status, 200, "Zcash governance policy submit failed");
+  const governanceReceipt = await request("GET", `/v1/executions/${encodeURIComponent(governancePrepared.body.executionId)}/receipt`);
+  assert.equal(governanceReceipt.status, 200, "Zcash governance policy receipt failed");
+  assert.equal(governanceReceipt.body.network, "zcash-testnet");
+  assert.equal(governanceReceipt.body.result.onchainSettlement, false);
+
   const malformed = await request("POST", "/v1/executions/prepare", { intent: { context: { network: "not-enabled" } } });
   assert.equal(malformed.status, 400);
   const missing = await request("GET", "/v1/executions/missing/status");

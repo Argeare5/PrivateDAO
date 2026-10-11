@@ -74,6 +74,10 @@ for (const product of ["blind-verification", "record-verification", "treasury", 
 const zcashPayrollPolicyRows = entries.filter((entry) => entry.network === "zcash-testnet" && entry.product === "payroll" && ["payroll.calculate", "payroll.approve"].includes(entry.capability) && entry.declared);
 assert.equal(zcashPayrollPolicyRows.length, 2, "Zcash payroll policy workflows must be declared");
 assert.equal(zcashPayrollPolicyRows.every((entry) => entry.status === "testnet_ready" && entry.evidence === "runtime-only"), true, "Zcash payroll policy rows must be Kernel-ready without claiming settlement");
+const zcashGovernance = entries.filter((entry) => entry.network === "zcash-testnet" && entry.product === "governance" && entry.capability === "governance.proposal.execute" && entry.declared);
+assert.equal(zcashGovernance.length, 1, "Zcash governance policy workflow must be declared");
+assert.equal(zcashGovernance[0].status, "testnet_ready");
+assert.equal(zcashGovernance[0].provider, "privatedao-kernel-policy");
 const solanaPolicyRows = entries.filter((entry) => entry.network === "solana-devnet" && ["blind-verification", "record-verification"].includes(entry.product) && entry.declared);
 assert.ok(solanaPolicyRows.length >= 3, "Solana verification workflows must be available through the Kernel policy provider");
 assert.equal(solanaPolicyRows.every((entry) => entry.status === "testnet_ready" && entry.evidence === "kernel-policy-testnet"), true, "Solana verification policy rows must not claim on-chain E2E");
