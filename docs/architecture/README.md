@@ -6,20 +6,22 @@ product page.
 
 ## Read in this order
 
-1. [`kernel-network-adapters.md`](kernel-network-adapters.md) - request path,
+1. [`ENGINEER-INDEX.md`](ENGINEER-INDEX.md) - one-page index for the Kernel,
+   family map, evidence rules, and BNB boundary.
+2. [`kernel-network-adapters.md`](kernel-network-adapters.md) - request path,
    layer ownership, and family reuse.
-2. [`../../packages/privatedao-runtime/src/protocol.ts`](../../packages/privatedao-runtime/src/protocol.ts)
+3. [`../../packages/privatedao-runtime/src/protocol.ts`](../../packages/privatedao-runtime/src/protocol.ts)
    - protocol capabilities, permissions, policies, and receipts.
-3. [`../../packages/privatedao-runtime/src/catalog.ts`](../../packages/privatedao-runtime/src/catalog.ts)
+4. [`../../packages/privatedao-runtime/src/catalog.ts`](../../packages/privatedao-runtime/src/catalog.ts)
    - product and capability declarations.
-4. [`../../packages/privatedao-runtime/src/application-bindings.ts`](../../packages/privatedao-runtime/src/application-bindings.ts)
+5. [`../../packages/privatedao-runtime/src/application-bindings.ts`](../../packages/privatedao-runtime/src/application-bindings.ts)
    - actual product-to-network entrypoints and evidence notes.
-5. [`../../packages/privatedao-runtime/src/networks.ts`](../../packages/privatedao-runtime/src/networks.ts)
+6. [`../../packages/privatedao-runtime/src/networks.ts`](../../packages/privatedao-runtime/src/networks.ts)
    - network family, chain identity, finality, explorer, and adapter metadata.
-6. [`../../docs/generated/native-capability-matrix-20260911.json`](../generated/native-capability-matrix-20260911.json)
+7. [`../../docs/generated/native-capability-matrix-20260911.json`](../generated/native-capability-matrix-20260911.json)
    - machine-readable capability status generated from the runtime and
    evidence artifacts.
-7. [`product-network-evidence.md`](product-network-evidence.md) - concise
+8. [`product-network-evidence.md`](product-network-evidence.md) - concise
    product/network status rules and the current evidence-backed lanes.
 
 ## What proves execution
