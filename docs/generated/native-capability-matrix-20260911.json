@@ -1,6 +1,6 @@
 {
   "schema": "privatedao.native-capability-matrix.v1",
-  "generatedAt": "2026-10-11T17:42:31.048Z",
+  "generatedAt": "2026-10-11T17:51:16.641Z",
   "bridgeFree": true,
   "entries": [
     {
@@ -452,21 +452,24 @@
       "supportedAssets": [
         "HYPE"
       ],
-      "contracts": [],
-      "verifier": null,
-      "provider": "privatedao-kernel-policy",
-      "walletModel": "none",
+      "contracts": [
+        "0xdd01da1b53ba46bf1ce8c71bc1c5e86e8784694b",
+        "0x6f813e1221cb5f760bb5c467983c014bbE4B3B5c"
+      ],
+      "verifier": "0x26e3515d02bb3d8122fad109d159f43e81e8beeb",
+      "provider": "evm-hyperliquid-testnet",
+      "walletModel": "provider-wallet",
       "supportsExecution": true,
       "supportsPrivateExecution": false,
       "supportsPrivateSettlement": false,
       "supportsProof": true,
       "supportsReceipt": true,
-      "supportsReconciliation": true,
+      "supportsReconciliation": false,
       "supportsMainnet": false,
-      "status": "testnet_ready",
-      "lastVerifiedCommit": null,
-      "lastVerifiedTimestamp": null,
-      "evidence": "runtime-only"
+      "status": "testnet_verified",
+      "lastVerifiedCommit": "f2ef80d81",
+      "lastVerifiedTimestamp": "2026-10-11T14:08:00.682Z",
+      "evidence": "testnet-e2e"
     },
     {
       "product": "blind-verification",
@@ -945,21 +948,24 @@
       "supportedAssets": [
         "HYPE"
       ],
-      "contracts": [],
-      "verifier": null,
-      "provider": "privatedao-kernel-policy",
-      "walletModel": "none",
+      "contracts": [
+        "0xdd01da1b53ba46bf1ce8c71bc1c5e86e8784694b",
+        "0x6f813e1221cb5f760bb5c467983c014bbE4B3B5c"
+      ],
+      "verifier": "0x26e3515d02bb3d8122fad109d159f43e81e8beeb",
+      "provider": "evm-hyperliquid-testnet",
+      "walletModel": "provider-wallet",
       "supportsExecution": true,
       "supportsPrivateExecution": false,
       "supportsPrivateSettlement": false,
-      "supportsProof": true,
+      "supportsProof": false,
       "supportsReceipt": true,
-      "supportsReconciliation": true,
+      "supportsReconciliation": false,
       "supportsMainnet": false,
-      "status": "testnet_ready",
-      "lastVerifiedCommit": null,
-      "lastVerifiedTimestamp": null,
-      "evidence": "runtime-only"
+      "status": "testnet_verified",
+      "lastVerifiedCommit": "f2ef80d81",
+      "lastVerifiedTimestamp": "2026-10-11T14:08:00.682Z",
+      "evidence": "testnet-e2e"
     },
     {
       "product": "record-verification",
@@ -1438,21 +1444,24 @@
       "supportedAssets": [
         "HYPE"
       ],
-      "contracts": [],
-      "verifier": null,
-      "provider": "privatedao-kernel-policy",
-      "walletModel": "none",
+      "contracts": [
+        "0xdd01da1b53ba46bf1ce8c71bc1c5e86e8784694b",
+        "0x6f813e1221cb5f760bb5c467983c014bbE4B3B5c"
+      ],
+      "verifier": "0x26e3515d02bb3d8122fad109d159f43e81e8beeb",
+      "provider": "evm-hyperliquid-testnet",
+      "walletModel": "provider-wallet",
       "supportsExecution": true,
       "supportsPrivateExecution": false,
       "supportsPrivateSettlement": false,
-      "supportsProof": true,
+      "supportsProof": false,
       "supportsReceipt": true,
-      "supportsReconciliation": true,
+      "supportsReconciliation": false,
       "supportsMainnet": false,
-      "status": "testnet_ready",
-      "lastVerifiedCommit": null,
-      "lastVerifiedTimestamp": null,
-      "evidence": "runtime-only"
+      "status": "testnet_verified",
+      "lastVerifiedCommit": "f2ef80d81",
+      "lastVerifiedTimestamp": "2026-10-11T14:08:00.682Z",
+      "evidence": "testnet-e2e"
     },
     {
       "product": "record-verification",

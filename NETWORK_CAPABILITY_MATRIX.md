@@ -15,7 +15,7 @@ authoritative and intentionally fails closed.
 | Robinhood Chain Testnet | `available` | Treasury, Governance, and Sealed Auction have independent real Testnet E2E evidence; verification and Payroll settlement remain gated. | `packages/evm-verification/deployments/organizational-robinhood-testnet.json` plus the capability matrix. |
 | Tempo Testnet | `available` | Blind Verification and Record Verification are application-bound through the Kernel. | Real contract-write E2E in `packages/evm-verification/deployments/phase-2-e2e-tempo-testnet.json` on chain 42431. |
 | Zcash Testnet | `available` | Payroll settlement has confirmed Zallet/Zebra Testnet evidence; other product rows remain Kernel policy-only. | Zcash payroll evidence and runtime artifacts; no EVM or bridge substitution is allowed. |
-| Hyperliquid Testnet | `planned` | No product execution adapter is recorded. | Requires a product-specific native capability decision before implementation. |
+| Hyperliquid Testnet | `available` | Blind Verification and Record Verification have independent HyperEVM Testnet evidence. Treasury, Payroll, Governance, and Auctions remain gated. | `packages/evm-verification/deployments/phase-2-e2e-hyperliquid-testnet.json`; this does not certify HyperCore native execution. |
 
 An entry is not customer-executable merely because an adapter or RPC responds.
 A network requires a real provider adapter, transaction lifecycle, finality,

@@ -76,6 +76,17 @@ const BNB_TESTNET_EVIDENCE = {
   timestamp: "2026-10-11T15:16:22.645Z",
 } as const;
 
+const HYPERLIQUID_TESTNET_EVIDENCE = {
+  verifier: "0x26e3515d02bb3d8122fad109d159f43e81e8beeb",
+  contracts: [
+    "0xdd01da1b53ba46bf1ce8c71bc1c5e86e8784694b",
+    "0x6f813e1221cb5f760bb5c467983c014bbE4B3B5c",
+  ],
+  provider: "evm-hyperliquid-testnet",
+  commit: "f2ef80d81",
+  timestamp: "2026-10-11T14:08:00.682Z",
+} as const;
+
 const ARBITRUM_SEPOLIA_EVIDENCE = {
   verifier: "0x53aa3e1d6c7a0844c900c5f4e0d4b5967a3367dc",
   contracts: [
@@ -298,6 +309,27 @@ function applyBnbTestnetEvidence(entry: NativeCapabilityEntry): NativeCapability
     status: "testnet_verified",
     lastVerifiedCommit: BNB_TESTNET_EVIDENCE.commit,
     lastVerifiedTimestamp: BNB_TESTNET_EVIDENCE.timestamp,
+    evidence: "testnet-e2e",
+  };
+}
+
+function applyHyperliquidTestnetEvidence(entry: NativeCapabilityEntry): NativeCapabilityEntry {
+  const isBlind = entry.product === "blind-verification" && entry.capability === "verification.blind.prove";
+  const isRecord = entry.product === "record-verification" && ["verification.record.create", "verification.record.verify"].includes(entry.capability);
+  if (entry.network !== "hyperliquid-testnet" || (!isBlind && !isRecord)) return entry;
+  return {
+    ...entry,
+    provider: HYPERLIQUID_TESTNET_EVIDENCE.provider,
+    contracts: HYPERLIQUID_TESTNET_EVIDENCE.contracts,
+    verifier: HYPERLIQUID_TESTNET_EVIDENCE.verifier,
+    walletModel: "provider-wallet",
+    supportsExecution: true,
+    supportsProof: isBlind,
+    supportsReceipt: true,
+    supportsReconciliation: false,
+    status: "testnet_verified",
+    lastVerifiedCommit: HYPERLIQUID_TESTNET_EVIDENCE.commit,
+    lastVerifiedTimestamp: HYPERLIQUID_TESTNET_EVIDENCE.timestamp,
     evidence: "testnet-e2e",
   };
 }
@@ -563,7 +595,8 @@ export function buildNativeCapabilityRegistry(): readonly NativeCapabilityEntry[
         const withFuturePolicy = applyFutureKernelPolicyReadiness(withSolanaPolicy);
         const withSolanaOrg = applySolanaDevnetOrganizationalEvidence(withFuturePolicy);
         const withBnb = applyBnbTestnetEvidence(withSolanaOrg);
-        return applyOrganizationalEvidence(withBnb);
+        const withHyperliquid = applyHyperliquidTestnetEvidence(withBnb);
+        return applyOrganizationalEvidence(withHyperliquid);
       }),
     ),
   );

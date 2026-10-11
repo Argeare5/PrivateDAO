@@ -12,7 +12,7 @@ receipt claim.
 | EVM | Tempo Testnet | `packages/evm-verification/deployments/phase-2-e2e-tempo-testnet.json` | Token-fee/payment behavior is Tempo-specific. |
 | EVM | BNB Testnet | `packages/evm-verification/deployments/phase-2-e2e-bnb-testnet.json`, `organizational-bnb-testnet.json` | Verification, Treasury, Payroll, Governance, and Auction organizational E2E are verified. |
 | EVM | Robinhood Testnet | `packages/evm-verification/deployments/` | Do not infer support from RPC health. |
-| EVM | Hyperliquid HyperEVM | `packages/evm-verification/deployments/` | EVM testnet boundary is distinct from HyperCore native APIs. |
+| EVM | Hyperliquid HyperEVM | `packages/evm-verification/deployments/phase-2-e2e-hyperliquid-testnet.json` | Blind and Record Verification are independently verified; HyperCore native APIs remain separate. |
 | Solana | Solana Devnet/Mainnet | runtime and Agent Exchange evidence | Wallet/commitment rules differ from EVM. |
 | Zcash | Zcash Testnet | Zcash evidence and runtime artifacts | Shielded notes and wallet state are not EVM receipts. |
 | HyperCore | Hyperliquid native | runtime adapter evidence | Read-only/native exchange boundary; not HyperEVM execution. |
