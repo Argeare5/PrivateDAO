@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { buildNativeCapabilityRegistry } from "../packages/privatedao-runtime/src/index.ts";
+import { APPLICATION_CAPABILITY_BINDINGS, buildNativeCapabilityRegistry } from "../packages/privatedao-runtime/src/index.ts";
 
 const entries = buildNativeCapabilityRegistry();
 const verified = entries.filter((entry) => entry.status === "testnet_verified");
@@ -98,6 +98,7 @@ assert.equal(zcashPayrollSettlement.status, "testnet_verified");
 assert.equal(zcashPayrollSettlement.evidence, "testnet-e2e");
 assert.equal(zcashPayrollSettlement.supportsPrivateSettlement, true);
 assert.equal(entries.some((entry) => entry.product === "payroll" && entry.capability === "payroll.settle" && entry.network === "solana-devnet" && entry.declared), false, "Solana payroll settlement must remain outside the catalog while Umbra is disabled");
+assert.equal(APPLICATION_CAPABILITY_BINDINGS.some((entry) => entry.product === "payroll" && entry.capability === "payroll.settle" && entry.network === "solana-devnet"), false, "Solana payroll settlement must not have an application binding while Umbra is disabled");
 
 assert.equal(entries.some((entry) => entry.network === "wormhole-integration"), false, "bridge network must not be present");
 console.log(`[native-capability-registry] rows=${entries.length} verified=${verified.length} bridge-free=true`);
