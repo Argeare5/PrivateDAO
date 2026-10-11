@@ -48,7 +48,7 @@ try {
   assert.equal(result.body.hypercore.nativeReadAdapter, "privatedao-hyperliquid-core-testnet");
   assert.equal(result.body.hypercore.ready, true);
   assert.equal(result.body.hypercore.executionEnabled, false);
-  for (const network of ["robinhood-testnet", "hyperliquid-testnet"]) {
+  for (const network of ["arbitrum-sepolia", "robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"]) {
     const policy = await request(port, "POST", "/v1/executions/prepare", {
       intent: {
         context: {

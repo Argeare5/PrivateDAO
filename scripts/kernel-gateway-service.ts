@@ -156,7 +156,11 @@ export class KernelGatewayService {
         new AuctionOutcomeProofProvider(),
       ];
       for (const provider of providers) registry.register(scopedProvider(provider, network));
-      if (["zcash-testnet", "robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"].includes(network)) registry.register(new GovernancePolicyProvider(network));
+      // Keep policy governance available on every non-Solana lane. A real
+      // contract-write payload is still resolved to the network adapter;
+      // policy payloads must remain executable when a network has no product
+      // contract deployment yet.
+      if (network !== "solana-devnet") registry.register(new GovernancePolicyProvider(network));
     }
     registry.register(new AgentDiscoveryProvider());
     registry.register(new SolanaBrowserExecutionProvider());
@@ -403,6 +407,16 @@ export class KernelGatewayService {
 
   private routeNetworkAdapter(intent: ExecutionIntent): ExecutionIntent {
     if (intent.context.provider || !isRecord(intent.payload)) return intent;
+    if (
+      intent.context.capability === "governance.proposal.execute"
+      && intent.payload.kind !== "contract-write"
+      && intent.context.network !== "solana-devnet"
+    ) {
+      return {
+        ...intent,
+        context: { ...intent.context, provider: `privatedao-governance-policy-${intent.context.network}` },
+      };
+    }
     if (intent.payload.kind !== "contract-write") return intent;
     const provider = this.evmProviders.get(intent.context.network);
     if (!provider) return intent;
