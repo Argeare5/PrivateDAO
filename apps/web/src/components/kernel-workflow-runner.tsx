@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
+import { auctionWriteAbi, getEvmProductContracts, governanceWriteAbi } from "@/lib/evm-contract-config";
 
 type KernelWorkflowRunnerProps = {
   product: string;
@@ -37,6 +38,10 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
   const [zcashFromAddress, setZcashFromAddress] = useState("");
   const [zcashRecipientAddress, setZcashRecipientAddress] = useState("");
   const [zcashAtomicAmount, setZcashAtomicAmount] = useState("10000");
+  const [evmProposalId, setEvmProposalId] = useState("");
+  const [evmActionHash, setEvmActionHash] = useState("");
+  const [evmAuctionId, setEvmAuctionId] = useState("");
+  const [evmCommitment, setEvmCommitment] = useState("");
 
   async function buildPayload() {
     if (network === "zcash-testnet" && capability === "payroll.settle") {
@@ -55,6 +60,24 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
       const manifestCommitment = await digestHex(`PrivateDAO:${batchId}:payroll-demo`);
       const recipientHash = await digestHex(`PrivateDAO:${batchId}:recipient-demo`);
       return { kind: "umbra-payroll", manifestCommitment, recipientHash, recipientCount: 1, totalAmount: "0.001", asset: "WSOL", batchId, sensitive: true };
+    }
+    const evmContracts = getEvmProductContracts(network);
+    if (evmContracts && capability === "governance.proposal.execute") {
+      if (!/^0x[0-9a-fA-F]{64}$/.test(evmProposalId) || !/^0x[0-9a-fA-F]{64}$/.test(evmActionHash)) {
+        throw new Error("Enter a 32-byte proposal ID and action hash before preparing the Base, Tempo, or Ethereum workflow.");
+      }
+      const now = Math.floor(Date.now() / 1000);
+      return { kind: "contract-write", address: evmContracts.governance, abi: governanceWriteAbi, functionName: "createProposal", args: [evmProposalId, evmActionHash, now + 120, now + 300, 1] };
+    }
+    if (evmContracts && capability === "auction.bid.commit") {
+      if (!/^0x[0-9a-fA-F]{64}$/.test(evmAuctionId) || !/^0x[0-9a-fA-F]{64}$/.test(evmCommitment)) {
+        throw new Error("Enter a 32-byte auction ID and bid commitment before preparing the workflow.");
+      }
+      return { kind: "contract-write", address: evmContracts.auction, abi: auctionWriteAbi, functionName: "commitBid", args: [evmAuctionId, evmCommitment] };
+    }
+    if (evmContracts && capability === "auction.settle") {
+      if (!/^0x[0-9a-fA-F]{64}$/.test(evmAuctionId)) throw new Error("Enter the 32-byte auction ID before preparing settlement.");
+      return { kind: "contract-write", address: evmContracts.auction, abi: auctionWriteAbi, functionName: "settleAuction", args: [evmAuctionId] };
     }
     if (capability === "payroll.approve") {
       const batchId = `web-payroll-${requestIdForHash()}`;
@@ -161,6 +184,14 @@ export function KernelWorkflowRunner({ product, capability, network, networkLabe
         <label className="text-xs font-semibold text-[#40536d]">Source address<input value={zcashFromAddress} onChange={(event) => setZcashFromAddress(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-normal" autoComplete="off" /></label>
         <label className="text-xs font-semibold text-[#40536d]">Recipient address<input value={zcashRecipientAddress} onChange={(event) => setZcashRecipientAddress(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-normal" autoComplete="off" /></label>
         <label className="text-xs font-semibold text-[#40536d]">TAZ atomic amount<input inputMode="numeric" value={zcashAtomicAmount} onChange={(event) => setZcashAtomicAmount(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-normal" /></label>
+      </div> : null}
+      {getEvmProductContracts(network) && capability === "governance.proposal.execute" ? <div className="mt-5 grid gap-3 rounded-[14px] border border-[#d7e2f0] bg-white p-4 sm:grid-cols-2">
+        <label className="text-xs font-semibold text-[#40536d]">Proposal ID (bytes32)<input value={evmProposalId} onChange={(event) => setEvmProposalId(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-mono font-normal" autoComplete="off" placeholder="0x..." /></label>
+        <label className="text-xs font-semibold text-[#40536d]">Action hash (bytes32)<input value={evmActionHash} onChange={(event) => setEvmActionHash(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-mono font-normal" autoComplete="off" placeholder="0x..." /></label>
+      </div> : null}
+      {getEvmProductContracts(network) && (capability === "auction.bid.commit" || capability === "auction.settle") ? <div className="mt-5 grid gap-3 rounded-[14px] border border-[#d7e2f0] bg-white p-4 sm:grid-cols-2">
+        <label className="text-xs font-semibold text-[#40536d]">Auction ID (bytes32)<input value={evmAuctionId} onChange={(event) => setEvmAuctionId(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-mono font-normal" autoComplete="off" placeholder="0x..." /></label>
+        {capability === "auction.bid.commit" ? <label className="text-xs font-semibold text-[#40536d]">Bid commitment (bytes32)<input value={evmCommitment} onChange={(event) => setEvmCommitment(event.target.value)} className="mt-2 min-h-10 w-full rounded-[8px] border border-[#cfdbea] px-3 text-sm font-mono font-normal" autoComplete="off" placeholder="0x..." /></label> : null}
       </div> : null}
       {error ? <div className="mt-4 rounded-[14px] border border-[#f1c7cc] bg-[#fff7f7] p-4 text-sm text-[#8f1d2c]" role="alert">{error}</div> : null}
     </section>

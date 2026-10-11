@@ -101,6 +101,7 @@
     "test:runtime:http-runtime": "node --import tsx scripts/test-runtime-http-runtime.mjs",
     "test:runtime:payroll": "node --import tsx scripts/test-runtime-payroll.mjs",
     "test:runtime:evm-foundation": "node --import tsx scripts/test-evm-foundation.mjs",
+    "test:runtime:evm-product-capabilities": "node --import tsx scripts/test-evm-gateway-product-capabilities.mjs",
     "test:runtime:zcash-foundation": "node --import tsx scripts/test-zcash-foundation.mjs",
     "test:zcash:e2e-runner": "node scripts/test-zcash-e2e-runner.mjs",
     "test:zcash:wait-ready": "node scripts/test-zcash-wait-ready.mjs",

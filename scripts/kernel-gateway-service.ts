@@ -39,6 +39,9 @@ export type KernelGatewayServiceOptions = {
 const EVM_KERNEL_CAPABILITIES = [
   "verification.record.create",
   "verification.blind.prove",
+  "governance.proposal.execute",
+  "auction.bid.commit",
+  "auction.settle",
 ] as const;
 
 type EvmProviderEntry = {
@@ -192,6 +195,7 @@ export class KernelGatewayService {
         "testnet",
         config.explorerBaseUrl,
         config.nativeAsset,
+        account.address,
       );
       const providerId = `privatedao-evm-${network}`;
       const adapter = new EvmNetworkAdapter({

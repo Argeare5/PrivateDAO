@@ -67,6 +67,7 @@ export interface PreparedExecution<TUnsigned = unknown> {
   unsignedPayload: TUnsigned;
   requiredSigners: AccountReference[];
   state: "prepared" | "awaiting_signature";
+  signingMode?: "browser" | "server";
 }
 
 export interface ExecutionReceipt<TResult = unknown> {
