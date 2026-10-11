@@ -6,9 +6,28 @@ import {
   StellarNetworkAdapter,
 } from "../packages/privatedao-runtime/src/index.ts";
 
+const originalBroadcast = process.env.PDAO_STELLAR_TESTNET_BROADCAST_ENABLED;
+const originalApproval = process.env.PDAO_STELLAR_TESTNET_E2E_APPROVED;
+for (const [broadcast, approval, expected] of [
+  [undefined, undefined, false],
+  ["1", undefined, false],
+  [undefined, "1", false],
+  ["1", "1", true],
+]) {
+  if (broadcast === undefined) delete process.env.PDAO_STELLAR_TESTNET_BROADCAST_ENABLED;
+  else process.env.PDAO_STELLAR_TESTNET_BROADCAST_ENABLED = broadcast;
+  if (approval === undefined) delete process.env.PDAO_STELLAR_TESTNET_E2E_APPROVED;
+  else process.env.PDAO_STELLAR_TESTNET_E2E_APPROVED = approval;
+  assert.equal(new StellarHorizonTransport(fetch).broadcastEnabled, expected);
+}
+if (originalBroadcast === undefined) delete process.env.PDAO_STELLAR_TESTNET_BROADCAST_ENABLED;
+else process.env.PDAO_STELLAR_TESTNET_BROADCAST_ENABLED = originalBroadcast;
+if (originalApproval === undefined) delete process.env.PDAO_STELLAR_TESTNET_E2E_APPROVED;
+else process.env.PDAO_STELLAR_TESTNET_E2E_APPROVED = originalApproval;
+
 const envFile = process.env.PDAO_STELLAR_TESTNET_SIGNER_ENV_FILE;
 if (!envFile) {
-  console.log("STELLAR_SIGNER_BOUNDARY: SKIP signer env file not configured");
+  console.log("STELLAR_SIGNER_BOUNDARY: PASS config_gate=dual-approval signer=SKIP broadcast=disabled");
   process.exit(0);
 }
 
