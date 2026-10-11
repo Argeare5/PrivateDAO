@@ -178,7 +178,7 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
     network: "solana-devnet",
     mode: "kernel-gateway",
     entrypoint: "kernel://payroll.settle",
-    note: "Kernel delegates to the existing Umbra Devnet payroll workflow; the provider keeps recipient data hashed and accepts only an observed workflow receipt.",
+    note: "Solana payroll settlement is intentionally disabled until a non-Umbra production provider passes independent Devnet E2E. Calculation and approval remain Kernel-native.",
   },
   {
     product: "payroll",

@@ -10,8 +10,8 @@ const verifiedPayroll = verifiedDevnet.filter((entry) => entry.product === "payr
 assert.equal(entries.length, 192, "unexpected native capability matrix size");
 assert.equal(verified.length, 29, "only evidence-backed testnet verification and organizational rows should be verified");
 assert.equal(liveAgents.length, 2, "the two live Agent Exchange rows must be runtime-verified");
-assert.equal(verifiedPayroll.length, 3, "only the three Payroll Devnet evidence rows should be verified");
-assert.equal(verifiedDevnet.length, 7, "Solana Devnet must include Payroll plus the evidenced governance, treasury, and auction lanes");
+assert.equal(verifiedPayroll.length, 2, "only Payroll calculation and approval remain enabled on Solana Devnet");
+assert.equal(verifiedDevnet.length, 6, "Solana Devnet must include enabled Payroll plus the evidenced governance, treasury, and auction lanes");
 for (const entry of verifiedPayroll) {
   assert.equal(entry.product, "payroll");
   assert.equal(entry.network, "solana-devnet");

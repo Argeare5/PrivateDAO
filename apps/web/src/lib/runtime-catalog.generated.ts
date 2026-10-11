@@ -1870,17 +1870,17 @@ export const runtimeCatalog = {
               "mode": "kernel-gateway",
               "entrypoint": "kernel://payroll.settle",
               "method": null,
-              "note": "Kernel delegates to the existing Umbra Devnet payroll workflow; the provider keeps recipient data hashed and accepts only an observed workflow receipt.",
-              "evidenceStatus": "devnet_verified",
-              "evidence": "devnet-e2e",
-              "supportsExecution": true,
-              "supportsProof": true,
-              "supportsReceipt": true,
-              "supportsReconciliation": true,
+              "note": "Solana payroll settlement is intentionally disabled until a non-Umbra production provider passes independent Devnet E2E. Calculation and approval remain Kernel-native.",
+              "evidenceStatus": "implementation",
+              "evidence": "umbra-disabled",
+              "supportsExecution": false,
+              "supportsProof": false,
+              "supportsReceipt": false,
+              "supportsReconciliation": false,
               "supportedAssets": [
                 "WSOL"
               ],
-              "provider": "umbra-solana-devnet"
+              "provider": "privatedao-payroll-kernel"
             },
             {
               "network": "zcash-testnet",
@@ -1908,16 +1908,16 @@ export const runtimeCatalog = {
               "chainId": null,
               "declared": true,
               "mode": "kernel-gateway",
-              "evidenceStatus": "devnet_verified",
-              "evidence": "devnet-e2e",
-              "executable": true,
-              "supportsProof": true,
-              "supportsReceipt": true,
-              "supportsReconciliation": true,
+              "evidenceStatus": "implementation",
+              "evidence": "umbra-disabled",
+              "executable": false,
+              "supportsProof": false,
+              "supportsReceipt": false,
+              "supportsReconciliation": false,
               "supportedAssets": [
                 "WSOL"
               ],
-              "provider": "umbra-solana-devnet"
+              "provider": "privatedao-payroll-kernel"
             },
             {
               "network": "solana-mainnet-beta",

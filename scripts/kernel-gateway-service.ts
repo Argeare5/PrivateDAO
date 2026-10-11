@@ -38,8 +38,6 @@ export type KernelGatewayServiceOptions = {
 };
 
 const EVM_KERNEL_CAPABILITIES = [
-  "verification.record.create",
-  "verification.blind.prove",
   "governance.proposal.execute",
   "auction.bid.commit",
   "auction.settle",
@@ -127,7 +125,11 @@ export class KernelGatewayService {
       ];
       for (const provider of providers) registry.register(scopedProvider(provider, network));
     }
-    registry.register(new SolanaPayrollSettlementProvider());
+    // Umbra remains available as a legacy integration, but it is opt-in. The
+    // production Kernel must not advertise a failing private-settlement lane.
+    if (process.env.PDAO_SOLANA_PAYROLL_UMBRA_ENABLED === "1") {
+      registry.register(new SolanaPayrollSettlementProvider());
+    }
     registry.register(new AgentDiscoveryProvider());
 
     if (zcashConfigured) {
@@ -262,17 +264,17 @@ export class KernelGatewayService {
           provider: network === "zcash-testnet"
             ? "privatedao-zcash-testnet-zallet"
             : network === "solana-devnet"
-              ? "privatedao-umbra-solana-devnet"
+              ? process.env.PDAO_SOLANA_PAYROLL_UMBRA_ENABLED === "1" ? "privatedao-umbra-solana-devnet" : "kernel-native"
             : this.evmProviders.get(network)?.id || "kernel-native",
           onchainAdapter: network === "zcash-testnet"
             ? this.supportedNetworks.includes("zcash-testnet")
             : network === "solana-devnet"
-              ? false
+              ? process.env.PDAO_SOLANA_PAYROLL_UMBRA_ENABLED === "1"
             : this.evmProviders.has(network),
           ready: network === "zcash-testnet"
             ? Boolean(zcashReadiness?.ok)
             : network === "solana-devnet"
-              ? Boolean(process.env.PDAO_SOLANA_PAYROLL_UMBRA_ENDPOINT?.trim())
+              ? process.env.PDAO_SOLANA_PAYROLL_UMBRA_ENABLED === "1" && Boolean(process.env.PDAO_SOLANA_PAYROLL_UMBRA_ENDPOINT?.trim())
             : network in evmReady
               ? Boolean(evmReady[network])
               : false,

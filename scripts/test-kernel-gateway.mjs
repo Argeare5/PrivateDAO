@@ -55,7 +55,7 @@ try {
       assert.equal(mode.onchainAdapter, true);
       assert.equal(mode.ready, false);
     } else if (network === "solana-devnet") {
-      assert.equal(mode.provider, "privatedao-umbra-solana-devnet");
+      assert.equal(mode.provider, "kernel-native");
       assert.equal(mode.onchainAdapter, false);
       assert.equal(mode.ready, false);
     } else {

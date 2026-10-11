@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { OperationsShell } from "@/components/operations-shell";
 import { SelectedKernelWorkflow } from "@/components/selected-kernel-workflow";
-import { UmbraPayrollControlRoom } from "@/components/umbra-payroll-control-room";
+import { ProductNetworkWorkspace } from "@/components/product-network-workspace";
 import { buildRouteMetadata } from "@/lib/route-metadata";
 
 export const metadata: Metadata = buildRouteMetadata({
@@ -25,7 +25,7 @@ export default function PayrollPage() {
       ]}
     >
       <SelectedKernelWorkflow product="payroll">
-        <UmbraPayrollControlRoom />
+        <ProductNetworkWorkspace />
       </SelectedKernelWorkflow>
     </OperationsShell>
   );
