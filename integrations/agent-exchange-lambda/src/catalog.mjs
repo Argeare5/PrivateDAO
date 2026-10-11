@@ -1,3 +1,10 @@
+export const UNIVERSAL_READ_NETWORKS = Object.freeze([
+  "solana-mainnet-beta",
+  "ethereum-mainnet",
+  "base-mainnet",
+  "arbitrum-mainnet",
+]);
+
 export const SERVICES = Object.freeze([
   {
     id: "verify.basic",
@@ -7,6 +14,7 @@ export const SERVICES = Object.freeze([
     access: "free",
     input: "JSON evidence",
     output: "canonical digest and receipt",
+    supportedNetworks: UNIVERSAL_READ_NETWORKS,
   },
   {
     id: "verify.deep",
@@ -16,6 +24,7 @@ export const SERVICES = Object.freeze([
     access: "paid",
     input: "JSON evidence and rules",
     output: "verified receipt and checks",
+    supportedNetworks: UNIVERSAL_READ_NETWORKS,
   },
   {
     id: "token.intelligence",
@@ -48,13 +57,24 @@ export const SERVICES = Object.freeze([
     supportedNetworks: ["solana-mainnet-beta", "ethereum-mainnet", "base-mainnet", "arbitrum-mainnet"],
   },
   {
+    id: "wallet.bot.classify",
+    title: "Wallet bot classification",
+    price: 1,
+    currency: "USDC",
+    access: "paid",
+    input: "network and wallet address",
+    output: "bounded activity evidence and a cautious automation classification",
+    supportedNetworks: ["solana-mainnet-beta", "ethereum-mainnet", "base-mainnet", "arbitrum-mainnet"],
+  },
+  {
     id: "contract.inspect",
     title: "Program inspection",
     price: 0.08,
     currency: "USDC",
     access: "paid",
-    input: "Solana program",
-    output: "account owner and executable-state evidence",
+    input: "network and program or contract",
+    output: "account owner, bytecode and executable-state evidence",
+    supportedNetworks: ["solana-mainnet-beta", "ethereum-mainnet", "base-mainnet", "arbitrum-mainnet"],
   },
   {
     id: "launch.check",
@@ -62,8 +82,9 @@ export const SERVICES = Object.freeze([
     price: 0.03,
     currency: "USDC",
     access: "paid",
-    input: "Solana mint",
+    input: "network and token or mint",
     output: "pre-decision launch evidence",
+    supportedNetworks: ["solana-mainnet-beta", "ethereum-mainnet", "base-mainnet", "arbitrum-mainnet"],
   },
   {
     id: "market.snapshot",
@@ -151,9 +172,9 @@ export const SERVICES = Object.freeze([
     price: 0.01,
     currency: "USDC",
     access: "paid",
-    input: "Solana input mint, output mint and amount",
+    input: "network, input token, output token and amount",
     output: "quote-only route, expected output, slippage and network cost",
-    supportedNetworks: ["solana-mainnet-beta"],
+    supportedNetworks: ["solana-mainnet-beta", "ethereum-mainnet", "base-mainnet", "arbitrum-mainnet"],
   },
   {
     id: "transaction.simulate",
@@ -173,6 +194,7 @@ export const SERVICES = Object.freeze([
     access: "paid",
     input: "structured evidence",
     output: "deterministic evidence context",
+    supportedNetworks: UNIVERSAL_READ_NETWORKS,
   },
   {
     id: "receipt.verify",
@@ -182,6 +204,7 @@ export const SERVICES = Object.freeze([
     access: "free",
     input: "receipt and expected hash",
     output: "receipt integrity result",
+    supportedNetworks: UNIVERSAL_READ_NETWORKS,
   },
   {
     id: "github.repository",
@@ -198,8 +221,9 @@ export const SERVICES = Object.freeze([
     price: 0.75,
     currency: "USDC",
     access: "paid",
-    input: "public Solana address",
+    input: "network and public address",
     output: "read-only transaction summary",
+    supportedNetworks: ["solana-mainnet-beta", "ethereum-mainnet", "base-mainnet", "arbitrum-mainnet"],
   },
   {
     id: "agent.match",
@@ -209,6 +233,7 @@ export const SERVICES = Object.freeze([
     access: "paid",
     input: "capabilities and context",
     output: "ranked registry matches",
+    supportedNetworks: UNIVERSAL_READ_NETWORKS,
   },
   {
     id: "sponsored.discovery",
@@ -218,6 +243,7 @@ export const SERVICES = Object.freeze([
     access: "paid",
     input: "verified Agent Card and targeting",
     output: "explicit sponsored placement",
+    supportedNetworks: UNIVERSAL_READ_NETWORKS,
   },
   {
     id: "intelligence.synthesize",
@@ -227,6 +253,7 @@ export const SERVICES = Object.freeze([
     access: "paid",
     input: "structured evidence",
     output: "structured synthesis and receipt",
+    supportedNetworks: UNIVERSAL_READ_NETWORKS,
   },
 ]);
 
