@@ -121,6 +121,7 @@
     "build:base:evidence": "node scripts/build-base-integration-evidence.mjs",
     "verify:base:evidence": "node scripts/verify-base-evidence.mjs",
     "test:evm:organizational": "node --import tsx scripts/run-evm-organizational-e2e.mjs",
+    "verify:bnb:evidence": "node scripts/verify-bnb-evidence.mjs",
     "probe:evm-rpc": "node --import tsx scripts/probe-evm-rpc-readiness.mjs",
     "report:testnet-funding": "node scripts/report-testnet-funding.mjs",
     "prepare:testnet:funding": "node scripts/prepare-testnet-funding.mjs",

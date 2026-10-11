@@ -100,6 +100,18 @@ testnet deployer, writes a network-specific evidence file only after all
 receipts and state assertions pass, and rejects unsupported or Mainnet
 networks.
 
+BNB Testnet verification is recorded in
+`deployments/phase-2-e2e-bnb-testnet.json`. Revalidate its on-chain receipts
+without signing or sending anything with:
+
+```bash
+npm run verify:bnb:evidence
+```
+
+The BNB artifact proves the Blind Verification and Record Verification lanes.
+The organizational Treasury, Governance, and Auction lanes have a separate
+runner and remain unpromoted until that runner completes with sufficient tBNB.
+
 ## Current evidence boundary
 
 Ethereum Sepolia has a committed `testnet_verified` artifact at

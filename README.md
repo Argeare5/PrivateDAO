@@ -125,6 +125,12 @@ successful receipt. A configured network is not considered supported merely
 because it appears in a UI or configuration file; it needs a real adapter and
 independent evidence.
 
+Engineer-facing architecture and BNB evidence:
+
+- [Kernel and network adapter architecture](docs/architecture/kernel-network-adapters.md)
+- [BNB Testnet E2E boundary](docs/integrations/bnb-testnet-e2e.md)
+- [Network capability matrix](NETWORK_CAPABILITY_MATRIX.md)
+
 ## Review and operating references
 
 The repository keeps security, release, runtime, and operating evidence
