@@ -104,8 +104,9 @@ Run the read-only artifact verifier with:
 npm run verify:bnb:organizational-evidence
 ```
 
-The verifier also performs a state readback and confirms that replaying the
-settled Payroll action is rejected. It does not send a new transaction.
+The verifier performs state readback for Treasury, Payroll, Governance, and
+Auction, then confirms that replaying each completed action is rejected. It
+uses read-only `eth_call` for these checks and does not send a new transaction.
 
 ## BNB Ecosystem References
 

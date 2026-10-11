@@ -62,16 +62,48 @@ const payrollAbi = parseAbi([
   "function batches(bytes32) view returns (bytes32 batchCommitment, address recipient, uint256 netAmount, uint8 status, uint64 createdAt, uint64 approvedAt, uint64 settledAt)",
   "function settlePayroll(bytes32 batchId)",
 ]);
+const treasuryAbi = parseAbi([
+  "function payments(bytes32) view returns (address recipient, uint256 amount, bytes32 budgetId, uint8 status, uint64 createdAt, uint64 approvedAt, uint64 executedAt)",
+  "function executePayment(bytes32 paymentId)",
+]);
+const governanceAbi = parseAbi([
+  "function proposals(bytes32) view returns (bytes32 actionHash, uint64 commitEnd, uint64 revealEnd, uint256 quorum, uint256 yesVotes, uint256 noVotes, uint256 revealedVotes, uint8 status)",
+  "function finalizeProposal(bytes32 proposalId)",
+]);
+const auctionAbi = parseAbi([
+  "function auctions(bytes32) view returns (address seller, uint64 biddingEnd, uint64 revealEnd, uint256 highestBid, address highestBidder, uint8 status)",
+  "function settleAuction(bytes32 auctionId)",
+]);
+const readCall = async (address, abi, functionName, args) => {
+  const data = await call("eth_call", [{ to: address, data: encodeFunctionData({ abi, functionName, args }) }, "latest"]);
+  return decodeFunctionResult({ abi, functionName, data });
+};
+const expectReplayRejected = async (address, abi, functionName, args) => {
+  try {
+    await call("eth_call", [{ from: artifact.deployer, to: address, data: encodeFunctionData({ abi, functionName, args }) }, "latest"]);
+  } catch {
+    return true;
+  }
+  return false;
+};
 const payrollAddress = artifact.contracts.payroll.address;
 const payrollBatchId = artifact.evidence.payroll.payrollBatchId;
-const payrollStateData = await call("eth_call", [{ to: payrollAddress, data: encodeFunctionData({ abi: payrollAbi, functionName: "batches", args: [payrollBatchId] }) }, "latest"]);
-const payrollState = decodeFunctionResult({ abi: payrollAbi, functionName: "batches", data: payrollStateData });
+const payrollState = await readCall(payrollAddress, payrollAbi, "batches", [payrollBatchId]);
 assert.equal(Number(payrollState[3]), 3, "Payroll recovery readback did not return Settled");
-let replayRejected = false;
-try {
-  await call("eth_call", [{ from: artifact.deployer, to: payrollAddress, data: encodeFunctionData({ abi: payrollAbi, functionName: "settlePayroll", args: [payrollBatchId] }) }, "latest"]);
-} catch {
-  replayRejected = true;
-}
-assert.equal(replayRejected, true, "Payroll settlement replay was not rejected by the contract");
-console.log(JSON.stringify({ status: "PASS", network: "bnb-testnet", chainId: 97, receiptCount: receipts.length, receipts, contracts, recoveryReadback: "PASS", replayProtection: "PASS", source: artifactPath }, null, 2));
+const treasuryPaymentId = artifact.evidence.treasury.paymentId;
+const treasuryState = await readCall(artifact.contracts.treasury.address, treasuryAbi, "payments", [treasuryPaymentId]);
+assert.equal(Number(treasuryState[3]), 3, "Treasury recovery readback did not return Executed");
+const governanceProposalId = artifact.evidence.governance.proposalId;
+const governanceState = await readCall(artifact.contracts.governance.address, governanceAbi, "proposals", [governanceProposalId]);
+assert.equal(Number(governanceState[7]), 2, "Governance recovery readback did not return Passed");
+const auctionId = artifact.evidence.auction.auctionId;
+const auctionState = await readCall(artifact.contracts.auction.address, auctionAbi, "auctions", [auctionId]);
+assert.equal(Number(auctionState[5]), 3, "Auction recovery readback did not return Settled");
+const replayProtection = {
+  treasury: await expectReplayRejected(artifact.contracts.treasury.address, treasuryAbi, "executePayment", [treasuryPaymentId]),
+  payroll: await expectReplayRejected(payrollAddress, payrollAbi, "settlePayroll", [payrollBatchId]),
+  governance: await expectReplayRejected(artifact.contracts.governance.address, governanceAbi, "finalizeProposal", [governanceProposalId]),
+  auction: await expectReplayRejected(artifact.contracts.auction.address, auctionAbi, "settleAuction", [auctionId]),
+};
+assert.deepEqual(replayProtection, { treasury: true, payroll: true, governance: true, auction: true }, "an organizational replay was not rejected");
+console.log(JSON.stringify({ status: "PASS", network: "bnb-testnet", chainId: 97, receiptCount: receipts.length, receipts, contracts, recoveryReadback: { treasury: "PASS", payroll: "PASS", governance: "PASS", auction: "PASS" }, replayProtection: { treasury: "PASS", payroll: "PASS", governance: "PASS", auction: "PASS" }, source: artifactPath }, null, 2));
