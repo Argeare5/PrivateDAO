@@ -69,8 +69,11 @@ assert.equal(entries.some((entry) => entry.network === "zcash-testnet" && entry.
 for (const product of ["blind-verification", "record-verification", "treasury", "auction"]) {
   const zcashRows = entries.filter((entry) => entry.network === "zcash-testnet" && entry.product === product && entry.declared);
   assert.ok(zcashRows.length > 0, `${product} must expose a Zcash Kernel policy workflow`);
-  assert.equal(zcashRows.every((entry) => entry.status === "implementation" && entry.evidence === "runtime-only"), true, `${product} Zcash policy rows must not claim E2E`);
+  assert.equal(zcashRows.every((entry) => entry.status === "testnet_ready" && entry.evidence === "runtime-only"), true, `${product} Zcash policy rows must not claim E2E`);
 }
+const solanaPolicyRows = entries.filter((entry) => entry.network === "solana-devnet" && ["blind-verification", "record-verification"].includes(entry.product) && entry.declared);
+assert.ok(solanaPolicyRows.length >= 3, "Solana verification workflows must be available through the Kernel policy provider");
+assert.equal(solanaPolicyRows.every((entry) => entry.status === "testnet_ready" && entry.evidence === "kernel-policy-testnet"), true, "Solana verification policy rows must not claim on-chain E2E");
 assert.equal(entries.some((entry) => entry.product === "payroll" && entry.capability === "payroll.settle"), false, "Payroll settlement must not be advertised without a native provider");
 
 assert.equal(entries.some((entry) => entry.network === "wormhole-integration"), false, "bridge network must not be present");

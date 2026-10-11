@@ -42,17 +42,16 @@ try {
   const health = await waitForHealth();
   const prefixedHealth = await request("GET", "/api/healthz");
   assert.equal(prefixedHealth.status, 200);
-  const expectedNetworks = process.env.PDAO_ZCASH_ZALLET_BINARY && process.env.PDAO_ZCASH_ZALLET_DATA_DIR && process.env.PDAO_ZCASH_ZALLET_CONFIG
-    ? ["solana-devnet", "ethereum-sepolia", "tempo-testnet", "base-sepolia", "zcash-testnet"]
-    : ["solana-devnet", "ethereum-sepolia", "tempo-testnet", "base-sepolia"];
+  const zcashConfigured = Boolean(process.env.PDAO_ZCASH_ZALLET_BINARY && process.env.PDAO_ZCASH_ZALLET_DATA_DIR && process.env.PDAO_ZCASH_ZALLET_CONFIG);
+  const expectedNetworks = ["solana-devnet", "ethereum-sepolia", "tempo-testnet", "base-sepolia", "zcash-testnet"];
   assert.deepEqual(health.networks, expectedNetworks);
   assert.equal(health.networkModes.length, expectedNetworks.length);
   for (const network of expectedNetworks) {
     const mode = health.networkModes.find((entry) => entry.network === network);
     assert.ok(mode, `${network} must have a Kernel network mode`);
     if (network === "zcash-testnet") {
-      assert.equal(mode.provider, "privatedao-zcash-testnet-zallet");
-      assert.equal(mode.onchainAdapter, true);
+      assert.equal(mode.provider, zcashConfigured ? "privatedao-zcash-testnet-zallet" : "privatedao-kernel-policy");
+      assert.equal(mode.onchainAdapter, zcashConfigured);
       assert.equal(mode.ready, false);
     } else if (network === "solana-devnet") {
       assert.equal(mode.provider, "kernel-native");
@@ -64,11 +63,10 @@ try {
       assert.equal(mode.ready, false);
     }
   }
-  if (expectedNetworks.includes("zcash-testnet")) {
-    assert.equal(health.zcash.configured, true);
-    assert.equal(health.zcash.testnetOnly, true);
-    assert.equal(health.zcash.broadcastEnabled, false);
-  }
+  assert.equal(health.zcash.configured, zcashConfigured);
+  assert.equal(health.zcash.policyReady, true);
+  assert.equal(health.zcash.testnetOnly, true);
+  assert.equal(health.zcash.broadcastEnabled, false);
 
   const baseIntent = (network, requestId) => ({
     context: {
@@ -97,7 +95,6 @@ try {
   });
 
   for (const network of health.networks) {
-    if (network === "zcash-testnet") continue;
     const requestId = `gateway-${network}`;
     const preparePath = network === "solana-devnet" ? "/api/v1/executions/prepare" : "/v1/executions/prepare";
     const first = await request("POST", preparePath, { intent: baseIntent(network, requestId) });

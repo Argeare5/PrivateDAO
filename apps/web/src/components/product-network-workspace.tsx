@@ -31,7 +31,7 @@ const actionLabels: Record<string, string> = {
   "agent.invoke": "Request agent work",
 };
 
-const verifiedStates = new Set(["devnet_verified", "testnet_verified", "mainnet_live"]);
+const verifiedStates = new Set(["testnet_ready", "devnet_verified", "testnet_verified", "mainnet_live"]);
 
 type WorkflowOption = {
   id: string;
@@ -68,11 +68,11 @@ export function ProductNetworkWorkspace() {
   useEffect(() => {
     let cancelled = false;
     void fetch("https://api.privatedao.org/healthz", { headers: { Accept: "application/json" } })
-      .then((response) => response.ok ? response.json() as Promise<{ networks?: string[]; zcash?: { configured?: boolean; ready?: boolean } }> : null)
+      .then((response) => response.ok ? response.json() as Promise<{ networks?: string[]; zcash?: { policyReady?: boolean } }> : null)
       .then((health) => {
         if (cancelled) return;
         const next = new Set(runtimeCatalog.networks.map((network) => String(network.id)).filter((network) => network !== "zcash-testnet"));
-        if (health?.zcash?.configured && health.zcash.ready && health.networks?.includes("zcash-testnet")) next.add("zcash-testnet");
+        if (health?.zcash?.policyReady && health.networks?.includes("zcash-testnet")) next.add("zcash-testnet");
         setReadyNetworks(next);
       })
       .catch(() => undefined);
@@ -119,7 +119,7 @@ export function ProductNetworkWorkspace() {
         <div>
           <div className="commercial-eyebrow">Start with the work</div>
           <h2 id="workflow-start-title" className="mt-3 text-3xl font-semibold text-[#10233f]">Choose the outcome. PrivateDAO handles the route.</h2>
-          <p className="mt-4 max-w-xl text-sm leading-7 text-[#5d6d82]">Select what your organization needs and where it should run. Only independently completed paths are offered for use.</p>
+          <p className="mt-4 max-w-xl text-sm leading-7 text-[#5d6d82]">Select what your organization needs and where it should run. Available paths are routed through the Kernel and labeled by their verified execution status.</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
           <label className="text-xs font-semibold text-[#5d6d82]">Product

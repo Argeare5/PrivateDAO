@@ -323,7 +323,7 @@ function applyZcashTestnetEvidence(entry: NativeCapabilityEntry): NativeCapabili
       supportsProof: entry.capability !== "treasury.policy.check",
       supportsReceipt: true,
       supportsReconciliation: true,
-      status: "implementation",
+      status: "testnet_ready",
       evidence: "runtime-only",
     };
   }
@@ -357,6 +357,23 @@ function applyZcashTestnetEvidence(entry: NativeCapabilityEntry): NativeCapabili
     lastVerifiedCommit: ZCASH_TESTNET_PAYROLL_EVIDENCE.commit,
     lastVerifiedTimestamp: ZCASH_TESTNET_PAYROLL_EVIDENCE.timestamp,
     evidence: "testnet-e2e",
+  };
+}
+
+function applySolanaKernelPolicyReadiness(entry: NativeCapabilityEntry): NativeCapabilityEntry {
+  if (entry.network !== "solana-devnet" || !["verification.blind.prove", "verification.record.create", "verification.record.verify"].includes(entry.capability)) return entry;
+  return {
+    ...entry,
+    provider: "privatedao-kernel-policy",
+    walletModel: "none",
+    supportsExecution: true,
+    supportsPrivateExecution: false,
+    supportsPrivateSettlement: false,
+    supportsProof: true,
+    supportsReceipt: true,
+    supportsReconciliation: true,
+    status: "testnet_ready",
+    evidence: "kernel-policy-testnet",
   };
 }
 
@@ -477,7 +494,8 @@ export function buildNativeCapabilityRegistry(): readonly NativeCapabilityEntry[
         const withPayrollEvm = applyPayrollEvmPolicyEvidence(withPayroll);
         const withZcash = applyZcashTestnetEvidence(withPayrollEvm);
         const withTempo = applyTempoTestnetEvidence(withZcash);
-        const withSolanaOrg = applySolanaDevnetOrganizationalEvidence(withTempo);
+        const withSolanaPolicy = applySolanaKernelPolicyReadiness(withTempo);
+        const withSolanaOrg = applySolanaDevnetOrganizationalEvidence(withSolanaPolicy);
         return applyOrganizationalEvidence(withSolanaOrg);
       }),
     ),

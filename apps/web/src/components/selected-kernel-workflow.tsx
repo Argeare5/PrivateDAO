@@ -35,10 +35,12 @@ function SelectedKernelWorkflowInner({ product, children }: SelectedKernelWorkfl
     if (network !== "zcash-testnet") return;
     let cancelled = false;
     void fetch("https://api.privatedao.org/healthz", { headers: { Accept: "application/json" } })
-      .then((response) => response.ok ? response.json() as Promise<{ networks?: string[]; zcash?: { configured?: boolean; ready?: boolean } }> : null)
+      .then((response) => response.ok ? response.json() as Promise<{ networks?: string[]; zcash?: { configured?: boolean; ready?: boolean; policyReady?: boolean } }> : null)
       .then((health) => {
         if (!cancelled) {
-          setZcashStatus(health?.zcash?.configured && health.zcash.ready && health.networks?.includes("zcash-testnet") ? "ready" : "unavailable");
+          const policyWorkflow = capability !== "payroll.settle";
+          const ready = policyWorkflow ? health?.zcash?.policyReady : health?.zcash?.configured && health?.zcash?.ready;
+          setZcashStatus(ready && health?.networks?.includes("zcash-testnet") ? "ready" : "unavailable");
           setCheckedZcashNetwork(network);
         }
       })

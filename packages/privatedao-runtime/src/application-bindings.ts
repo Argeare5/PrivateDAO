@@ -26,7 +26,7 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
     network: "solana-devnet",
     mode: "kernel-gateway",
     entrypoint: "kernel://verification.blind.prove",
-    note: "Kernel adapter delegates to the HTTPS proof service and accepts only an observed successful public proof package.",
+    note: "Solana Devnet blind verification runs through the Kernel policy provider; on-chain settlement is not implied by this workflow.",
   },
   {
     product: "record-verification",
@@ -34,7 +34,7 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
     network: "solana-devnet",
     mode: "kernel-gateway",
     entrypoint: "kernel://verification.record.create",
-    note: "Kernel-native digest and selective disclosure artifact; no public URL or on-chain anchor is created.",
+    note: "Solana Devnet record creation runs through the Kernel policy provider; the source record remains off-chain.",
   },
   {
     product: "record-verification",
@@ -42,7 +42,7 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
     network: "solana-devnet",
     mode: "kernel-gateway",
     entrypoint: "kernel://verification.record.verify",
-    note: "Kernel-native digest verification; no source payload is returned and no on-chain anchor is claimed.",
+    note: "Solana Devnet record verification runs through the Kernel policy provider without returning source data.",
   },
   {
     product: "blind-verification",
