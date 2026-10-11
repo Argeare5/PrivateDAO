@@ -56,6 +56,16 @@ const PUBLIC_EVM_TESTNET_RPC_URLS: Partial<Record<NetworkId, string>> = {
   "hyperliquid-testnet": "https://rpc.hyperliquid-testnet.xyz/evm",
 };
 
+// An EVM RPC adapter can be healthy before a network has PrivateDAO product
+// contracts. Keep those lanes available for Kernel policy workflows until a
+// real contract deployment and independent E2E evidence are registered.
+const DEFAULT_EVM_PRODUCT_EXECUTION_NETWORKS = new Set<NetworkId>([
+  "ethereum-sepolia",
+  "arbitrum-sepolia",
+  "tempo-testnet",
+  "base-sepolia",
+]);
+
 type EvmProviderEntry = {
   id: string;
   network: NetworkId;
@@ -193,6 +203,13 @@ export class KernelGatewayService {
     if (selected.size === 0) for (const network of networks) selected.add(network);
     const unknown = [...selected].filter((network) => !networks.includes(network as NetworkId));
     if (unknown.length > 0) throw new Error(`PDAO_KERNEL_EVM_NETWORKS contains unsupported gateway networks: ${unknown.join(", ")}`);
+    const productExecutionSelection = (process.env.PDAO_KERNEL_EVM_PRODUCT_EXECUTION_NETWORKS || "")
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean);
+    const productExecutionNetworks = productExecutionSelection.length > 0
+      ? new Set(productExecutionSelection as NetworkId[])
+      : DEFAULT_EVM_PRODUCT_EXECUTION_NETWORKS;
 
     for (const network of networks) {
       const config = EVM_NETWORK_CONFIGS.find((entry) => entry.network === network);
@@ -258,7 +275,7 @@ export class KernelGatewayService {
           estimateFee: (intent) => inner.estimateFee(intent),
         },
       });
-      registry.register(adapter);
+      if (productExecutionNetworks.has(network)) registry.register(adapter);
       this.evmAdapters.set(network, adapter);
       this.evmProviders.set(network, { id: providerId, network });
     }
