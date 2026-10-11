@@ -66,6 +66,30 @@ try {
     assert.equal(policy.status, 200, `${network} must use the Kernel policy path until product contracts exist`);
     assert.equal(policy.body.requiredSigners?.[0]?.address, "authority-1");
   }
+  const robinhoodContractWrite = await request(port, "POST", "/v1/executions/prepare", {
+    intent: {
+      context: {
+        requestId: "robinhood-contract-write-routing",
+        idempotencyKey: "robinhood-contract-write-routing",
+        product: "governance",
+        capability: "governance.proposal.execute",
+        actorId: "browser-readiness-test",
+        network: "robinhood-testnet",
+      },
+      payload: {
+        kind: "contract-write",
+        address: "0x1111111111111111111111111111111111111111",
+        abi: [],
+        functionName: "execute",
+        args: [],
+        account: "0x2222222222222222222222222222222222222222",
+      },
+      accounts: [{ role: "payer", address: "0x2222222222222222222222222222222222222222", network: "robinhood-testnet" }],
+    },
+  });
+  assert.equal(robinhoodContractWrite.status, 200, "Robinhood contract writes must route through the EVM adapter");
+  assert.equal(robinhoodContractWrite.body.signingMode, "browser");
+  assert.equal(robinhoodContractWrite.body.requiredSigners?.[0]?.address, "0x2222222222222222222222222222222222222222");
   console.log("KERNEL_GATEWAY_BROWSER_READINESS: PASS");
 } finally {
   await new Promise((resolve) => server.close(resolve));

@@ -64,6 +64,10 @@ const DEFAULT_EVM_PRODUCT_EXECUTION_NETWORKS = new Set<NetworkId>([
   "arbitrum-sepolia",
   "tempo-testnet",
   "base-sepolia",
+  // Robinhood organizational contracts have independently verified Testnet
+  // receipts, so contract-write routing is enabled by default for its
+  // Kernel-backed Governance and Auction workflows.
+  "robinhood-testnet",
 ]);
 
 type EvmProviderEntry = {
