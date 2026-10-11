@@ -1,11 +1,38 @@
 import assert from "node:assert/strict";
-import { EvmNetworkAdapter, EVM_NETWORK_CONFIGS, HyperCoreNetworkAdapter, ZcashNetworkAdapter, ZCASH_NETWORK_CONFIGS } from "../packages/privatedao-runtime/src/index.ts";
+import { EvmNetworkAdapter, EVM_NETWORK_CONFIGS, HyperCoreNetworkAdapter, SolanaBrowserExecutionProvider, ZcashNetworkAdapter, ZCASH_NETWORK_CONFIGS } from "../packages/privatedao-runtime/src/index.ts";
 
 const session = (network, address) => ({
   address,
   network,
   connectedAt: "2026-10-11T00:00:00.000Z",
 });
+
+const solanaProgramId = "EP9xE8MJZ6FfyEwLqns6HDdUZBknEa7WGYs1Jzsecuva";
+const solanaProvider = new SolanaBrowserExecutionProvider(async () => new Response("{}", { status: 200 }), "https://devnet.example.test");
+const solanaIntent = {
+  context: {
+    requestId: "recovery-solana-browser",
+    idempotencyKey: "recovery-solana-browser-key",
+    product: "governance",
+    capability: "governance.proposal.execute",
+    network: "solana-devnet",
+  },
+  payload: {
+    kind: "solana-browser-transaction",
+    operation: "governance.proposal.execute",
+    account: "11111111111111111111111111111111",
+    programId: solanaProgramId,
+  },
+  accounts: [],
+};
+const recoveredSolana = await solanaProvider.prepare(solanaIntent);
+assert.equal(recoveredSolana.signingMode, "browser");
+assert.equal(recoveredSolana.requiredSigners[0].network, "solana-devnet");
+assert.equal((await solanaProvider.prepare(solanaIntent)).executionId, recoveredSolana.executionId);
+await assert.rejects(
+  () => solanaProvider.prepare({ ...solanaIntent, context: { ...solanaIntent.context, network: "ethereum-sepolia" } }),
+  /Devnet-only/,
+);
 
 const evmNetworks = [
   "ethereum-sepolia",
@@ -113,4 +140,4 @@ assert.equal((await hypercore.health()).ok, true);
 assert.equal((await hypercore.health()).ok, true);
 assert.equal(hypercoreCalls, 2, "HyperCore recovery must remain stateless and reconnect per health check");
 
-console.log("WALLET_RECOVERY: PASS evm-chain-check=PASS zcash-testnet-check=PASS hypercore-stateless-recovery=PASS wrong-network-rejection=PASS");
+console.log("WALLET_RECOVERY: PASS solana-browser-recovery=PASS evm-chain-check=PASS zcash-testnet-check=PASS hypercore-stateless-recovery=PASS wrong-network-rejection=PASS");
