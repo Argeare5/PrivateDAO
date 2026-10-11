@@ -16,6 +16,7 @@ const EVM_EXECUTABLE_SERVICES = new Set([
   "token.intelligence",
   "risk.score",
   "wallet.intelligence",
+  "wallet.bot.classify",
   "contract.inspect",
   "launch.check",
   "forensics.trace",
