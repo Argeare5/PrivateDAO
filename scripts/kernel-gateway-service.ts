@@ -21,7 +21,6 @@ import {
   ZalletCliTransport,
   ZcashNetworkAdapter,
   ZCASH_NETWORK_CONFIGS,
-  SolanaPayrollSettlementProvider,
   AgentDiscoveryProvider,
   createPrivateDaoRuntime,
   type ExecutionIntent,
@@ -124,11 +123,6 @@ export class KernelGatewayService {
         new AuctionOutcomeProofProvider(),
       ];
       for (const provider of providers) registry.register(scopedProvider(provider, network));
-    }
-    // Umbra remains available as a legacy integration, but it is opt-in. The
-    // production Kernel must not advertise a failing private-settlement lane.
-    if (process.env.PDAO_SOLANA_PAYROLL_UMBRA_ENABLED === "1") {
-      registry.register(new SolanaPayrollSettlementProvider());
     }
     registry.register(new AgentDiscoveryProvider());
 
@@ -264,17 +258,17 @@ export class KernelGatewayService {
           provider: network === "zcash-testnet"
             ? "privatedao-zcash-testnet-zallet"
             : network === "solana-devnet"
-              ? process.env.PDAO_SOLANA_PAYROLL_UMBRA_ENABLED === "1" ? "privatedao-umbra-solana-devnet" : "kernel-native"
+              ? "kernel-native"
             : this.evmProviders.get(network)?.id || "kernel-native",
           onchainAdapter: network === "zcash-testnet"
             ? this.supportedNetworks.includes("zcash-testnet")
             : network === "solana-devnet"
-              ? process.env.PDAO_SOLANA_PAYROLL_UMBRA_ENABLED === "1"
+              ? false
             : this.evmProviders.has(network),
           ready: network === "zcash-testnet"
             ? Boolean(zcashReadiness?.ok)
             : network === "solana-devnet"
-              ? process.env.PDAO_SOLANA_PAYROLL_UMBRA_ENABLED === "1" && Boolean(process.env.PDAO_SOLANA_PAYROLL_UMBRA_ENDPOINT?.trim())
+              ? false
             : network in evmReady
               ? Boolean(evmReady[network])
               : false,

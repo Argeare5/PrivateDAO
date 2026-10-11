@@ -7,8 +7,8 @@ const liveAgents = entries.filter((entry) => entry.status === "mainnet_live" && 
 const verifiedDevnet = entries.filter((entry) => entry.status === "devnet_verified");
 const verifiedPayroll = verifiedDevnet.filter((entry) => entry.product === "payroll");
 
-assert.equal(entries.length, 192, "unexpected native capability matrix size");
-assert.equal(verified.length, 29, "only evidence-backed testnet verification and organizational rows should be verified");
+assert.equal(entries.length, 176, "unexpected native capability matrix size");
+assert.equal(verified.length, 28, "only evidence-backed testnet verification and organizational rows should be verified");
 assert.equal(liveAgents.length, 2, "the two live Agent Exchange rows must be runtime-verified");
 assert.equal(verifiedPayroll.length, 2, "only Payroll calculation and approval remain enabled on Solana Devnet");
 assert.equal(verifiedDevnet.length, 6, "Solana Devnet must include enabled Payroll plus the evidenced governance, treasury, and auction lanes");
@@ -63,16 +63,8 @@ assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && 
 assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && entry.product === "record-verification")?.nativeAsset, "HYPE", "HyperEVM native asset must be HYPE");
 assert.equal(entries.find((entry) => entry.network === "hyperliquid-testnet" && entry.product === "record-verification")?.status, "planned", "HyperEVM must remain unverified until E2E evidence exists");
 
-const zcashSettlement = entries.find((entry) => entry.network === "zcash-testnet" && entry.product === "payroll" && entry.capability === "payroll.settle");
-assert.equal(zcashSettlement?.status, "testnet_verified", "Zcash payroll settlement must use the committed Testnet E2E evidence");
-assert.equal(zcashSettlement?.nativeAsset, "TAZ");
-assert.equal(zcashSettlement?.provider, "zcash-testnet-zallet");
-assert.equal(zcashSettlement?.supportsExecution, true);
-assert.equal(zcashSettlement?.supportsPrivateSettlement, true);
-assert.equal(zcashSettlement?.supportsReconciliation, true);
-assert.equal(zcashSettlement?.evidence, "testnet-e2e");
-assert.deepEqual(zcashSettlement?.contracts, []);
-assert.equal(zcashSettlement?.lastVerifiedCommit, "d41bec9addcd6580afce1fa11554d5ec03b94c86");
+assert.equal(entries.some((entry) => entry.network === "zcash-testnet" && entry.product === "payroll" && entry.declared), false, "Zcash must not be customer-facing in the current Payroll release");
+assert.equal(entries.some((entry) => entry.product === "payroll" && entry.capability === "payroll.settle"), false, "Payroll settlement must not be advertised without a native provider");
 
 assert.equal(entries.some((entry) => entry.network === "wormhole-integration"), false, "bridge network must not be present");
 console.log(`[native-capability-registry] rows=${entries.length} verified=${verified.length} bridge-free=true`);

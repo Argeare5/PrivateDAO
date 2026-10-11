@@ -17,7 +17,6 @@ const ethereumSepolia = "ethereum-sepolia" as NetworkId;
 const arbitrumSepolia = "arbitrum-sepolia" as NetworkId;
 const baseSepolia = "base-sepolia" as NetworkId;
 const tempoTestnet = "tempo-testnet" as NetworkId;
-const zcashTestnet = "zcash-testnet" as NetworkId;
 
 function capability(
   id: CapabilityId,
@@ -61,11 +60,13 @@ export const PRODUCT_CATALOG: readonly ProductDescriptor[] = [
     id: "payroll",
     name: "Confidential Payroll",
     availability: "available",
-    networks: [solanaDevnet, zcashTestnet],
+    // Payroll is intentionally limited to the Solana workflow until a native
+    // settlement provider passes an independent E2E gate. Umbra and the
+    // unfinished Zcash route are not customer-facing capabilities.
+    networks: [solanaDevnet],
     capabilities: [
-      capability("payroll.calculate", "payroll", false, true, [solanaDevnet, zcashTestnet]),
-      capability("payroll.approve", "payroll", true, true, [solanaDevnet, zcashTestnet]),
-      capability("payroll.settle", "payroll", true, true, [solanaDevnet, zcashTestnet]),
+      capability("payroll.calculate", "payroll", false, true, [solanaDevnet]),
+      capability("payroll.approve", "payroll", true, true, [solanaDevnet]),
     ],
   },
   {

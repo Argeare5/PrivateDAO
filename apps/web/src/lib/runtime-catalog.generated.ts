@@ -1188,8 +1188,7 @@ export const runtimeCatalog = {
       "name": "Confidential Payroll",
       "availability": "available",
       "networks": [
-        "solana-devnet",
-        "zcash-testnet"
+        "solana-devnet"
       ],
       "capabilities": [
         {
@@ -1214,23 +1213,6 @@ export const runtimeCatalog = {
               "supportedAssets": [
                 "WSOL"
               ],
-              "provider": "umbra-solana-devnet"
-            },
-            {
-              "network": "zcash-testnet",
-              "mode": "kernel-gateway",
-              "entrypoint": "kernel://payroll.calculate",
-              "method": null,
-              "note": "Zcash Testnet payroll calculation uses the same deterministic Kernel policy engine; it does not access wallet keys or move TAZ.",
-              "evidenceStatus": "implementation",
-              "evidence": "runtime-only",
-              "supportsExecution": true,
-              "supportsProof": false,
-              "supportsReceipt": true,
-              "supportsReconciliation": true,
-              "supportedAssets": [
-                "TAZ"
-              ],
               "provider": "privatedao-payroll-kernel"
             }
           ],
@@ -1251,7 +1233,7 @@ export const runtimeCatalog = {
               "supportedAssets": [
                 "WSOL"
               ],
-              "provider": "umbra-solana-devnet"
+              "provider": "privatedao-payroll-kernel"
             },
             {
               "network": "solana-mainnet-beta",
@@ -1492,8 +1474,8 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": null,
-              "declared": true,
-              "mode": "kernel-gateway",
+              "declared": false,
+              "mode": "unbound",
               "evidenceStatus": "implementation",
               "evidence": "runtime-only",
               "executable": false,
@@ -1547,23 +1529,6 @@ export const runtimeCatalog = {
               "supportedAssets": [
                 "WSOL"
               ],
-              "provider": "umbra-solana-devnet"
-            },
-            {
-              "network": "zcash-testnet",
-              "mode": "kernel-gateway",
-              "entrypoint": "kernel://payroll.approve",
-              "method": null,
-              "note": "Zcash Testnet payroll approval is a Kernel policy gate; the subsequent settlement uses the verified Zallet provider only when its runtime health check passes.",
-              "evidenceStatus": "implementation",
-              "evidence": "runtime-only",
-              "supportsExecution": true,
-              "supportsProof": false,
-              "supportsReceipt": true,
-              "supportsReconciliation": true,
-              "supportedAssets": [
-                "TAZ"
-              ],
               "provider": "privatedao-payroll-kernel"
             }
           ],
@@ -1584,7 +1549,7 @@ export const runtimeCatalog = {
               "supportedAssets": [
                 "WSOL"
               ],
-              "provider": "umbra-solana-devnet"
+              "provider": "privatedao-payroll-kernel"
             },
             {
               "network": "solana-mainnet-beta",
@@ -1825,8 +1790,8 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": null,
-              "declared": true,
-              "mode": "kernel-gateway",
+              "declared": false,
+              "mode": "unbound",
               "evidenceStatus": "implementation",
               "evidence": "runtime-only",
               "executable": false,
@@ -1837,339 +1802,6 @@ export const runtimeCatalog = {
                 "TAZ"
               ],
               "provider": "privatedao-payroll-kernel"
-            },
-            {
-              "network": "hyperliquid-testnet",
-              "stage": "available",
-              "environment": "testnet",
-              "chainId": "998",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "HYPE"
-              ],
-              "provider": "evm-hyperliquid-testnet"
-            }
-          ]
-        },
-        {
-          "id": "payroll.settle",
-          "version": "1.0",
-          "requiresSignature": true,
-          "supportsAsync": true,
-          "receiptSchema": "privatedao.execution-receipt.v1",
-          "applicationBindings": [
-            {
-              "network": "solana-devnet",
-              "mode": "kernel-gateway",
-              "entrypoint": "kernel://payroll.settle",
-              "method": null,
-              "note": "Solana payroll settlement is intentionally disabled until a non-Umbra production provider passes independent Devnet E2E. Calculation and approval remain Kernel-native.",
-              "evidenceStatus": "implementation",
-              "evidence": "umbra-disabled",
-              "supportsExecution": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "WSOL"
-              ],
-              "provider": "privatedao-payroll-kernel"
-            },
-            {
-              "network": "zcash-testnet",
-              "mode": "kernel-gateway",
-              "entrypoint": "kernel://payroll.settle",
-              "method": null,
-              "note": "Kernel-to-Zallet Testnet settlement is backed by a finalized receipt, wallet-observed funding, and reconciled recipient evidence; broadcast remains explicitly gated by runtime configuration.",
-              "evidenceStatus": "testnet_verified",
-              "evidence": "testnet-e2e",
-              "supportsExecution": true,
-              "supportsProof": false,
-              "supportsReceipt": true,
-              "supportsReconciliation": true,
-              "supportedAssets": [
-                "TAZ"
-              ],
-              "provider": "zcash-testnet-zallet"
-            }
-          ],
-          "networkAvailability": [
-            {
-              "network": "solana-devnet",
-              "stage": "available",
-              "environment": "devnet",
-              "chainId": null,
-              "declared": true,
-              "mode": "kernel-gateway",
-              "evidenceStatus": "implementation",
-              "evidence": "umbra-disabled",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "WSOL"
-              ],
-              "provider": "privatedao-payroll-kernel"
-            },
-            {
-              "network": "solana-mainnet-beta",
-              "stage": "available",
-              "environment": "mainnet",
-              "chainId": null,
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "SOL"
-              ],
-              "provider": "solana-mainnet-beta"
-            },
-            {
-              "network": "ethereum-sepolia",
-              "stage": "available",
-              "environment": "testnet",
-              "chainId": "11155111",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "ETH"
-              ],
-              "provider": "evm-ethereum-sepolia"
-            },
-            {
-              "network": "ethereum-mainnet",
-              "stage": "planned",
-              "environment": "mainnet",
-              "chainId": "1",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "ETH"
-              ],
-              "provider": "evm-ethereum-mainnet"
-            },
-            {
-              "network": "arbitrum-sepolia",
-              "stage": "available",
-              "environment": "testnet",
-              "chainId": "421614",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "ETH"
-              ],
-              "provider": "evm-arbitrum-sepolia"
-            },
-            {
-              "network": "arbitrum-one",
-              "stage": "planned",
-              "environment": "mainnet",
-              "chainId": "42161",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "ETH"
-              ],
-              "provider": "evm-arbitrum-one"
-            },
-            {
-              "network": "bnb-testnet",
-              "stage": "available",
-              "environment": "testnet",
-              "chainId": "97",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "BNB"
-              ],
-              "provider": "evm-bnb-testnet"
-            },
-            {
-              "network": "bnb-mainnet",
-              "stage": "planned",
-              "environment": "mainnet",
-              "chainId": "56",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "BNB"
-              ],
-              "provider": "evm-bnb-mainnet"
-            },
-            {
-              "network": "base-sepolia",
-              "stage": "available",
-              "environment": "testnet",
-              "chainId": "84532",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "ETH"
-              ],
-              "provider": "evm-base-sepolia"
-            },
-            {
-              "network": "base-mainnet",
-              "stage": "planned",
-              "environment": "mainnet",
-              "chainId": "8453",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "ETH"
-              ],
-              "provider": "evm-base-mainnet"
-            },
-            {
-              "network": "robinhood-testnet",
-              "stage": "available",
-              "environment": "testnet",
-              "chainId": "46630",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "ETH"
-              ],
-              "provider": "evm-robinhood-testnet"
-            },
-            {
-              "network": "robinhood-mainnet",
-              "stage": "planned",
-              "environment": "mainnet",
-              "chainId": "4663",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "ETH"
-              ],
-              "provider": "evm-robinhood-mainnet"
-            },
-            {
-              "network": "tempo-testnet",
-              "stage": "available",
-              "environment": "testnet",
-              "chainId": "42431",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "USD"
-              ],
-              "provider": "evm-tempo-testnet"
-            },
-            {
-              "network": "tempo-mainnet",
-              "stage": "planned",
-              "environment": "mainnet",
-              "chainId": null,
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
-              "executable": false,
-              "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [
-                "USD"
-              ],
-              "provider": "evm-tempo-mainnet"
-            },
-            {
-              "network": "zcash-testnet",
-              "stage": "available",
-              "environment": "testnet",
-              "chainId": null,
-              "declared": true,
-              "mode": "kernel-gateway",
-              "evidenceStatus": "testnet_verified",
-              "evidence": "testnet-e2e",
-              "executable": true,
-              "supportsProof": false,
-              "supportsReceipt": true,
-              "supportsReconciliation": true,
-              "supportedAssets": [
-                "TAZ"
-              ],
-              "provider": "zcash-testnet-zallet"
             },
             {
               "network": "hyperliquid-testnet",

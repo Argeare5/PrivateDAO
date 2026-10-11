@@ -90,17 +90,13 @@ assert.equal(isRuntimeProductAvailable("governance"), true);
   assert.equal(isRuntimeProductAvailable("agent"), false);
 assert.equal(isRuntimeCapabilityExecutable("payroll", "payroll.calculate", "solana-devnet"), true);
 assert.equal(isRuntimeCapabilityExecutable("payroll", "payroll.approve", "solana-devnet"), true);
-assert.equal(isRuntimeCapabilityExecutable("payroll", "payroll.settle", "solana-devnet"), false);
-assert.equal(isRuntimeCapabilityExecutable("payroll", "payroll.calculate", "zcash-testnet"), false);
-assert.equal(isRuntimeCapabilityExecutable("payroll", "payroll.approve", "zcash-testnet"), false);
-assert.equal(isRuntimeCapabilityExecutable("payroll", "payroll.settle", "zcash-testnet"), true);
 
 const runtime = createPrivateDaoRuntime(registry);
 const protocolRegistry = runtime.protocols;
 const registrations = protocolRegistry.list();
 const expectedRegistrationCount = products.reduce((count, product) => count + product.capabilities.length, 0);
 assert.equal(registrations.length, expectedRegistrationCount);
-assert.equal(protocolRegistry.list("payroll").length, 3);
+assert.equal(protocolRegistry.list("payroll").length, 2);
 assert.equal(protocolRegistry.authorize("payroll.approve", "execution.submit", "checker"), true);
 assert.equal(protocolRegistry.authorize("payroll.approve", "execution.submit", "auditor"), false);
 
@@ -324,8 +320,6 @@ assert.equal(
   products.reduce((count, product) => count + product.capabilities.reduce((total, capability) => total + capability.networks.length, 0), 0),
 );
 assert.equal(listApplicationBindings().find((entry) => entry.capability === "payroll.calculate")?.mode, "kernel-gateway");
-assert.equal(listApplicationBindings().find((entry) => entry.capability === "payroll.calculate" && entry.network === "zcash-testnet")?.mode, "kernel-gateway");
-assert.equal(listApplicationBindings().find((entry) => entry.capability === "payroll.approve" && entry.network === "zcash-testnet")?.mode, "kernel-gateway");
 assert.equal(listApplicationBindings().find((entry) => entry.capability === "treasury.policy.check")?.mode, "kernel-gateway");
 assert.equal(listApplicationBindings().find((entry) => entry.capability === "verification.record.create")?.mode, "kernel-gateway");
 assert.equal(listApplicationBindings().find((entry) => entry.capability === "verification.record.verify")?.mode, "kernel-gateway");

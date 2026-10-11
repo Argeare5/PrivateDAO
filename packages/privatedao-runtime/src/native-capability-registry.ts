@@ -83,8 +83,7 @@ const AGENT_MAINNET_EVIDENCE = {
 } as const;
 
 const PAYROLL_SOLANA_DEVNET_EVIDENCE = {
-  provider: "umbra-solana-devnet",
-  program: "DSuKkyqGVGgo4QtPABfxKJKygUDACbUhirnuv63mEpAJ",
+  provider: "privatedao-payroll-kernel",
   asset: "WSOL",
   commit: "adcb3ae",
   timestamp: "2026-09-11T21:36:18.740Z",
@@ -266,32 +265,12 @@ function applyAgentMainnetEvidence(entry: NativeCapabilityEntry): NativeCapabili
 
 function applyPayrollDevnetEvidence(entry: NativeCapabilityEntry): NativeCapabilityEntry {
   if (entry.product !== "payroll" || entry.network !== "solana-devnet") return entry;
-  if (!["payroll.calculate", "payroll.approve", "payroll.settle"].includes(entry.capability)) return entry;
-  const isSettlement = entry.capability === "payroll.settle";
-  if (isSettlement) {
-    return {
-      ...entry,
-      provider: "privatedao-payroll-kernel",
-      supportedAssets: [PAYROLL_SOLANA_DEVNET_EVIDENCE.asset],
-      contracts: [],
-      walletModel: "none",
-      supportsExecution: false,
-      supportsPrivateExecution: false,
-      supportsPrivateSettlement: false,
-      supportsProof: false,
-      supportsReceipt: false,
-      supportsReconciliation: false,
-      status: "implementation",
-      lastVerifiedCommit: null,
-      lastVerifiedTimestamp: null,
-      evidence: "umbra-disabled",
-    };
-  }
+  if (!["payroll.calculate", "payroll.approve"].includes(entry.capability)) return entry;
   return {
     ...entry,
     provider: PAYROLL_SOLANA_DEVNET_EVIDENCE.provider,
     supportedAssets: [PAYROLL_SOLANA_DEVNET_EVIDENCE.asset],
-    contracts: [PAYROLL_SOLANA_DEVNET_EVIDENCE.program],
+    contracts: [],
     walletModel: "external-wallet",
     supportsExecution: true,
     supportsPrivateExecution: false,
