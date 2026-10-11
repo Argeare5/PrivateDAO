@@ -129,6 +129,7 @@ Engineer-facing architecture and BNB evidence:
 
 - [Engineer index](docs/architecture/ENGINEER-INDEX.md)
 - [Current engineering state](docs/architecture/current-state-20261011.md)
+- [Production surface handoff](docs/architecture/PRODUCTION-SURFACE-HANDOFF.md)
 - [Engineering map and evidence rules](docs/architecture/README.md)
 - [Kernel and network adapter architecture](docs/architecture/kernel-network-adapters.md)
 - [Product and network evidence map](docs/architecture/product-network-evidence.md)

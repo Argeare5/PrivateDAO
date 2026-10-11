@@ -16,6 +16,7 @@ product bindings, and independent on-chain evidence.
 | What is independently proven? | [`product-network-evidence.md`](product-network-evidence.md) and [`../../docs/generated/native-capability-matrix-20260911.json`](../generated/native-capability-matrix-20260911.json) |
 | What is the machine-readable architecture manifest? | [`../generated/engineer-architecture-index.json`](../generated/engineer-architecture-index.json) |
 | What is the current evidence snapshot? | [`current-state-20261011.md`](current-state-20261011.md) |
+| What is the repository-to-production boundary? | [`PRODUCTION-SURFACE-HANDOFF.md`](PRODUCTION-SURFACE-HANDOFF.md) |
 | How is BNB verified? | [`../integrations/bnb-testnet-e2e.md`](../integrations/bnb-testnet-e2e.md) |
 
 ## Architecture Tree
