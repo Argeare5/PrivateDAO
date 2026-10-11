@@ -11,6 +11,7 @@ const suites = [
   ["record-verification", ["npm", "run", "test:record-verification"]],
   ["capability-registry", ["npm", "run", "test:native-capability-registry"]],
   ["capability-matrix", ["npm", "run", "verify:native-capability-matrix"]],
+  ["engineer-index", ["npm", "run", "verify:engineer-index"]],
   ["application-bindings", ["npm", "run", "verify:application-bindings"]],
   ["tracked-secrets", ["npm", "run", "verify:tracked-secrets"]],
   ["agent-mcp", ["npm", "run", "test:agent-mcp"]],
