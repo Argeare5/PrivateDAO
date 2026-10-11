@@ -8,7 +8,7 @@ const verifiedDevnet = entries.filter((entry) => entry.status === "devnet_verifi
 const verifiedPayroll = verifiedDevnet.filter((entry) => entry.product === "payroll");
 
 assert.equal(entries.length, 187, "unexpected native capability matrix size");
-assert.equal(verified.length, 36, "only evidence-backed testnet verification and organizational rows should be verified");
+assert.equal(verified.length, 40, "only evidence-backed testnet verification and organizational rows should be verified");
 assert.equal(liveAgents.length, 2, "the two live Agent Exchange rows must be runtime-verified");
 assert.equal(verifiedPayroll.length, 2, "only Payroll calculation and approval remain enabled on Solana Devnet");
 assert.equal(verifiedDevnet.length, 6, "Solana Devnet must include enabled Payroll plus the evidenced governance, treasury, and auction lanes");
@@ -54,6 +54,8 @@ assert.equal(verified.filter((entry) => entry.provider === "evm-base-sepolia").l
 assert.equal(verified.filter((entry) => entry.provider === "evm-base-sepolia").every((entry) => entry.chainId === "84532"), true);
 assert.equal(verified.filter((entry) => entry.provider === "evm-base-sepolia-organizational").length, 4, "Base organizational evidence must cover treasury, governance, and auction lanes");
 assert.equal(verified.filter((entry) => entry.provider === "evm-base-sepolia-organizational").every((entry) => entry.chainId === "84532"), true);
+assert.equal(verified.filter((entry) => entry.provider === "evm-robinhood-testnet-organizational").length, 4, "Robinhood organizational evidence must cover treasury, governance, and auction lanes");
+assert.equal(verified.filter((entry) => entry.provider === "evm-robinhood-testnet-organizational").every((entry) => entry.chainId === "46630"), true);
 assert.equal(verified.filter((entry) => entry.provider === "evm-arbitrum-sepolia").length, 3, "Arbitrum Sepolia must have three verified verification rows");
 assert.equal(verified.filter((entry) => entry.provider === "evm-arbitrum-sepolia-organizational").length, 4, "Arbitrum organizational evidence must cover treasury, governance, and auction lanes");
 assert.equal(verified.filter((entry) => entry.network === "arbitrum-sepolia" && entry.provider === "privatedao-payroll-kernel").length, 2, "Arbitrum Sepolia must have Kernel payroll policy lanes");
@@ -70,7 +72,8 @@ assert.equal(entries.find((entry) => entry.network === "hypercore-testnet" && en
 for (const network of ["robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet"]) {
   const policyRows = entries.filter((entry) => entry.network === network && entry.declared && entry.product !== "agent");
   assert.equal(policyRows.length, 9, `${network} must expose all Kernel policy product lanes`);
-  assert.equal(policyRows.every((entry) => entry.status === "testnet_ready" && entry.evidence === "runtime-only"), true, `${network} policy rows must not claim on-chain E2E`);
+  const expectedPolicyRows = network === "robinhood-testnet" ? 5 : 9;
+  assert.equal(policyRows.filter((entry) => entry.status === "testnet_ready" && entry.evidence === "runtime-only").length, expectedPolicyRows, `${network} policy rows must not claim unsupported on-chain E2E`);
 }
 
 assert.equal(entries.some((entry) => entry.network === "zcash-testnet" && entry.product === "payroll" && entry.declared), true, "Zcash Kernel payroll policy workflows must be declared");
