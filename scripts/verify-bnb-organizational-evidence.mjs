@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { decodeFunctionResult, encodeFunctionData, parseAbi } from "viem";
 
 const artifactPath = "packages/evm-verification/deployments/organizational-bnb-testnet.json";
 const artifact = JSON.parse(await readFile(artifactPath, "utf8"));
@@ -57,4 +58,20 @@ for (const [label, address] of Object.entries({ treasury: artifact.contracts.tre
   assert.ok(bytecode && bytecode !== "0x", `${label} contract has no deployed bytecode`);
   contracts.push({ label, address, deployed: true });
 }
-console.log(JSON.stringify({ status: "PASS", network: "bnb-testnet", chainId: 97, receiptCount: receipts.length, receipts, contracts, source: artifactPath }, null, 2));
+const payrollAbi = parseAbi([
+  "function batches(bytes32) view returns (bytes32 batchCommitment, address recipient, uint256 netAmount, uint8 status, uint64 createdAt, uint64 approvedAt, uint64 settledAt)",
+  "function settlePayroll(bytes32 batchId)",
+]);
+const payrollAddress = artifact.contracts.payroll.address;
+const payrollBatchId = artifact.evidence.payroll.payrollBatchId;
+const payrollStateData = await call("eth_call", [{ to: payrollAddress, data: encodeFunctionData({ abi: payrollAbi, functionName: "batches", args: [payrollBatchId] }) }, "latest"]);
+const payrollState = decodeFunctionResult({ abi: payrollAbi, functionName: "batches", data: payrollStateData });
+assert.equal(Number(payrollState[3]), 3, "Payroll recovery readback did not return Settled");
+let replayRejected = false;
+try {
+  await call("eth_call", [{ from: artifact.deployer, to: payrollAddress, data: encodeFunctionData({ abi: payrollAbi, functionName: "settlePayroll", args: [payrollBatchId] }) }, "latest"]);
+} catch {
+  replayRejected = true;
+}
+assert.equal(replayRejected, true, "Payroll settlement replay was not rejected by the contract");
+console.log(JSON.stringify({ status: "PASS", network: "bnb-testnet", chainId: 97, receiptCount: receipts.length, receipts, contracts, recoveryReadback: "PASS", replayProtection: "PASS", source: artifactPath }, null, 2));
