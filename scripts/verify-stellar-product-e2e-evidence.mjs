@@ -14,6 +14,7 @@ assert.equal(evidence.environment, "testnet");
 assert.equal(evidence.provider, "stellar-testnet-horizon");
 assert.equal(evidence.executionPath, "product-gateway->protocol->kernel->stellar-adapter->horizon");
 assert.equal(evidence.broadcastExecuted, true);
+assert.deepEqual(evidence.preparedOnly, ["payroll.settle"]);
 const expectedProducts = new Map(
   PRODUCT_CATALOG
     .filter((product) => product.id !== "agent")

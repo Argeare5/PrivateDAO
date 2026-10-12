@@ -7,6 +7,9 @@
   "signerPublicKey": "GBBDH5SMLNRE5FSPNEGISMWSSZBV7OE4L5DUC7BRTWJCJSVYDODJK32L",
   "broadcastExecuted": true,
   "capabilityCount": 9,
+  "preparedOnly": [
+    "payroll.settle"
+  ],
   "results": [
     {
       "product": "blind-verification",
