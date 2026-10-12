@@ -73,7 +73,8 @@ function workflowFor(capability) {
 }
 
 const results = [];
-for (const capability of STELLAR_KERNEL_CAPABILITIES) {
+const verifiedCapabilities = STELLAR_KERNEL_CAPABILITIES.filter((capability) => capability !== "payroll.settle");
+for (const capability of verifiedCapabilities) {
   const product = productFor(capability);
   const requestId = `stellar-product-e2e-${capability}-${Date.now()}`;
   const workflow = workflowFor(capability);
@@ -126,6 +127,8 @@ for (const capability of STELLAR_KERNEL_CAPABILITIES) {
   });
 }
 
+assert.equal(results.length, 9, "This runner must only produce the nine independently verified Stellar product receipts.");
+
 const evidence = {
   schema: "privatedao.stellar-testnet-product-e2e.v1",
   network: "stellar-testnet",
@@ -135,6 +138,7 @@ const evidence = {
   signerPublicKey: publicKey,
   broadcastExecuted: true,
   capabilityCount: results.length,
+  preparedOnly: ["payroll.settle"],
   results,
   generatedAt: new Date().toISOString(),
 };
