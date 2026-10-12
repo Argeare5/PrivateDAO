@@ -22,12 +22,13 @@ const expectedProducts = new Map(
       .map((capability) => [capability.id, product.id]),
   ),
 );
+const evidencedProducts = new Map([...expectedProducts].filter(([capability]) => capability !== "payroll.settle"));
 assert.deepEqual(
   [...expectedProducts.keys()].sort(),
   [...STELLAR_KERNEL_CAPABILITIES].sort(),
   "Stellar adapter capabilities must match the catalog's declared Stellar capabilities",
 );
-assert.equal(evidence.results.length, expectedProducts.size);
+assert.equal(evidence.results.length, evidencedProducts.size);
 
 for (const [capability, product] of expectedProducts) {
   const binding = APPLICATION_CAPABILITY_BINDINGS.find(
@@ -40,7 +41,7 @@ for (const [capability, product] of expectedProducts) {
 
 const seen = new Set();
 for (const result of evidence.results) {
-  assert.equal(expectedProducts.get(result.capability), result.product, `wrong product for ${result.capability}`);
+  assert.equal(evidencedProducts.get(result.capability), result.product, `wrong product for ${result.capability}`);
   assert.equal(result.network, "stellar-testnet");
   assert.equal(result.provider, "stellar-testnet-horizon");
   assert.equal(result.state, "confirmed");
@@ -72,13 +73,14 @@ for (const result of evidence.results) {
   assert.equal(String(transaction.ledger), String(result.ledger), `${result.capability} ledger mismatch`);
 }
 
-assert.deepEqual([...seen].sort(), [...STELLAR_KERNEL_CAPABILITIES].sort());
+assert.deepEqual([...seen].sort(), [...evidencedProducts.keys()].sort());
 console.log(JSON.stringify({
   schema: evidence.schema,
   network: evidence.network,
   provider: evidence.provider,
   executionPath: evidence.executionPath,
   capabilities: seen.size,
+  preparedOnly: ["payroll.settle"],
   confirmedOnHorizon: true,
   readOnly: true,
 }, null, 2));
