@@ -1,0 +1,111 @@
+{
+  "schema": "privatedao.stellar-testnet-product-e2e.v1",
+  "network": "stellar-testnet",
+  "environment": "testnet",
+  "provider": "stellar-testnet-horizon",
+  "signerPublicKey": "GBBDH5SMLNRE5FSPNEGISMWSSZBV7OE4L5DUC7BRTWJCJSVYDODJK32L",
+  "broadcastExecuted": true,
+  "capabilityCount": 9,
+  "results": [
+    {
+      "product": "blind-verification",
+      "capability": "verification.blind.prove",
+      "network": "stellar-testnet",
+      "provider": "stellar-testnet-horizon",
+      "state": "confirmed",
+      "transactionHash": "ada0682524d42abd328921f33ffa0839e7d5dbd88b7d8f96574c7b61fac23f87",
+      "ledger": "5148259",
+      "explorerUrl": "https://stellar.expert/explorer/testnet/tx/ada0682524d42abd328921f33ffa0839e7d5dbd88b7d8f96574c7b61fac23f87",
+      "asset": "XLM"
+    },
+    {
+      "product": "record-verification",
+      "capability": "verification.record.create",
+      "network": "stellar-testnet",
+      "provider": "stellar-testnet-horizon",
+      "state": "confirmed",
+      "transactionHash": "9fa2f9e77b8ed961cffdc88dcbede2d546883ff520cf3333c24a9245f7edff94",
+      "ledger": "5148260",
+      "explorerUrl": "https://stellar.expert/explorer/testnet/tx/9fa2f9e77b8ed961cffdc88dcbede2d546883ff520cf3333c24a9245f7edff94",
+      "asset": "XLM"
+    },
+    {
+      "product": "record-verification",
+      "capability": "verification.record.verify",
+      "network": "stellar-testnet",
+      "provider": "stellar-testnet-horizon",
+      "state": "confirmed",
+      "transactionHash": "3dba3ed593e71a266229a3fcffe4c69e24142cbec740262c31d94a73c88118a7",
+      "ledger": "5148261",
+      "explorerUrl": "https://stellar.expert/explorer/testnet/tx/3dba3ed593e71a266229a3fcffe4c69e24142cbec740262c31d94a73c88118a7",
+      "asset": "XLM"
+    },
+    {
+      "product": "payroll",
+      "capability": "payroll.calculate",
+      "network": "stellar-testnet",
+      "provider": "stellar-testnet-horizon",
+      "state": "confirmed",
+      "transactionHash": "13b0008e20444beff5995d6575d362e55c9ebaf6f4c05c0340cdc42ac1a312d3",
+      "ledger": "5148262",
+      "explorerUrl": "https://stellar.expert/explorer/testnet/tx/13b0008e20444beff5995d6575d362e55c9ebaf6f4c05c0340cdc42ac1a312d3",
+      "asset": "XLM"
+    },
+    {
+      "product": "payroll",
+      "capability": "payroll.approve",
+      "network": "stellar-testnet",
+      "provider": "stellar-testnet-horizon",
+      "state": "confirmed",
+      "transactionHash": "ff6eda0b40f4c97ecc44000823fb165f6d996f44f66e2f2e390943f419ef4732",
+      "ledger": "5148263",
+      "explorerUrl": "https://stellar.expert/explorer/testnet/tx/ff6eda0b40f4c97ecc44000823fb165f6d996f44f66e2f2e390943f419ef4732",
+      "asset": "XLM"
+    },
+    {
+      "product": "treasury",
+      "capability": "treasury.policy.check",
+      "network": "stellar-testnet",
+      "provider": "stellar-testnet-horizon",
+      "state": "confirmed",
+      "transactionHash": "66c45149a965966f81dcad6789084ff0a7fbd2b15c4d41e5a1943ba0d8803491",
+      "ledger": "5148264",
+      "explorerUrl": "https://stellar.expert/explorer/testnet/tx/66c45149a965966f81dcad6789084ff0a7fbd2b15c4d41e5a1943ba0d8803491",
+      "asset": "XLM"
+    },
+    {
+      "product": "governance",
+      "capability": "governance.proposal.execute",
+      "network": "stellar-testnet",
+      "provider": "stellar-testnet-horizon",
+      "state": "confirmed",
+      "transactionHash": "a6b417289df135ebc88e2f38fb1d6fc26b2c5fa1e2d7ca436f5051f7a9b07cda",
+      "ledger": "5148265",
+      "explorerUrl": "https://stellar.expert/explorer/testnet/tx/a6b417289df135ebc88e2f38fb1d6fc26b2c5fa1e2d7ca436f5051f7a9b07cda",
+      "asset": "XLM"
+    },
+    {
+      "product": "auction",
+      "capability": "auction.bid.commit",
+      "network": "stellar-testnet",
+      "provider": "stellar-testnet-horizon",
+      "state": "confirmed",
+      "transactionHash": "0b9fe22ca4b1faeb1a99220bbca7afdb51c243172b7030445bb39f29f8a77c1f",
+      "ledger": "5148266",
+      "explorerUrl": "https://stellar.expert/explorer/testnet/tx/0b9fe22ca4b1faeb1a99220bbca7afdb51c243172b7030445bb39f29f8a77c1f",
+      "asset": "XLM"
+    },
+    {
+      "product": "auction",
+      "capability": "auction.settle",
+      "network": "stellar-testnet",
+      "provider": "stellar-testnet-horizon",
+      "state": "confirmed",
+      "transactionHash": "0046b07b6e4c53fe7d48523036af874b4d0bf99abe45408cde1bbecdbc0e7e59",
+      "ledger": "5148267",
+      "explorerUrl": "https://stellar.expert/explorer/testnet/tx/0046b07b6e4c53fe7d48523036af874b4d0bf99abe45408cde1bbecdbc0e7e59",
+      "asset": "XLM"
+    }
+  ],
+  "generatedAt": "2026-10-12T00:28:42.898Z"
+}
