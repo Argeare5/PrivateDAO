@@ -14,6 +14,18 @@ Historical Devnet proof registry program: `5AhUsbQ4mJ8Xh7QJEomuS85qGgmK9iNvFqzF6
 (`docs/proof-registry.json`); this is retained as provenance and is not the
 current Testnet deployment.
 
+## Release language
+
+The public product interface stays customer-facing and does not use
+environment badges or protocol shorthand as marketing copy. Exact environment
+names such as `Testnet`, `Devnet`, and `Mainnet` remain in this repository's
+engineering evidence, runtime metadata, and verification reports so reviewers
+can distinguish proven execution from planned or historical work.
+
+The repository is the authoritative place to review those boundaries. A
+network appearing in configuration or documentation is not, by itself, a
+claim that every PrivateDAO product executes on that network.
+
 An organization does **not** need to become a Web3 or crypto company to use
 PrivateDAO. A company, institution, financial team, DAO, data provider, or
 Web3 operator can start with a familiar business workflow and add wallets,

@@ -30,6 +30,7 @@ import {
   AgentDiscoveryProvider,
   SolanaBrowserExecutionProvider,
   createPrivateDaoRuntime,
+  buildNativeCapabilityRegistry,
   type ExecutionIntent,
   type KernelProvider,
   type NetworkId,
@@ -326,12 +327,25 @@ export class KernelGatewayService {
         this.hypercoreAdapter ? this.hypercoreAdapter.health() : Promise.resolve(null),
       ]);
       const evmReady = Object.fromEntries(evmReadiness.map(([network, result]) => [network, result.ok]));
+      const capabilityStatus = buildNativeCapabilityRegistry()
+        .filter((entry) => entry.declared)
+        .map((entry) => ({
+          product: entry.product,
+          capability: entry.capability,
+          network: entry.network,
+          status: entry.status,
+          evidence: entry.evidence,
+          provider: entry.provider,
+          supportsExecution: entry.supportsExecution,
+          supportsReceipt: entry.supportsReceipt,
+        }));
       this.writeJson(res, 200, {
         ok: true,
         service: "privatedao-kernel-gateway",
         mode: "kernel",
         networks: this.supportedNetworks,
-          networkModes: this.supportedNetworks.map((network) => ({
+        capabilityStatus,
+        networkModes: this.supportedNetworks.map((network) => ({
           network,
           provider: network === "zcash-testnet"
             ? this.zcashAdapter?.id || "privatedao-kernel-policy"

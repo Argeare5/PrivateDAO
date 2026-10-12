@@ -46,6 +46,13 @@ try {
   const expectedNetworks = ["solana-devnet", "ethereum-sepolia", "arbitrum-sepolia", "tempo-testnet", "base-sepolia", "bnb-testnet", "robinhood-testnet", "hyperliquid-testnet", "zcash-testnet", "stellar-testnet", "hypercore-testnet"];
   assert.deepEqual(health.networks, expectedNetworks);
   assert.equal(health.networkModes.length, expectedNetworks.length);
+  assert.ok(Array.isArray(health.capabilityStatus));
+  const stellarCapabilityStatus = health.capabilityStatus.filter((entry) => entry.network === "stellar-testnet");
+  assert.equal(stellarCapabilityStatus.length, 9);
+  assert.equal(stellarCapabilityStatus.every((entry) => entry.status === "testnet_verified" && entry.evidence === "testnet-e2e" && entry.supportsExecution && entry.supportsReceipt), true);
+  const hypercoreCapabilityStatus = health.capabilityStatus.filter((entry) => entry.network === "hypercore-testnet");
+  assert.equal(hypercoreCapabilityStatus.length, 9);
+  assert.equal(hypercoreCapabilityStatus.every((entry) => entry.status === "testnet_ready" && entry.evidence === "runtime-only"), true);
   for (const network of expectedNetworks) {
     const mode = health.networkModes.find((entry) => entry.network === network);
     assert.ok(mode, `${network} must have a Kernel network mode`);
