@@ -65,6 +65,7 @@ capability without repository code and independent evidence.
 ```bash
 npm run verify:bnb:evidence
 npm run verify:bnb:organizational-evidence
+npm run verify:stellar:product-e2e
 npm run test:native-capability-registry
 npm run verify:native-capability-matrix
 npm run release:verify
