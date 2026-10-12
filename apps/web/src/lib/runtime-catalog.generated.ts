@@ -2717,7 +2717,7 @@ export const runtimeCatalog = {
               "mode": "kernel-gateway",
               "entrypoint": "kernel://payroll.settle",
               "method": null,
-              "note": "Stellar Testnet payroll settlement is Kernel-ready for commitment-bound XDR preparation and signing; funded payout E2E remains pending.",
+              "note": "Stellar Testnet payroll settlement is backed by the confirmed commitment-bound payout receipt; payroll inputs remain off-chain and broadcast stays Testnet-gated.",
               "evidenceStatus": "testnet_verified",
               "evidence": "testnet-e2e",
               "supportsExecution": true,

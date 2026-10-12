@@ -245,7 +245,7 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
       network,
       mode: "kernel-gateway" as const,
       entrypoint: "kernel://payroll.settle",
-      note: "Stellar Testnet payroll settlement is Kernel-ready for commitment-bound XDR preparation and signing; funded payout E2E remains pending.",
+      note: "Stellar Testnet payroll settlement is backed by the confirmed commitment-bound payout receipt; payroll inputs remain off-chain and broadcast stays Testnet-gated.",
     },
     {
       product: "treasury" as ProductId,

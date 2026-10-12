@@ -74,8 +74,8 @@ export const PRODUCT_CATALOG: readonly ProductDescriptor[] = [
       capability("payroll.calculate", "payroll", false, true, [solanaDevnet, ethereumSepolia, arbitrumSepolia, tempoTestnet, baseSepolia, bnbTestnet, zcashTestnet, stellarTestnet, robinhoodTestnet, hyperliquidTestnet, hypercoreTestnet]),
       capability("payroll.approve", "payroll", true, true, [solanaDevnet, ethereumSepolia, arbitrumSepolia, tempoTestnet, baseSepolia, bnbTestnet, zcashTestnet, stellarTestnet, robinhoodTestnet, hyperliquidTestnet, hypercoreTestnet]),
       // Settlement is exposed only where a network-specific provider exists.
-      // Stellar is Kernel-ready for XDR preparation/signing, but remains
-      // unverified until an independent funded payout receipt is recorded.
+      // Stellar settlement is backed by an independently confirmed Testnet
+      // payout receipt; Mainnet remains outside this catalog lane.
       capability("payroll.settle", "payroll", true, true, [zcashTestnet, bnbTestnet, stellarTestnet]),
     ],
   },

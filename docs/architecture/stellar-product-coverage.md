@@ -55,11 +55,10 @@ The coherence verifier fails if any of these projections diverge.
   in `docs/evidence/stellar-testnet-payroll-e2e.json`. This proves the guarded
   Kernel-to-Horizon settlement path on Testnet; it does not imply Mainnet
   readiness or that private payroll inputs are published.
-- The shared `StellarHorizonTransport` now supports a guarded,
+- The shared `StellarHorizonTransport` supports a guarded,
   multi-recipient `stellar-payroll-settlement` payload with commitment-bound
-  workflow metadata. It can build and sign Testnet XDR, but remains
-  unadvertised and broadcast-disabled until an independent funded settlement
-  E2E produces a confirmed payout receipt.
+  workflow metadata. The confirmed payout evidence proves the Testnet path;
+  broadcast remains explicitly gated and Mainnet is not implied.
 - The dedicated payroll runner is `npm run test:stellar:payroll:e2e`. It
   requires the normal Testnet approval and broadcast gates plus
   `PDAO_STELLAR_PAYROLL_E2E_APPROVED=1`; without those gates it fails closed
