@@ -1,0 +1,38 @@
+# Solana Record Anchor Service
+
+The local service in `scripts/record-anchor-service.mjs` is the explicit
+anchor boundary for the real Solana Record Verification E2E.
+
+```text
+record request
+  -> canonical record and schema digest
+  -> selective public fields
+  -> evidence digest
+  -> Solana memo transaction
+  -> confirmed signature
+  -> public receipt without source payload
+```
+
+The service binds only the evidence digest to a Solana memo. It never puts the
+source record, salary, amount, recipient, or private policy data on-chain.
+
+## Safety gates
+
+- Solana Devnet/Testnet only.
+- Binds to `127.0.0.1` only.
+- HTTPS RPC matching the selected cluster is required.
+- Broadcast is disabled unless both
+  `PDAO_RECORD_ANCHOR_BROADCAST_ENABLED=1` and
+  `PDAO_RECORD_ANCHOR_E2E_APPROVED=1` are explicitly set.
+- No signer file is read while broadcast is disabled.
+- The service does not create keypairs or recovery material.
+
+The default and the automated boundary test are dry-run. A real E2E run must
+be separately approved and use an existing funded Testnet keypair through
+`PDAO_RECORD_ANCHOR_KEYPAIR_PATH`; no secret belongs in GitHub or source.
+
+Run the boundary test with:
+
+```bash
+npm run test:record-anchor-boundary
+```
