@@ -49,17 +49,13 @@ try {
   assert.equal(health.networkModes.length, expectedNetworks.length);
   assert.ok(Array.isArray(health.capabilityStatus));
   const stellarCapabilityStatus = health.capabilityStatus.filter((entry) => entry.network === "stellar-testnet");
-  assert.equal(stellarCapabilityStatus.length, 12);
-  const stellarPreparedOnly = stellarCapabilityStatus.filter((entry) => ["payroll.settle", "agent.discover", "agent.invoke"].includes(entry.capability));
-  assert.equal(stellarPreparedOnly.length, 3);
+  assert.equal(stellarCapabilityStatus.length, 10);
+  const stellarPreparedOnly = stellarCapabilityStatus.filter((entry) => entry.capability === "payroll.settle");
+  assert.equal(stellarPreparedOnly.length, 1);
   const payrollVerified = existsSync("docs/evidence/stellar-testnet-payroll-e2e.json");
-  const agentVerified = existsSync("docs/evidence/stellar-testnet-agent-e2e.json");
-  for (const entry of stellarPreparedOnly) {
-    const verified = entry.capability === "payroll.settle" ? payrollVerified : agentVerified;
-    assert.equal(entry.status, verified ? "testnet_verified" : "testnet_ready");
-    assert.equal(entry.evidence, verified ? "testnet-e2e" : "runtime-only");
-  }
-  assert.equal(stellarCapabilityStatus.filter((entry) => !["payroll.settle", "agent.discover", "agent.invoke"].includes(entry.capability)).every((entry) => entry.status === "testnet_verified" && entry.evidence === "testnet-e2e" && entry.supportsExecution && entry.supportsReceipt), true);
+  assert.equal(stellarPreparedOnly[0].status, payrollVerified ? "testnet_verified" : "testnet_ready");
+  assert.equal(stellarPreparedOnly[0].evidence, payrollVerified ? "testnet-e2e" : "runtime-only");
+  assert.equal(stellarCapabilityStatus.filter((entry) => entry.capability !== "payroll.settle").every((entry) => entry.status === "testnet_verified" && entry.evidence === "testnet-e2e" && entry.supportsExecution && entry.supportsReceipt), true);
   const hypercoreCapabilityStatus = health.capabilityStatus.filter((entry) => entry.network === "hypercore-testnet");
   assert.equal(hypercoreCapabilityStatus.length, 9);
   assert.equal(hypercoreCapabilityStatus.every((entry) => entry.status === "testnet_ready" && entry.evidence === "runtime-only"), true);
@@ -160,8 +156,6 @@ try {
     ["governance", "governance.proposal.execute"],
     ["auction", "auction.bid.commit"],
     ["auction", "auction.settle"],
-    ["agent", "agent.discover"],
-    ["agent", "agent.invoke"],
   ];
   let stellarGatewayCapabilities = 0;
   for (const [product, capability] of stellarProductIntents) {
@@ -200,7 +194,7 @@ try {
     assert.equal(status.body.state, "awaiting_signature");
     stellarGatewayCapabilities += 1;
   }
-  assert.equal(stellarGatewayCapabilities, 12);
+  assert.equal(stellarGatewayCapabilities, 10);
 
   const governanceRequest = "gateway-zcash-governance";
   const governanceIntent = {

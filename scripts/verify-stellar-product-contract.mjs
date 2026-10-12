@@ -8,7 +8,6 @@ import {
 
 const network = "stellar-testnet";
 const payrollEvidencePresent = existsSync("docs/evidence/stellar-testnet-payroll-e2e.json");
-const agentEvidencePresent = existsSync("docs/evidence/stellar-testnet-agent-e2e.json");
 const declared = new Set(
   PRODUCT_CATALOG.flatMap((product) => product.capabilities
     .filter((capability) => capability.networks.includes(network))
@@ -31,10 +30,8 @@ assert.deepEqual(
   [...new Set([...declared].map((key) => key.split("/").slice(1).join("/")))].sort(),
   "Stellar adapter capabilities diverged from the product catalog.",
 );
-assert.equal([...declared].some((key) => key.startsWith("agent/")), true);
+assert.equal([...declared].some((key) => key.startsWith("agent/")), false);
 assert.equal([...declared].filter((key) => key.endsWith("/payroll.settle")).length, 1);
 
-const verified = declared.size
-  - (payrollEvidencePresent ? 0 : 1)
-  - (agentEvidencePresent ? 0 : 2);
+const verified = payrollEvidencePresent ? declared.size : declared.size - 1;
 console.log(`STELLAR_PRODUCT_CONTRACT: PASS capabilities=${declared.size} verified=${verified} prepared_only=${declared.size - verified}`);

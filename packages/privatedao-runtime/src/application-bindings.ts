@@ -279,22 +279,6 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
       entrypoint: "kernel://auction.settle",
       note: "Auction outcome proof is Kernel-backed; financial settlement remains signature-gated.",
     },
-    {
-      product: "agent" as ProductId,
-      capability: "agent.discover" as CapabilityId,
-      network,
-      mode: "kernel-gateway" as const,
-      entrypoint: "kernel://agent.discover",
-      note: "Stellar Testnet Agent Exchange discovery is routed through the Kernel and commits only discovered service metadata.",
-    },
-    {
-      product: "agent" as ProductId,
-      capability: "agent.invoke" as CapabilityId,
-      network,
-      mode: "kernel-gateway" as const,
-      entrypoint: "kernel://agent.invoke",
-      note: "Stellar Testnet Agent Exchange invocation is signature-gated and anchors a safe MCP result; commercial payment remains the separate Solana USDC rail.",
-    },
   ]),
   {
     product: "payroll",

@@ -495,7 +495,7 @@ function applyFutureKernelPolicyReadiness(entry: NativeCapabilityEntry): NativeC
 }
 
 function applyStellarTestnetReadiness(entry: NativeCapabilityEntry): NativeCapabilityEntry {
-  if (entry.network !== "stellar-testnet") return entry;
+  if (entry.network !== "stellar-testnet" || entry.product === "agent") return entry;
   if (!entry.declared) return entry;
   const lifecycleVerified = (STELLAR_TESTNET_EVIDENCE.capabilities as readonly string[]).includes(entry.capability);
   return {

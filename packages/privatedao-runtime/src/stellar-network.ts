@@ -37,8 +37,6 @@ export const STELLAR_KERNEL_CAPABILITIES: readonly CapabilityId[] = [
   "governance.proposal.execute",
   "auction.bid.commit",
   "auction.settle",
-  "agent.discover",
-  "agent.invoke",
 ];
 
 export const STELLAR_NETWORK_CONFIGS: readonly StellarNetworkConfig[] = [

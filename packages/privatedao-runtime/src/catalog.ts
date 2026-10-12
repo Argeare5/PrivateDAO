@@ -111,10 +111,10 @@ export const PRODUCT_CATALOG: readonly ProductDescriptor[] = [
     id: "agent",
     name: "Agent Marketplace",
     availability: "available",
-    networks: [solanaDevnet, solanaMainnet, stellarTestnet],
+    networks: [solanaDevnet, solanaMainnet],
     capabilities: [
-      capability("agent.discover", "agent", false, true, [solanaDevnet, solanaMainnet, stellarTestnet]),
-      capability("agent.invoke", "agent", true, true, [solanaDevnet, solanaMainnet, stellarTestnet]),
+      capability("agent.discover", "agent", false, true, [solanaDevnet, solanaMainnet]),
+      capability("agent.invoke", "agent", true, true, [solanaDevnet, solanaMainnet]),
     ],
   },
 ];

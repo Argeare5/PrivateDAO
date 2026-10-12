@@ -5213,8 +5213,7 @@ export const runtimeCatalog = {
       "availability": "available",
       "networks": [
         "solana-devnet",
-        "solana-mainnet-beta",
-        "stellar-testnet"
+        "solana-mainnet-beta"
       ],
       "capabilities": [
         {
@@ -5257,23 +5256,6 @@ export const runtimeCatalog = {
                 "SOL"
               ],
               "provider": "https://agents.privatedao.org"
-            },
-            {
-              "network": "stellar-testnet",
-              "mode": "kernel-gateway",
-              "entrypoint": "kernel://agent.discover",
-              "method": null,
-              "note": "Stellar Testnet Agent Exchange discovery is routed through the Kernel and commits only discovered service metadata.",
-              "evidenceStatus": "testnet_ready",
-              "evidence": "runtime-only",
-              "supportsExecution": true,
-              "supportsProof": false,
-              "supportsReceipt": true,
-              "supportsReconciliation": true,
-              "supportedAssets": [
-                "XLM"
-              ],
-              "provider": "stellar-testnet-horizon"
             }
           ],
           "networkAvailability": [
@@ -5570,17 +5552,15 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "Test SDF Network ; September 2015",
-              "declared": true,
-              "mode": "kernel-gateway",
-              "evidenceStatus": "testnet_ready",
-              "evidence": "runtime-only",
+              "declared": false,
+              "mode": "unbound",
+              "evidenceStatus": "planned",
+              "evidence": "none",
               "executable": false,
               "supportsProof": false,
-              "supportsReceipt": true,
-              "supportsReconciliation": true,
-              "supportedAssets": [
-                "XLM"
-              ],
+              "supportsReceipt": false,
+              "supportsReconciliation": false,
+              "supportedAssets": [],
               "provider": "stellar-testnet-horizon"
             },
             {
@@ -5643,23 +5623,6 @@ export const runtimeCatalog = {
                 "SOL"
               ],
               "provider": "https://agents.privatedao.org"
-            },
-            {
-              "network": "stellar-testnet",
-              "mode": "kernel-gateway",
-              "entrypoint": "kernel://agent.invoke",
-              "method": null,
-              "note": "Stellar Testnet Agent Exchange invocation is signature-gated and anchors a safe MCP result; commercial payment remains the separate Solana USDC rail.",
-              "evidenceStatus": "testnet_ready",
-              "evidence": "runtime-only",
-              "supportsExecution": true,
-              "supportsProof": false,
-              "supportsReceipt": true,
-              "supportsReconciliation": true,
-              "supportedAssets": [
-                "XLM"
-              ],
-              "provider": "stellar-testnet-horizon"
             }
           ],
           "networkAvailability": [
@@ -5956,17 +5919,15 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "Test SDF Network ; September 2015",
-              "declared": true,
-              "mode": "kernel-gateway",
-              "evidenceStatus": "testnet_ready",
-              "evidence": "runtime-only",
+              "declared": false,
+              "mode": "unbound",
+              "evidenceStatus": "planned",
+              "evidence": "none",
               "executable": false,
               "supportsProof": false,
-              "supportsReceipt": true,
-              "supportsReconciliation": true,
-              "supportedAssets": [
-                "XLM"
-              ],
+              "supportsReceipt": false,
+              "supportsReconciliation": false,
+              "supportedAssets": [],
               "provider": "stellar-testnet-horizon"
             },
             {
