@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { APPLICATION_CAPABILITY_BINDINGS } from "../packages/privatedao-runtime/src/application-bindings.ts";
 import { PRODUCT_CATALOG } from "../packages/privatedao-runtime/src/catalog.ts";
 import { STELLAR_KERNEL_CAPABILITIES } from "../packages/privatedao-runtime/src/index.ts";
 
@@ -27,6 +28,15 @@ assert.deepEqual(
   "Stellar adapter capabilities must match the catalog's declared Stellar capabilities",
 );
 assert.equal(evidence.results.length, expectedProducts.size);
+
+for (const [capability, product] of expectedProducts) {
+  const binding = APPLICATION_CAPABILITY_BINDINGS.find(
+    (entry) => entry.product === product && entry.capability === capability && entry.network === "stellar-testnet",
+  );
+  assert(binding, `missing Stellar application binding for ${product}/${capability}`);
+  assert.equal(binding.mode, "kernel-gateway", `${product}/${capability} must use the Kernel gateway`);
+  assert.match(binding.entrypoint || "", /^kernel:\/\//, `${product}/${capability} must expose a Kernel entrypoint`);
+}
 
 const seen = new Set();
 for (const result of evidence.results) {
