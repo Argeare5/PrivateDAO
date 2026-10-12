@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { PRODUCT_CATALOG } from "../packages/privatedao-runtime/src/catalog.ts";
 import { STELLAR_KERNEL_CAPABILITIES } from "../packages/privatedao-runtime/src/index.ts";
 
 const horizon = process.env.PDAO_STELLAR_TESTNET_HORIZON_URL?.replace(/\/$/, "") || "https://horizon-testnet.stellar.org";
@@ -12,19 +13,20 @@ assert.equal(evidence.environment, "testnet");
 assert.equal(evidence.provider, "stellar-testnet-horizon");
 assert.equal(evidence.executionPath, "product-gateway->protocol->kernel->stellar-adapter->horizon");
 assert.equal(evidence.broadcastExecuted, true);
-assert.equal(evidence.results.length, STELLAR_KERNEL_CAPABILITIES.length);
-
-const expectedProducts = new Map([
-  ["verification.blind.prove", "blind-verification"],
-  ["verification.record.create", "record-verification"],
-  ["verification.record.verify", "record-verification"],
-  ["payroll.calculate", "payroll"],
-  ["payroll.approve", "payroll"],
-  ["treasury.policy.check", "treasury"],
-  ["governance.proposal.execute", "governance"],
-  ["auction.bid.commit", "auction"],
-  ["auction.settle", "auction"],
-]);
+const expectedProducts = new Map(
+  PRODUCT_CATALOG
+    .filter((product) => product.id !== "agent")
+    .flatMap((product) => product.capabilities
+      .filter((capability) => capability.networks.includes("stellar-testnet"))
+      .map((capability) => [capability.id, product.id]),
+  ),
+);
+assert.deepEqual(
+  [...expectedProducts.keys()].sort(),
+  [...STELLAR_KERNEL_CAPABILITIES].sort(),
+  "Stellar adapter capabilities must match the catalog's declared Stellar capabilities",
+);
+assert.equal(evidence.results.length, expectedProducts.size);
 
 const seen = new Set();
 for (const result of evidence.results) {
