@@ -86,6 +86,25 @@ const receipt = await adapter.receipt(prepared.executionId);
 assert.equal(receipt.state, "confirmed");
 assert.equal(receipt.signatures[0], txHash);
 
+const receiptWorkflow = {
+  workflowId: "readiness:receipt-binding",
+  inputCommitment: commitment,
+  policyCommitment: commitment,
+};
+const receiptWorkflowPrepared = await adapter.prepare({
+  context: { requestId: "receipt-binding", idempotencyKey: "receipt-binding", product: "treasury", capability: "treasury.policy.check", network: "stellar-testnet" },
+  payload: { kind: "stellar-payment", destination: knownAccount, amount: "0.000001", memo: "PDAO-RECEIPT", workflow: receiptWorkflow },
+  accounts: [{ role: "payer", address: knownAccount, network: "stellar-testnet" }],
+});
+await transport.observeConfirmedTransaction(receiptWorkflowPrepared.executionId, txHash);
+const workflowReceipt = await adapter.receipt(receiptWorkflowPrepared.executionId);
+assert.deepEqual(workflowReceipt.metadata, {
+  workflowId: receiptWorkflow.workflowId,
+  inputCommitment: receiptWorkflow.inputCommitment,
+  policyCommitment: receiptWorkflow.policyCommitment,
+});
+assert.equal(Object.keys(workflowReceipt.metadata || {}).some((key) => /payload|salary|amount|recipient|address|private|secret/i.test(key)), false);
+
 await assert.rejects(
   () => adapter.prepare({
     context: { requestId: "wrong-account-network", idempotencyKey: "wrong-account-network", product: "treasury", capability: "treasury.policy.check", network: "stellar-testnet" },
