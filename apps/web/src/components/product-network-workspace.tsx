@@ -31,7 +31,10 @@ const actionLabels: Record<string, string> = {
   "agent.invoke": "Request agent work",
 };
 
-const verifiedStates = new Set(["testnet_ready", "devnet_verified", "testnet_verified", "mainnet_live"]);
+// A product selector is an execution surface, not a roadmap view. Keep
+// policy-ready and planned rows in the machine-readable catalog, but expose
+// only independently evidenced execution paths here.
+const verifiedStates = new Set(["devnet_verified", "testnet_verified", "mainnet_live"]);
 
 type WorkflowOption = {
   id: string;
