@@ -6,11 +6,13 @@ const productModules = [
   "agent-provider.ts",
   "auction-bid-provider.ts",
   "auction-outcome-provider.ts",
+  "auction-proof-service.ts",
   "blind-policy-provider.ts",
   "governance-policy-provider.ts",
   "payroll-approval-provider.ts",
   "payroll-provider.ts",
   "record-provider.ts",
+  "solana-payroll-settlement-provider.ts",
   "treasury-policy-provider.ts",
 ];
 const forbidden = /\b(?:fetch\s*\(|new\s+Connection\s*\(|new\s+Horizon\.Server\s*\(|sendTransaction\s*\(|sendRawTransaction\s*\(|createPublicClient\s*\(|http\s*\()/;
