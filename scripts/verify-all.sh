@@ -65,6 +65,7 @@ npm run verify:web-runtime-catalog >/dev/null
 
 echo "[verify-all] checking application capability bindings"
 npm run verify:application-bindings >/dev/null
+npm run verify:commercial:coherence >/dev/null
 
 echo "[verify-all] checking multichain Kernel product boundaries"
 npm run verify:product-gateway-boundary >/dev/null

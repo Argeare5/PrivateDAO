@@ -103,6 +103,9 @@ jobs:
       - name: Verify product Kernel boundary
         run: npm run verify:product-gateway-boundary
 
+      - name: Verify commercial capability coherence
+        run: npm run verify:commercial:coherence
+
       - name: Verify multichain capability registry
         run: |
           npm run test:native-capability-registry
