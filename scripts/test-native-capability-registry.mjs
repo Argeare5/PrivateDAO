@@ -86,7 +86,7 @@ for (const network of ["bnb-testnet", "robinhood-testnet", "hyperliquid-testnet"
 const stellarVerified = entries.filter((entry) => entry.network === "stellar-testnet" && entry.product !== "agent" && entry.capability !== "payroll.settle");
 assert.equal(stellarVerified.length, 9, "Stellar must expose all nine product-binding capabilities");
 assert.equal(stellarVerified.every((entry) => entry.status === "testnet_verified" && entry.evidence === "testnet-e2e"), true, "Stellar product-binding evidence must be reflected in the registry");
-assert.equal(stellarVerified.every((entry) => entry.lastVerifiedCommit === "351333f03"), true, "Stellar evidence commit must be pinned");
+assert.equal(stellarVerified.every((entry) => entry.lastVerifiedCommit === "dafaaee9b"), true, "Stellar evidence commit must be pinned");
 const stellarPayrollSettlement = entries.find((entry) => entry.network === "stellar-testnet" && entry.capability === "payroll.settle");
 assert(stellarPayrollSettlement, "Stellar payroll settlement row must remain explicit");
 assert.equal(stellarPayrollSettlement.status, "planned", "Stellar payroll settlement must remain outside the declared product lane");

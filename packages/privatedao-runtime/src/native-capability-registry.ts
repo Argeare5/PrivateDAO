@@ -121,7 +121,7 @@ const ZCASH_TESTNET_PAYROLL_EVIDENCE = {
 
 const STELLAR_TESTNET_EVIDENCE = {
   provider: "stellar-testnet-horizon",
-  commit: "351333f03",
+  commit: "dafaaee9b",
   capabilities: [
     "verification.blind.prove",
     "verification.record.create",
