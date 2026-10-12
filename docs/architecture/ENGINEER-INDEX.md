@@ -149,8 +149,12 @@ npm run verify:native-capability-matrix
 npm run verify:bnb:evidence
 npm run verify:bnb:organizational-evidence
 npm run verify:hyperliquid:evidence
+npm run verify:product-gateway-boundary
+npm run verify:stellar:product-e2e
 ```
 
 These commands are intentionally separate from production deployment. They
-validate routing, evidence, and network boundaries without changing the live
-website or game.
+validate routing, evidence, the product-to-Kernel boundary, and network
+receipts without changing the live website or game. The Stellar evidence
+verifier is read-only against Horizon; the Stellar product runner is a
+separately gated Testnet command.
