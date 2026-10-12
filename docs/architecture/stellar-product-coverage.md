@@ -30,6 +30,7 @@ confirmation lookup, and receipt construction.
 | Record Verification | `verification.record.verify` | Workflow commitment bound to a confirmed Testnet receipt |
 | Confidential Payroll | `payroll.calculate` | Calculation and policy commitments; employee data stays off-chain |
 | Confidential Payroll | `payroll.approve` | Approval policy commitment; employee data stays off-chain |
+| Confidential Payroll | `payroll.settle` | Confirmed Testnet settlement receipt; payroll inputs remain off-chain |
 | Private Treasury | `treasury.policy.check` | Treasury policy commitment; no private treasury data is published |
 | Private Governance | `governance.proposal.execute` | Governance policy commitment; discussion contents stay off-chain |
 | Private Auctions | `auction.bid.commit` | Bid workflow commitment; bid contents stay off-chain |
@@ -50,10 +51,10 @@ The coherence verifier fails if any of these projections diverge.
 
 - `agent.discover` and `agent.invoke` remain on the Solana Agent Exchange
   lane. The Solana registry identity is not silently advertised as Stellar.
-- `payroll.settle` is represented in the Kernel catalog as `testnet_ready`.
-  The shared transport can prepare and sign a multi-recipient XDR, but no
-  Stellar payroll payout is advertised as E2E-verified until a funded,
-  independently confirmed settlement receipt exists.
+- `payroll.settle` is now `testnet_verified` from the confirmed evidence packet
+  in `docs/evidence/stellar-testnet-payroll-e2e.json`. This proves the guarded
+  Kernel-to-Horizon settlement path on Testnet; it does not imply Mainnet
+  readiness or that private payroll inputs are published.
 - The shared `StellarHorizonTransport` now supports a guarded,
   multi-recipient `stellar-payroll-settlement` payload with commitment-bound
   workflow metadata. It can build and sign Testnet XDR, but remains

@@ -1,6 +1,6 @@
 {
   "schema": "privatedao.native-capability-matrix.v1",
-  "generatedAt": "2026-10-12T06:20:51.471Z",
+  "generatedAt": "2026-10-12T08:21:57.905Z",
   "bridgeFree": true,
   "entries": [
     {
@@ -495,8 +495,8 @@
       "supportsReconciliation": true,
       "supportsMainnet": false,
       "status": "testnet_verified",
-      "lastVerifiedCommit": "cba4217b9",
-      "lastVerifiedTimestamp": "2026-10-12T00:28:42.898Z",
+      "lastVerifiedCommit": "7aeff6d4b",
+      "lastVerifiedTimestamp": "2026-10-12T08:11:43.186Z",
       "evidence": "testnet-e2e"
     },
     {
@@ -1019,8 +1019,8 @@
       "supportsReconciliation": true,
       "supportsMainnet": false,
       "status": "testnet_verified",
-      "lastVerifiedCommit": "cba4217b9",
-      "lastVerifiedTimestamp": "2026-10-12T00:28:42.898Z",
+      "lastVerifiedCommit": "7aeff6d4b",
+      "lastVerifiedTimestamp": "2026-10-12T08:11:43.186Z",
       "evidence": "testnet-e2e"
     },
     {
@@ -1543,8 +1543,8 @@
       "supportsReconciliation": true,
       "supportsMainnet": false,
       "status": "testnet_verified",
-      "lastVerifiedCommit": "cba4217b9",
-      "lastVerifiedTimestamp": "2026-10-12T00:28:42.898Z",
+      "lastVerifiedCommit": "7aeff6d4b",
+      "lastVerifiedTimestamp": "2026-10-12T08:11:43.186Z",
       "evidence": "testnet-e2e"
     },
     {
@@ -2047,8 +2047,8 @@
       "supportsReconciliation": true,
       "supportsMainnet": false,
       "status": "testnet_verified",
-      "lastVerifiedCommit": "cba4217b9",
-      "lastVerifiedTimestamp": "2026-10-12T00:28:42.898Z",
+      "lastVerifiedCommit": "7aeff6d4b",
+      "lastVerifiedTimestamp": "2026-10-12T08:11:43.186Z",
       "evidence": "testnet-e2e"
     },
     {
@@ -2551,8 +2551,8 @@
       "supportsReconciliation": true,
       "supportsMainnet": false,
       "status": "testnet_verified",
-      "lastVerifiedCommit": "cba4217b9",
-      "lastVerifiedTimestamp": "2026-10-12T00:28:42.898Z",
+      "lastVerifiedCommit": "7aeff6d4b",
+      "lastVerifiedTimestamp": "2026-10-12T08:11:43.186Z",
       "evidence": "testnet-e2e"
     },
     {
@@ -3056,10 +3056,10 @@
       "supportsReceipt": true,
       "supportsReconciliation": true,
       "supportsMainnet": false,
-      "status": "testnet_ready",
-      "lastVerifiedCommit": null,
-      "lastVerifiedTimestamp": "2026-10-12T00:28:42.898Z",
-      "evidence": "runtime-only"
+      "status": "testnet_verified",
+      "lastVerifiedCommit": "7aeff6d4b",
+      "lastVerifiedTimestamp": "2026-10-12T08:11:43.186Z",
+      "evidence": "testnet-e2e"
     },
     {
       "product": "payroll",
@@ -3588,8 +3588,8 @@
       "supportsReconciliation": true,
       "supportsMainnet": false,
       "status": "testnet_verified",
-      "lastVerifiedCommit": "cba4217b9",
-      "lastVerifiedTimestamp": "2026-10-12T00:28:42.898Z",
+      "lastVerifiedCommit": "7aeff6d4b",
+      "lastVerifiedTimestamp": "2026-10-12T08:11:43.186Z",
       "evidence": "testnet-e2e"
     },
     {
@@ -4119,8 +4119,8 @@
       "supportsReconciliation": true,
       "supportsMainnet": false,
       "status": "testnet_verified",
-      "lastVerifiedCommit": "cba4217b9",
-      "lastVerifiedTimestamp": "2026-10-12T00:28:42.898Z",
+      "lastVerifiedCommit": "7aeff6d4b",
+      "lastVerifiedTimestamp": "2026-10-12T08:11:43.186Z",
       "evidence": "testnet-e2e"
     },
     {
@@ -4650,8 +4650,8 @@
       "supportsReconciliation": true,
       "supportsMainnet": false,
       "status": "testnet_verified",
-      "lastVerifiedCommit": "cba4217b9",
-      "lastVerifiedTimestamp": "2026-10-12T00:28:42.898Z",
+      "lastVerifiedCommit": "7aeff6d4b",
+      "lastVerifiedTimestamp": "2026-10-12T08:11:43.186Z",
       "evidence": "testnet-e2e"
     },
     {
@@ -5181,8 +5181,8 @@
       "supportsReconciliation": true,
       "supportsMainnet": false,
       "status": "testnet_verified",
-      "lastVerifiedCommit": "cba4217b9",
-      "lastVerifiedTimestamp": "2026-10-12T00:28:42.898Z",
+      "lastVerifiedCommit": "7aeff6d4b",
+      "lastVerifiedTimestamp": "2026-10-12T08:11:43.186Z",
       "evidence": "testnet-e2e"
     },
     {

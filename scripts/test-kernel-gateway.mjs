@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 import { spawn } from "node:child_process";
 import http from "node:http";
 
@@ -51,8 +52,9 @@ try {
   assert.equal(stellarCapabilityStatus.length, 10);
   const stellarPreparedOnly = stellarCapabilityStatus.filter((entry) => entry.capability === "payroll.settle");
   assert.equal(stellarPreparedOnly.length, 1);
-  assert.equal(stellarPreparedOnly[0].status, "testnet_ready");
-  assert.equal(stellarPreparedOnly[0].evidence, "runtime-only");
+  const payrollVerified = existsSync("docs/evidence/stellar-testnet-payroll-e2e.json");
+  assert.equal(stellarPreparedOnly[0].status, payrollVerified ? "testnet_verified" : "testnet_ready");
+  assert.equal(stellarPreparedOnly[0].evidence, payrollVerified ? "testnet-e2e" : "runtime-only");
   assert.equal(stellarCapabilityStatus.filter((entry) => entry.capability !== "payroll.settle").every((entry) => entry.status === "testnet_verified" && entry.evidence === "testnet-e2e" && entry.supportsExecution && entry.supportsReceipt), true);
   const hypercoreCapabilityStatus = health.capabilityStatus.filter((entry) => entry.network === "hypercore-testnet");
   assert.equal(hypercoreCapabilityStatus.length, 9);

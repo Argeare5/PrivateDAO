@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 import {
   APPLICATION_CAPABILITY_BINDINGS,
   PRODUCT_CATALOG,
@@ -8,6 +9,8 @@ import {
 import { runtimeCatalog } from "../apps/web/src/lib/runtime-catalog.generated.ts";
 
 const network = "stellar-testnet";
+const payrollEvidencePresent = existsSync("docs/evidence/stellar-testnet-payroll-e2e.json");
+const payrollVerified = payrollEvidencePresent;
 const expected = PRODUCT_CATALOG.flatMap((product) => product.capabilities
   .filter((capability) => capability.networks.includes(network))
   .map((capability) => ({ product: product.id, capability: capability.id })));
@@ -34,7 +37,7 @@ const native = buildNativeCapabilityRegistry();
 for (const { product, capability } of expected) {
   const entry = native.find((candidate) => candidate.product === product && candidate.capability === capability && candidate.network === network);
   assert(entry, `missing native registry row for ${product}/${capability}`);
-  const verified = capability !== "payroll.settle";
+  const verified = capability !== "payroll.settle" || payrollVerified;
   assert.equal(entry.status, verified ? "testnet_verified" : "testnet_ready", `${product}/${capability} has an unexpected Stellar readiness status`);
   assert.equal(entry.evidence, verified ? "testnet-e2e" : "runtime-only", `${product}/${capability} has an unexpected Stellar evidence level`);
   assert.equal(entry.supportsExecution, true);
@@ -48,7 +51,8 @@ for (const { product, capability } of expected) {
   const webBinding = webCapability?.applicationBindings?.find((candidate) => candidate.network === network);
   assert(webBinding, `web catalog is missing ${product}/${capability}/${network}`);
   assert.equal(webBinding.mode, "kernel-gateway");
-  assert.equal(webBinding.evidenceStatus, capability === "payroll.settle" ? "testnet_ready" : "testnet_verified");
+  const webVerified = capability !== "payroll.settle" || payrollVerified;
+  assert.equal(webBinding.evidenceStatus, webVerified ? "testnet_verified" : "testnet_ready");
 }
 
 assert.equal(expected.some(({ product }) => product === "agent"), false, "Agent Exchange must remain outside Stellar");
@@ -61,5 +65,5 @@ console.log(JSON.stringify({
   capabilities: expected.length,
   layers: ["catalog", "application-bindings", "native-registry", "web-runtime-catalog"],
   excluded: ["agent"],
-  preparedOnly: ["payroll.settle"],
+  preparedOnly: payrollEvidencePresent ? [] : ["payroll.settle"],
 }, null, 2));

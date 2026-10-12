@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 import {
   APPLICATION_CAPABILITY_BINDINGS,
   PRODUCT_CATALOG,
@@ -6,6 +7,7 @@ import {
 } from "../packages/privatedao-runtime/src/index.ts";
 
 const network = "stellar-testnet";
+const payrollEvidencePresent = existsSync("docs/evidence/stellar-testnet-payroll-e2e.json");
 const declared = new Set(
   PRODUCT_CATALOG.flatMap((product) => product.capabilities
     .filter((capability) => capability.networks.includes(network))
@@ -31,4 +33,5 @@ assert.deepEqual(
 assert.equal([...declared].some((key) => key.startsWith("agent/")), false);
 assert.equal([...declared].filter((key) => key.endsWith("/payroll.settle")).length, 1);
 
-console.log(`STELLAR_PRODUCT_CONTRACT: PASS capabilities=${declared.size} verified=9 prepared_only=1`);
+const verified = payrollEvidencePresent ? declared.size : declared.size - 1;
+console.log(`STELLAR_PRODUCT_CONTRACT: PASS capabilities=${declared.size} verified=${verified} prepared_only=${declared.size - verified}`);

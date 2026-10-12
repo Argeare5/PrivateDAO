@@ -121,19 +121,22 @@ const ZCASH_TESTNET_PAYROLL_EVIDENCE = {
 
 const STELLAR_TESTNET_EVIDENCE = {
   provider: "stellar-testnet-horizon",
-  commit: "cba4217b9",
+  commit: "7aeff6d4b",
+  timestamp: "2026-10-12T08:11:43.186Z",
+  transaction: "8220fea632c55e3dca415b8b46ec82ea9d333cc2461947ef194592e5410a4e1b",
+  ledger: "5153823",
   capabilities: [
     "verification.blind.prove",
     "verification.record.create",
     "verification.record.verify",
     "payroll.calculate",
     "payroll.approve",
+    "payroll.settle",
     "treasury.policy.check",
     "governance.proposal.execute",
     "auction.bid.commit",
     "auction.settle",
   ],
-  timestamp: "2026-10-12T00:28:42.898Z",
 } as const;
 
 const SOLANA_DEVNET_ORGANIZATIONAL_EVIDENCE = {
