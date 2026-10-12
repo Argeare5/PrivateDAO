@@ -60,7 +60,7 @@ export interface StellarUnsignedPayload {
   payload: unknown;
   accounts: readonly { role: string; address: string }[];
   transactionXdr?: string;
-  transactionKind?: "payment";
+  transactionKind?: "payment" | "payroll-settlement";
 }
 
 export interface StellarPaymentPayload {
@@ -69,6 +69,19 @@ export interface StellarPaymentPayload {
   amount: string;
   memo?: string;
   workflow?: StellarProductWorkflow;
+}
+
+export interface StellarPayrollRecipient {
+  destination: string;
+  amount: string;
+}
+
+export interface StellarPayrollSettlementPayload {
+  kind: "stellar-payroll-settlement";
+  recipients: readonly StellarPayrollRecipient[];
+  totalAmount: string;
+  memo?: string;
+  workflow: StellarProductWorkflow;
 }
 
 export interface StellarRecoveredAccount {
@@ -208,7 +221,7 @@ export class StellarHorizonTransport implements StellarTransport {
     if (payment) {
       const built = await this.buildPaymentTransaction(intent, payment);
       unsignedPayload.transactionXdr = built.xdr;
-      unsignedPayload.transactionKind = "payment";
+      unsignedPayload.transactionKind = payment.kind === "stellar-payroll-settlement" ? "payroll-settlement" : "payment";
     }
     this.records.set(executionId, {
       intent: intent as ExecutionIntent<unknown>,
@@ -307,16 +320,11 @@ export class StellarHorizonTransport implements StellarTransport {
     return { network: "stellar-testnet", atomicAmount: fee, asset: "stroops", expiresAt: new Date(Date.now() + 60_000).toISOString() };
   }
 
-  private async buildPaymentTransaction(intent: ExecutionIntent<unknown>, payment: StellarPaymentPayload): Promise<{ xdr: string }> {
+  private async buildPaymentTransaction(intent: ExecutionIntent<unknown>, payment: StellarPaymentPayload | StellarPayrollSettlementPayload): Promise<{ xdr: string }> {
     const payer = intent.accounts.find((account) => account.role === "payer" || account.role === "authority");
     if (!payer) throw new Error("Stellar payment requires a payer or authority account.");
     const { Keypair, Horizon, Memo, Networks, Operation, TransactionBuilder, Asset } = await import("@stellar/stellar-sdk");
-    try {
-      Keypair.fromPublicKey(payer.address);
-      Keypair.fromPublicKey(payment.destination);
-    } catch {
-      throw new Error("Stellar payment contains an invalid public account.");
-    }
+    try { Keypair.fromPublicKey(payer.address); } catch { throw new Error("Stellar payment contains an invalid payer account."); }
     const server = new Horizon.Server(this.horizonUrl);
     await this.recoverAccount(payer.address);
     const source = await server.loadAccount(payer.address);
@@ -324,11 +332,16 @@ export class StellarHorizonTransport implements StellarTransport {
     let builder = new TransactionBuilder(source, {
       fee: fee.atomicAmount,
       networkPassphrase: Networks.TESTNET,
-    }).addOperation(Operation.payment({
-      destination: payment.destination,
-      asset: Asset.native(),
-      amount: payment.amount,
-    }));
+    });
+    if (payment.kind === "stellar-payroll-settlement") {
+      for (const recipient of payment.recipients) {
+        try { Keypair.fromPublicKey(recipient.destination); } catch { throw new Error("Stellar payroll contains an invalid recipient account."); }
+        builder = builder.addOperation(Operation.payment({ destination: recipient.destination, asset: Asset.native(), amount: recipient.amount }));
+      }
+    } else {
+      try { Keypair.fromPublicKey(payment.destination); } catch { throw new Error("Stellar payment contains an invalid public account."); }
+      builder = builder.addOperation(Operation.payment({ destination: payment.destination, asset: Asset.native(), amount: payment.amount }));
+    }
     if (payment.memo) builder = builder.addMemo(Memo.text(payment.memo));
     const transaction = builder.setTimeout(60).build();
     return { xdr: transaction.toXDR() };
@@ -346,18 +359,47 @@ export class StellarHorizonTransport implements StellarTransport {
   }
 }
 
-function parsePaymentPayload(payload: unknown, capability: CapabilityId): StellarPaymentPayload | undefined {
+function parsePaymentPayload(payload: unknown, capability: CapabilityId): StellarPaymentPayload | StellarPayrollSettlementPayload | undefined {
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) return undefined;
-  const candidate = payload as Partial<StellarPaymentPayload>;
+  const candidate = payload as Partial<StellarPaymentPayload> & Partial<StellarPayrollSettlementPayload>;
+  if (candidate.kind === "stellar-payroll-settlement") {
+    if (capability !== "payroll.settle") throw new Error("Stellar payroll settlement payload requires payroll.settle.");
+    if (!Array.isArray(candidate.recipients) || candidate.recipients.length === 0 || candidate.recipients.length > 100) throw new Error("Stellar payroll requires between 1 and 100 recipients.");
+    if (typeof candidate.totalAmount !== "string") throw new Error("Stellar payroll requires totalAmount.");
+    const totalStroops = toStroops(candidate.totalAmount, "totalAmount");
+    let sum = 0n;
+    const recipients = candidate.recipients.map((recipient) => {
+      if (!recipient || typeof recipient !== "object" || typeof recipient.destination !== "string" || typeof recipient.amount !== "string") throw new Error("Stellar payroll recipient requires destination and amount.");
+      sum += toStroops(recipient.amount, "recipient amount");
+      return { destination: recipient.destination, amount: recipient.amount };
+    });
+    if (sum !== totalStroops) throw new Error("Stellar payroll totalAmount does not match recipient amounts.");
+    if (candidate.memo !== undefined && typeof candidate.memo !== "string") throw new Error("Stellar payroll memo must be text.");
+    if (!candidate.workflow) throw new Error("Stellar payroll settlement requires a workflow commitment envelope.");
+    return {
+      kind: "stellar-payroll-settlement",
+      recipients,
+      totalAmount: candidate.totalAmount,
+      memo: candidate.memo,
+      workflow: validateStellarProductWorkflow(capability, candidate.workflow),
+    };
+  }
   if (candidate.kind !== "stellar-payment") return undefined;
   if (typeof candidate.destination !== "string" || typeof candidate.amount !== "string" || candidate.amount.length === 0) {
     throw new Error("Stellar payment requires destination and amount.");
   }
+  toStroops(candidate.amount, "amount");
   if (candidate.memo !== undefined && typeof candidate.memo !== "string") throw new Error("Stellar payment memo must be text.");
   const workflow = candidate.workflow === undefined
     ? undefined
     : validateStellarProductWorkflow(capability, candidate.workflow);
   return { kind: "stellar-payment", destination: candidate.destination, amount: candidate.amount, memo: candidate.memo, workflow };
+}
+
+function toStroops(value: string, label: string): bigint {
+  if (!/^\d+(\.\d{1,7})?$/.test(value) || Number(value) <= 0) throw new Error(`Stellar ${label} must be a positive amount with at most 7 decimal places.`);
+  const [whole, fraction = ""] = value.split(".");
+  return BigInt(whole) * 10_000_000n + BigInt((fraction + "0000000").slice(0, 7));
 }
 
 export class StellarAdapterError extends Error {

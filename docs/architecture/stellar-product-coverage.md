@@ -52,6 +52,11 @@ The coherence verifier fails if any of these projections diverge.
   lane. The Solana registry identity is not silently advertised as Stellar.
 - `payroll.settle` is not exposed on Stellar. A product calculation or policy
   receipt is not a claim that Stellar settled payroll funds.
+- The shared `StellarHorizonTransport` now supports a guarded,
+  multi-recipient `stellar-payroll-settlement` payload with commitment-bound
+  workflow metadata. It can build and sign Testnet XDR, but remains
+  unadvertised and broadcast-disabled until an independent funded settlement
+  E2E produces a confirmed payout receipt.
 - The Stellar evidence uses workflow commitments and confirmed Testnet
   transactions. It does not publish salaries, bids, recipients, source
   records, or private policy inputs.
@@ -80,6 +85,7 @@ npm run verify:stellar:product-e2e
 npm run test:runtime:stellar
 npm run test:stellar:product-workflow
 npm run test:stellar:signer-boundary
+npm run test:stellar:payroll-prep
 ```
 
 Broadcast remains fail-closed unless both explicit Testnet approval gates are
