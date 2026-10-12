@@ -13,11 +13,10 @@ import {
   StellarNetworkAdapter,
 } from "../packages/privatedao-runtime/src/index.ts";
 
-const dryRun = process.env.PDAO_STELLAR_AGENT_E2E_DRY_RUN === "1";
 if (process.env.PDAO_STELLAR_TESTNET_E2E_APPROVED !== "1"
-  || (!dryRun && (process.env.PDAO_STELLAR_TESTNET_BROADCAST_ENABLED !== "1"
-  || process.env.PDAO_STELLAR_AGENT_E2E_APPROVED !== "1"))) {
-  throw new Error("Stellar Agent Exchange E2E requires Testnet approval; broadcast and Agent approval are required unless dry-run is enabled.");
+  || process.env.PDAO_STELLAR_TESTNET_BROADCAST_ENABLED !== "1"
+  || process.env.PDAO_STELLAR_AGENT_E2E_APPROVED !== "1") {
+  throw new Error("Stellar Agent Exchange E2E requires explicit Testnet, broadcast, and Agent approval gates.");
 }
 
 const envFile = process.env.PDAO_STELLAR_TESTNET_SIGNER_ENV_FILE;
@@ -77,7 +76,7 @@ const safe = await mcpCall("tools/call", {
   name: "verify_basic",
   arguments: { record: { source: "stellar-agent-e2e", purpose: "safe-read-only-compatibility-check", version: 1 } },
 });
-assert.notEqual(safe?.isError, true);
+assert.equal(safe?.isError, false);
 
 const digest = (label, value) => createHash("sha256").update(`${label}:${JSON.stringify(value)}`).digest("hex");
 const external = {
@@ -91,7 +90,7 @@ const external = {
 
 const horizon = process.env.PDAO_STELLAR_TESTNET_HORIZON_URL?.replace(/\/$/, "") || "https://horizon-testnet.stellar.org";
 const config = STELLAR_NETWORK_CONFIGS[0];
-const transport = new StellarHorizonTransport(fetch, horizon, !dryRun);
+const transport = new StellarHorizonTransport(fetch, horizon, true);
 const adapter = new StellarNetworkAdapter({
   id: "privatedao-stellar-testnet-agent-e2e",
   config,
@@ -139,10 +138,6 @@ for (const [capability, result] of cases) {
   const prepared = await gateway.prepare(intent, "maker");
   const transaction = TransactionBuilder.fromXDR(prepared.unsignedPayload.transactionXdr, Networks.TESTNET);
   transaction.sign(signer);
-  if (dryRun) {
-    results.push({ capability, state: "prepared", workflow, unsignedXdrDigest: digest(`${capability}:xdr`, transaction.toXDR()) });
-    continue;
-  }
   const submitted = await gateway.submit(prepared, {
     kind: "stellar-signed-xdr",
     network: "stellar-testnet",
@@ -156,12 +151,7 @@ for (const [capability, result] of cases) {
   }
   assert.equal(status?.state, "confirmed", `${capability} did not confirm`);
   const receipt = await gateway.receipt(prepared, "maker");
-  results.push({ capability, state: receipt.state, transactionHash: submitted.signatures[0], ledger: receipt.blockNumber, explorerUrl: receipt.explorerUrl, workflow: receipt.metadata });
-}
-
-if (dryRun) {
-  console.log(JSON.stringify({ status: "DRY_RUN_PASS", network: "stellar-testnet", product: "agent", mcp: external, results }, null, 2));
-  process.exit(0);
+  results.push({ capability, transactionHash: submitted.signatures[0], ledger: receipt.blockNumber, explorerUrl: receipt.explorerUrl, workflow: receipt.metadata });
 }
 
 const evidence = {
