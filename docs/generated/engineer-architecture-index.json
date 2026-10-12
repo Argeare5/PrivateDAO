@@ -1,6 +1,6 @@
 {
   "schema": "privatedao.engineer-architecture-index.v1",
-  "generatedAt": "2026-10-11T21:35:46.389Z",
+  "generatedAt": "2026-10-12T02:43:09.376Z",
   "bridgeFree": true,
   "sources": {
     "protocol": "packages/privatedao-runtime/src/protocol.ts",
@@ -523,7 +523,7 @@
   ],
   "evidenceSummary": {
     "entries": 216,
-    "testnetVerified": 52,
+    "testnetVerified": 61,
     "devnetVerified": 6,
     "mainnetLive": 2,
     "statuses": [
