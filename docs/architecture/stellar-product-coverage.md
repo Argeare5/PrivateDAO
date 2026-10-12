@@ -59,6 +59,11 @@ The coherence verifier fails if any of these projections diverge.
   workflow metadata. It can build and sign Testnet XDR, but remains
   unadvertised and broadcast-disabled until an independent funded settlement
   E2E produces a confirmed payout receipt.
+- The dedicated payroll runner is `npm run test:stellar:payroll:e2e`. It
+  requires the normal Testnet approval and broadcast gates plus
+  `PDAO_STELLAR_PAYROLL_E2E_APPROVED=1`; without those gates it fails closed
+  before reading or sending a transaction. Its evidence verifier is
+  `npm run verify:stellar:payroll:e2e`.
 - The Stellar evidence uses workflow commitments and confirmed Testnet
   transactions. It does not publish salaries, bids, recipients, source
   records, or private policy inputs.
