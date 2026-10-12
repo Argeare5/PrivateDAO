@@ -46,14 +46,24 @@ for (const capability of capabilities) {
   assert.equal(prepared.unsignedPayload.network, "stellar-testnet");
 }
 
-const transactionPrepared = await adapter.prepare({
-  context: { requestId: "stellar-payment-xdr", idempotencyKey: "stellar-payment-xdr", product: "treasury", capability: "treasury.policy.check", network: "stellar-testnet" },
-  payload: { kind: "stellar-payment", destination: knownAccount, amount: "0.000001", memo: "PDAO-E2E" },
-  accounts: [{ role: "payer", address: knownAccount, network: "stellar-testnet" }],
-});
-assert.equal(transactionPrepared.unsignedPayload.transactionKind, "payment");
-assert.equal(typeof transactionPrepared.unsignedPayload.transactionXdr, "string");
-assert.ok(transactionPrepared.unsignedPayload.transactionXdr.length > 100);
+const commitment = "a".repeat(64);
+function workflowFor(capability) {
+  const workflow = { workflowId: `readiness:${capability}`, inputCommitment: commitment };
+  if (["payroll.calculate", "payroll.approve", "treasury.policy.check", "governance.proposal.execute"].includes(capability)) workflow.policyCommitment = commitment;
+  if (capability === "auction.settle") workflow.outcomeCommitment = commitment;
+  return workflow;
+}
+for (const capability of capabilities) {
+  const product = capability.startsWith("verification") ? (capability === "verification.blind.prove" ? "blind-verification" : "record-verification") : capability.startsWith("payroll") ? "payroll" : capability.startsWith("treasury") ? "treasury" : capability.startsWith("governance") ? "governance" : "auction";
+  const transactionPrepared = await adapter.prepare({
+    context: { requestId: `stellar-payment-xdr-${capability}`, idempotencyKey: `stellar-payment-xdr-${capability}`, product, capability, network: "stellar-testnet" },
+    payload: { kind: "stellar-payment", destination: knownAccount, amount: "0.000001", memo: `PDAO-${product.slice(0, 16)}`, workflow: workflowFor(capability) },
+    accounts: [{ role: "payer", address: knownAccount, network: "stellar-testnet" }],
+  });
+  assert.equal(transactionPrepared.unsignedPayload.transactionKind, "payment");
+  assert.equal(typeof transactionPrepared.unsignedPayload.transactionXdr, "string");
+  assert.ok(transactionPrepared.unsignedPayload.transactionXdr.length > 100);
+}
 
 await assert.rejects(
   () => adapter.prepare({
@@ -94,4 +104,4 @@ await assert.rejects(
   /broadcast is disabled/i,
 );
 
-console.log(`[stellar-kernel] PASS health=1 recovery=1 known_tx=1 ledger=${transaction.ledger} product_capabilities=${capabilities.length} unsigned_xdr=1 receipt=1 broadcast=disabled`);
+console.log(`[stellar-kernel] PASS health=1 recovery=1 known_tx=1 ledger=${transaction.ledger} product_capabilities=${capabilities.length} workflow_xdr=${capabilities.length} receipt=1 broadcast=disabled`);
