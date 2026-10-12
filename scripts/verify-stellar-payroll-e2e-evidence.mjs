@@ -1,7 +1,23 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 
-const evidence = JSON.parse(await readFile("docs/evidence/stellar-testnet-payroll-e2e.json", "utf8"));
+const evidencePath = "docs/evidence/stellar-testnet-payroll-e2e.json";
+try {
+  await access(evidencePath);
+} catch {
+  console.error(JSON.stringify({
+    status: "BLOCKED",
+    network: "stellar-testnet",
+    capability: "payroll.settle",
+    reason: "confirmed payroll settlement evidence is not present",
+    expectedEvidence: evidencePath,
+    nextStep: "run the guarded Testnet payroll E2E only after funding and explicit broadcast approval",
+  }, null, 2));
+  process.exitCode = 2;
+  process.exit();
+}
+
+const evidence = JSON.parse(await readFile(evidencePath, "utf8"));
 assert.equal(evidence.schema, "privatedao.stellar-testnet-payroll-e2e.v1");
 assert.equal(evidence.network, "stellar-testnet");
 assert.equal(evidence.environment, "testnet");
