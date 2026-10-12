@@ -120,6 +120,7 @@
   "test:stellar:payroll-kernel": "node --import tsx scripts/test-stellar-payroll-kernel.mjs",
   "test:stellar:kernel-boundary": "node scripts/test-stellar-kernel-boundary.mjs",
   "test:stellar:products": "node --import tsx scripts/run-stellar-testnet-product-e2e.mjs",
+  "test:stellar:agent:e2e": "node --import tsx scripts/run-stellar-testnet-agent-e2e.mjs",
   "test:stellar:payroll:e2e": "node --import tsx scripts/run-stellar-testnet-payroll-e2e.mjs",
   "verify:stellar:product-e2e": "node --import tsx scripts/verify-stellar-product-e2e-evidence.mjs",
   "verify:stellar:payroll:e2e": "node scripts/verify-stellar-payroll-e2e-evidence.mjs",

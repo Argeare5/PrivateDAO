@@ -35,8 +35,10 @@ confirmation lookup, and receipt construction.
 | Private Governance | `governance.proposal.execute` | Governance policy commitment; discussion contents stay off-chain |
 | Private Auctions | `auction.bid.commit` | Bid workflow commitment; bid contents stay off-chain |
 | Private Auctions | `auction.settle` | Auction outcome commitment; financial settlement is not implied |
+| Agent Marketplace | `agent.discover` | Kernel route prepared for production MCP service discovery; independent Stellar receipt pending |
+| Agent Marketplace | `agent.invoke` | Kernel route prepared for a safe read-only MCP result; independent Stellar receipt pending; commercial payment remains Solana Mainnet USDC |
 
-The nine capabilities above are required to remain synchronized across:
+The twelve capabilities above are required to remain synchronized across:
 
 - `PRODUCT_CATALOG`
 - `APPLICATION_CAPABILITY_BINDINGS`
@@ -47,10 +49,12 @@ The nine capabilities above are required to remain synchronized across:
 
 The coherence verifier fails if any of these projections diverge.
 
-## Deliberate exclusions
+## Boundaries
 
-- `agent.discover` and `agent.invoke` remain on the Solana Agent Exchange
-  lane. The Solana registry identity is not silently advertised as Stellar.
+- Stellar Agent Exchange coverage is an execution/receipt lane for the
+  production MCP endpoint. It does not change the Agent Exchange commercial
+  payment rail, which remains Solana Mainnet USDC, and it does not create a
+  second agent identity or imply a Stellar registry registration.
 - `payroll.settle` is now `testnet_verified` from the confirmed evidence packet
   in `docs/evidence/stellar-testnet-payroll-e2e.json`. This proves the guarded
   Kernel-to-Horizon settlement path on Testnet; it does not imply Mainnet
@@ -68,9 +72,11 @@ The coherence verifier fails if any of these projections diverge.
 - The Stellar evidence uses workflow commitments and confirmed Testnet
   transactions. It does not publish salaries, bids, recipients, source
   records, or private policy inputs.
-- The current product E2E uses a real Stellar Testnet payment transaction as
-  the network execution proof. It is not a claim that every product has a
-  native Stellar smart contract implementation.
+- The institutional product E2E uses real Stellar Testnet payment
+  transactions as the network execution proof. Agent Exchange has a separate
+  guarded runner because it first performs a real production MCP discovery and
+  safe tool call before anchoring those results on Stellar. This is not a
+  claim that every product has a native Stellar smart contract implementation.
 
 ## Evidence and verification
 
