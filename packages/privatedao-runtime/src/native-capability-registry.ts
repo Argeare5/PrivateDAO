@@ -121,8 +121,19 @@ const ZCASH_TESTNET_PAYROLL_EVIDENCE = {
 
 const STELLAR_TESTNET_EVIDENCE = {
   provider: "stellar-testnet-horizon",
-  transaction: "591cb9a2bd0eba190a532b6592a7b277e6a24d84d7966d9b98c485dca1e0b769",
-  timestamp: "2026-09-17T07:46:42Z",
+  commit: "351333f03",
+  capabilities: [
+    "verification.blind.prove",
+    "verification.record.create",
+    "verification.record.verify",
+    "payroll.calculate",
+    "payroll.approve",
+    "treasury.policy.check",
+    "governance.proposal.execute",
+    "auction.bid.commit",
+    "auction.settle",
+  ],
+  timestamp: "2026-10-12T00:28:42.898Z",
 } as const;
 
 const SOLANA_DEVNET_ORGANIZATIONAL_EVIDENCE = {
@@ -483,6 +494,7 @@ function applyFutureKernelPolicyReadiness(entry: NativeCapabilityEntry): NativeC
 function applyStellarTestnetReadiness(entry: NativeCapabilityEntry): NativeCapabilityEntry {
   if (entry.network !== "stellar-testnet" || entry.product === "agent") return entry;
   if (!entry.declared) return entry;
+  const lifecycleVerified = (STELLAR_TESTNET_EVIDENCE.capabilities as readonly string[]).includes(entry.capability);
   return {
     ...entry,
     provider: STELLAR_TESTNET_EVIDENCE.provider,
@@ -494,9 +506,10 @@ function applyStellarTestnetReadiness(entry: NativeCapabilityEntry): NativeCapab
     supportsProof: ["verification.blind.prove", "verification.record.create", "verification.record.verify", "auction.bid.commit", "auction.settle"].includes(entry.capability),
     supportsReceipt: true,
     supportsReconciliation: true,
-    status: "testnet_ready",
+    status: lifecycleVerified ? "testnet_verified" : "testnet_ready",
+    lastVerifiedCommit: lifecycleVerified ? STELLAR_TESTNET_EVIDENCE.commit : null,
     lastVerifiedTimestamp: STELLAR_TESTNET_EVIDENCE.timestamp,
-    evidence: "runtime-only",
+    evidence: lifecycleVerified ? "testnet-e2e" : "runtime-only",
   };
 }
 

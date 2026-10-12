@@ -26,7 +26,7 @@ support.
 ## Product Evidence
 
 - Application bindings: `7` products and the current generated binding set.
-- Native capability registry: `192` rows, `24` testnet-verified, `3`
+- Native capability registry: `216` rows, `61` testnet-verified, `6`
   devnet-verified, `2` mainnet-live, bridge-free.
 - Hyperliquid organizational rows remain pending until the deployer has enough
   HYPE for the full Treasury/Payroll/Governance/Auction runner.

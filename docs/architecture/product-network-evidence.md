@@ -23,6 +23,7 @@ does not upgrade a capability.
 | Solana Devnet | Payroll calculation/approval, Treasury, Governance, Auctions | Product-specific evidence; do not generalize to every Solana product. |
 | Zcash Testnet | Payroll settlement | Shielded-wallet evidence is Zcash-specific; other products remain policy-only. |
 | Hyperliquid HyperEVM Testnet | Blind Verification, Record Verification | EVM chain 998 evidence is independent from HyperCore native APIs; organizational lanes remain gated. |
+| Stellar Testnet | Blind/Record Verification, Payroll, Treasury, Governance, Auctions | Nine confirmed Kernel-to-Horizon product-binding receipts; controlled self-payments prove lifecycle execution, not product data storage. |
 
 ## BNB evidence path
 

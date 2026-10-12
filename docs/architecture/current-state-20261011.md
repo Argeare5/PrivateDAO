@@ -1,6 +1,6 @@
 # PrivateDAO Current Engineering State
 
-Snapshot date: 2026-10-11
+Snapshot date: 2026-10-12
 
 This is an evidence-based engineering snapshot. It describes the repository
 and testnet evidence, not a production deployment or a Mainnet launch.
@@ -47,8 +47,8 @@ The generated architecture manifest currently reports:
 - 7 products
 - 17 network descriptors
 - 96 application bindings
-- 204 capability evidence entries
-- 52 `testnet_verified` entries
+- 216 capability evidence entries
+- 61 `testnet_verified` entries
 - 6 `devnet_verified` entries
 - 2 `mainnet_live` entries in the generated registry scope
 - `bridgeFree: true`
@@ -102,7 +102,8 @@ The current BNB deployer balance was read-only verified at
 | Robinhood Testnet | Treasury, Governance, and Auction are verified; other lanes remain gated |
 | Hyperliquid HyperEVM | Blind and Record Verification verified; HyperCore is separate |
 | Solana Devnet | Solana-specific wallet/commitment lifecycle and organizational evidence |
-| Zcash Testnet | Zcash-specific shielded wallet/provider boundary; not EVM evidence |
+| Zcash Testnet | Zcash-specific shielded wallet/provider boundary; Payroll settlement has a confirmed Testnet receipt, while other products remain policy-only |
+| Stellar Testnet | Nine product-binding capabilities verified through Kernel, signer boundary, Horizon submission, confirmation, and receipts; business payloads remain off-chain |
 
 The BNB ecosystem references supplied by the user, including Agent Studio,
 Agent SDK, Greenfield, MCP/Ask AI, MPP, ERC-8056, and Privacy at Scale, are
