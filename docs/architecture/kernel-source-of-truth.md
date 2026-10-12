@@ -83,16 +83,18 @@ support claim.
   HyperCore remains a separate native API surface.
 - `zcash-testnet`: native UTXO/Zallet-Zebra boundary with a separately
   evidenced payroll settlement path. It is not an EVM lane.
-- `stellar-testnet`: Horizon adapter with nine Kernel product capabilities
+- `stellar-testnet`: Horizon adapter with ten Kernel product capabilities
   covering verification, payroll calculation/approval, treasury policy,
-  governance, and auction workflow commitments. The confirmed transactions
-  prove product binding and workflow evidence; they do not claim private
-  business data storage or financial settlement on Stellar.
+  governance, auction workflow commitments, and a prepared-only payroll
+  settlement path. Nine capabilities have confirmed transactions; payroll
+  settlement remains `testnet_ready` until a funded receipt exists. The
+  confirmed transactions prove product binding and workflow evidence; they do
+  not claim private business data storage or financial settlement on Stellar.
 
 `agent` capabilities remain explicitly scoped to Solana in the catalog, and
-`payroll.settle` is not exposed on Stellar. These exclusions prevent the
-registry from advertising a product/network path that has not been independently
-verified. Mainnet configurations remain disabled everywhere.
+`payroll.settle` is exposed on Stellar only as a Kernel-ready preparation and
+signing path; it is not advertised as independently verified until a funded
+Testnet receipt exists. Mainnet configurations remain disabled everywhere.
 
 ## Migration rule
 

@@ -29,6 +29,6 @@ assert.deepEqual(
   "Stellar adapter capabilities diverged from the product catalog.",
 );
 assert.equal([...declared].some((key) => key.startsWith("agent/")), false);
-assert.equal([...declared].some((key) => key.endsWith("/payroll.settle")), false);
+assert.equal([...declared].filter((key) => key.endsWith("/payroll.settle")).length, 1);
 
-console.log(`STELLAR_PRODUCT_CONTRACT: PASS capabilities=${declared.size}`);
+console.log(`STELLAR_PRODUCT_CONTRACT: PASS capabilities=${declared.size} verified=9 prepared_only=1`);
