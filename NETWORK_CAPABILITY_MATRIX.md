@@ -6,7 +6,7 @@ authoritative and intentionally fails closed.
 
 | Network | Runtime stage | Product exposure | Independent evidence |
 |---|---|---|---|
-| Solana Devnet | `available` | Current Kernel network; Payroll rows are separately marked `devnet_verified`. | Product-specific Solana evidence; do not generalize it to every product. |
+| Solana Devnet | `available` | Current Kernel network; Payroll, Treasury, Governance, and Auction rows are separately marked `devnet_verified`. A guarded local Record Verification anchor service is ready, but it is not promoted to E2E until an approved funded signer run produces a real receipt. | Product-specific Solana evidence; `scripts/record-anchor-service.mjs` is fail-closed by default and must not be generalized to every product. |
 | Solana Mainnet | `planned` | Agent discovery/invocation is externally runtime-verified; no general product Mainnet execution claim. | No new Mainnet execution performed by this workstream. |
 | Ethereum Sepolia | `available` | Blind Verification and Record Verification are application-bound through the Kernel. | Real contract-write E2E in `packages/evm-verification/deployments/phase-2-e2e-ethereum-sepolia.json`, including wrong-chain, altered-proof, expiry, replay, and revocation checks. |
 | Arbitrum Sepolia | `available` | Blind Verification, Record Verification, Treasury, Governance, and Sealed Auction have independent real Testnet E2E evidence through the Kernel. | `packages/evm-verification/deployments/phase-2-e2e-arbitrum-sepolia.json` and `organizational-arbitrum-sepolia.json`. |

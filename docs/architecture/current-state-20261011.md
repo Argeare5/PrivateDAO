@@ -101,7 +101,7 @@ The current BNB deployer balance was read-only verified at
 | Tempo Testnet | EVM/tokenized fee and payment behavior is network-specific |
 | Robinhood Testnet | Treasury, Governance, and Auction are verified; other lanes remain gated |
 | Hyperliquid HyperEVM | Blind and Record Verification verified; HyperCore is separate |
-| Solana Devnet | Solana-specific wallet/commitment lifecycle and organizational evidence |
+| Solana Devnet | Solana-specific wallet/commitment lifecycle and organizational evidence. Record Verification now has a local schema/policy-bound anchor service with broadcast disabled by default; a funded approved signer run is still required before promotion to product E2E. |
 | Zcash Testnet | Zcash-specific shielded wallet/provider boundary; Payroll settlement has a confirmed Testnet receipt, while other products remain policy-only |
 | Stellar Testnet | Nine product-binding capabilities verified through Kernel, signer boundary, Horizon submission, confirmation, and receipts; business payloads remain off-chain |
 
