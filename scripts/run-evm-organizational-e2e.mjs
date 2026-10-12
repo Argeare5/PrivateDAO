@@ -69,13 +69,16 @@ const transport = http(rpcUrl, {
   retryCount: Number(process.env.PDAO_EVM_RPC_RETRY_COUNT || 0),
   retryDelay: 1_000,
 });
-const writeGasLimit = BigInt(process.env.PDAO_EVM_WRITE_GAS_LIMIT || "200000");
+const writeGasLimit = BigInt(process.env.PDAO_EVM_WRITE_GAS_LIMIT || "600000");
 if (writeGasLimit < 50_000n || writeGasLimit > 2_000_000n) throw new Error("PDAO_EVM_WRITE_GAS_LIMIT must be between 50000 and 2000000.");
 const deployerTempoClient = NETWORK === "tempo-testnet"
   ? createTempoClient({ account: deployer, chain: tempoModerato.extend({ feeToken: TEMPO_FEE_TOKEN }), transport })
   : null;
 const publicClient = deployerTempoClient ?? createPublicClient({ chain, transport });
 const deployerWallet = deployerTempoClient ?? createWalletClient({ account: deployer, chain, transport, ...(deployerDataSuffix ? { dataSuffix: deployerDataSuffix } : {}) });
+// Raw native transfers must not carry ERC-8021 suffix data: payable receive-only
+// contracts reject non-empty calldata. Keep attribution on eligible contract calls.
+const deployerTransferWallet = deployerTempoClient ?? createWalletClient({ account: deployer, chain, transport });
 let checker;
 for (let attempt = 0; attempt < 8; attempt += 1) {
   const candidate = privateKeyToAccount(generatePrivateKey());
@@ -136,7 +139,7 @@ async function feeOverrides() {
   return { maxFeePerGas: scaled, maxPriorityFeePerGas: gasPrice };
 }
 const tx = async (hash) => {
-  const receipt = await publicClient.waitForTransactionReceipt({ hash });
+  const receipt = await publicClient.waitForTransactionReceipt({ hash, timeout: rpcTimeoutMs });
   assert.equal(receipt.status, "success", `transaction reverted: ${hash}`);
   return receipt;
 };
@@ -180,7 +183,7 @@ const deployments = {
 
 const checkerFundingHash = tempoTokenMode
   ? await write(deployerWallet, TEMPO_FEE_TOKEN, erc20Abi, "transfer", [checker.address, parseUnits("10", TEMPO_TOKEN_DECIMALS)])
-  : await deployerWallet.sendTransaction({ to: checker.address, value: parseEther("0.002"), nonce: await takeNonce(deployerWallet.account), ...(await feeOverrides()) });
+  : await deployerTransferWallet.sendTransaction({ to: checker.address, value: parseEther("0.002"), nonce: await takeNonce(deployerTransferWallet.account), ...(await feeOverrides()) });
 if (!tempoTokenMode) await tx(checkerFundingHash);
 
 const treasury = await deploy(deployerWallet, treasuryAbi, treasuryBytecode, tempoTokenMode ? [checker.address, TEMPO_FEE_TOKEN] : [checker.address]);
@@ -189,7 +192,7 @@ const treasuryAmount = tempoTokenMode ? parseUnits("1", TEMPO_TOKEN_DECIMALS) : 
 const treasuryApprovalHash = tempoTokenMode ? await write(deployerWallet, TEMPO_FEE_TOKEN, erc20Abi, "approve", [treasury.address, treasuryAmount]) : null;
 const treasuryFundingHash = tempoTokenMode
   ? await write(deployerWallet, treasury.address, treasuryAbi, "deposit", [treasuryAmount])
-  : await deployerWallet.sendTransaction({ to: treasury.address, value: treasuryAmount, gas: 100_000n, nonce: await takeNonce(deployerWallet.account), ...(await feeOverrides()) });
+  : await deployerTransferWallet.sendTransaction({ to: treasury.address, value: treasuryAmount, gas: 100_000n, nonce: await takeNonce(deployerTransferWallet.account), ...(await feeOverrides()) });
 if (!tempoTokenMode) await tx(treasuryFundingHash);
 const budgetId = keccak256(`0x${Buffer.from(`budget:${runId}`).toString("hex")}`);
 const paymentId = keccak256(`0x${Buffer.from(`payment:${runId}`).toString("hex")}`);
@@ -232,12 +235,17 @@ if (!tempoTokenMode) {
   const payrollBatchId = keccak256(`0x${Buffer.from(`payroll-batch:${runId}`).toString("hex")}`);
   const payrollBatchCommitment = keccak256(`0x${Buffer.from(`payroll-commitment:${runId}`).toString("hex")}`);
   const payrollAmount = parseEther("0.0001");
-  const payrollFundingHash = await deployerWallet.sendTransaction({ to: payroll.address, value: payrollAmount, gas: 100_000n, nonce: await takeNonce(deployerWallet.account), ...(await feeOverrides()) });
+  const payrollFundingHash = await deployerTransferWallet.sendTransaction({ to: payroll.address, value: payrollAmount, gas: 100_000n, nonce: await takeNonce(deployerTransferWallet.account), ...(await feeOverrides()) });
   await tx(payrollFundingHash);
   const payrollCreateHash = await write(deployerWallet, payroll.address, payrollAbi, "createPayroll", [payrollBatchId, payrollBatchCommitment, recipient, payrollAmount]);
   const payrollApproveHash = await write(checkerWallet, payroll.address, payrollAbi, "approvePayroll", [payrollBatchId]);
   const payrollSettleHash = await write(deployerWallet, payroll.address, payrollAbi, "settlePayroll", [payrollBatchId]);
-  const payrollBatch = await publicClient.readContract({ address: payroll.address, abi: payrollAbi, functionName: "batches", args: [payrollBatchId] });
+  let payrollBatch;
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    payrollBatch = await publicClient.readContract({ address: payroll.address, abi: payrollAbi, functionName: "batches", args: [payrollBatchId] });
+    if (Number(payrollBatch[3]) === 3) break;
+    await sleep(1_000);
+  }
   assert.equal(Number(payrollBatch[3]), 3, "payroll batch was not settled");
   deployments.evidence.payroll = { payrollFundingHash, payrollCreateHash, payrollApproveHash, payrollSettleHash, payrollBatchId, payrollBatchCommitment, status: "settled" };
 }
