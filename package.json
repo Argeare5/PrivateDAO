@@ -7,6 +7,7 @@
     "web:dev": "npm --prefix apps/web run dev",
     "test:record-verification": "node --import tsx scripts/test-record-verification.mjs",
     "test:record-anchor-boundary": "node scripts/test-record-anchor-service.mjs",
+    "test:record-verification:solana:e2e": "node scripts/test-record-verification-solana-e2e.mjs",
     "start:record-anchor-service": "node --import tsx scripts/record-anchor-service.mjs",
     "test:payroll:domain": "node --experimental-strip-types scripts/test-payroll-domain.mjs",
     "certify:record-verification": "npm run test:record-verification",
