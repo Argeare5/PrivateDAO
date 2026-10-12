@@ -3,7 +3,7 @@ import { spawn } from "node:child_process";
 import http from "node:http";
 
 const port = 8791;
-const child = spawn("npx", ["tsx", "scripts/kernel-gateway.ts"], {
+const child = spawn(process.execPath, ["--import", "tsx", "scripts/kernel-gateway.ts"], {
   cwd: process.cwd(),
     env: { ...process.env, PDAO_KERNEL_GATEWAY_PORT: String(port), PDAO_KERNEL_EVM_BROWSER_ENABLED: "0" },
   stdio: ["ignore", "pipe", "pipe"],
@@ -28,7 +28,7 @@ const request = (method, path, body) => new Promise((resolve, reject) => {
 });
 
 const waitForHealth = async () => {
-  for (let attempt = 0; attempt < 200; attempt += 1) {
+  for (let attempt = 0; attempt < 600; attempt += 1) {
     try {
       const response = await request("GET", "/healthz");
       if (response.status === 200) return response.body;
