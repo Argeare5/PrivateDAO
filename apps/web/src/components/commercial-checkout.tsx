@@ -107,6 +107,19 @@ export function CommercialCheckout() {
   const [paymentState, setPaymentState] = useState<PaymentState>("idle");
   const [loading, setLoading] = useState<"prepare" | "pay" | "verify" | null>(null);
 
+  function persistCheckoutState(next: {
+    order?: OrderResponse["order"];
+    payment?: OrderResponse["payment"];
+    paymentHash?: string;
+    paymentState?: PaymentState;
+  }) {
+    try {
+      window.localStorage.setItem(checkoutStorageKey, JSON.stringify(next));
+    } catch {
+      // The in-memory state remains usable when browser storage is unavailable.
+    }
+  }
+
   useEffect(() => {
     try {
       const saved = JSON.parse(window.localStorage.getItem(checkoutStorageKey) || "null") as {
@@ -219,6 +232,9 @@ export function CommercialCheckout() {
       const signature = await sendBrowserTransaction(solanaConnection, transaction, sendTransaction);
       setPaymentHash(signature);
       setPaymentState("confirming");
+      // Persist the signature synchronously before any confirmation wait. A reload
+      // must never turn an already-submitted payment back into an empty form.
+      persistCheckoutState({ order, payment, paymentHash: signature, paymentState: "confirming" });
       await waitForConfirmation(signature);
       await verifyPayment(signature);
     } catch (paymentError) {
