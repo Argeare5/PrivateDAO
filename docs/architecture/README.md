@@ -67,10 +67,12 @@ Stellar Testnet is registered through the shared Kernel catalog and routed by
 used by the current non-agent product workflows for preparation, health, fee,
 and receipt boundaries. Nine declared product capabilities have confirmed
 Testnet lifecycle evidence through the Product Gateway, including a signed
-workflow commitment envelope. Broadcast remains disabled by default outside
-the explicit Testnet E2E runner. The evidence is product binding and workflow
-preparation proof; it does not claim that Stellar stores private product data
-or performs private business settlement on-chain.
+workflow commitment envelope. `payroll.settle` is also registered as a
+Kernel-ready, prepared-only capability; it has no confirmed payout receipt
+yet. Broadcast remains disabled by default outside the explicit Testnet E2E
+runner. The evidence is product binding and workflow preparation proof; it
+does not claim that Stellar stores private product data or performs private
+business settlement on-chain.
 
 ## BNB Testnet status
 

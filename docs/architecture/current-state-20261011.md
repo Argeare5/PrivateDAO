@@ -103,7 +103,7 @@ The current BNB deployer balance was read-only verified at
 | Hyperliquid HyperEVM | Blind and Record Verification verified; HyperCore is separate |
 | Solana Devnet | Solana-specific wallet/commitment lifecycle and organizational evidence. Record Verification now has a local schema/policy-bound anchor service with broadcast disabled by default; a funded approved signer run is still required before promotion to product E2E. |
 | Zcash Testnet | Zcash-specific shielded wallet/provider boundary; Payroll settlement has a confirmed Testnet receipt, while other products remain policy-only |
-| Stellar Testnet | Nine product-binding capabilities verified through Kernel, signer boundary, Horizon submission, confirmation, and receipts; business payloads remain off-chain |
+| Stellar Testnet | Nine product-binding capabilities verified through Kernel, signer boundary, Horizon submission, confirmation, and receipts; `payroll.settle` is Kernel-ready and prepared-only without a confirmed payout receipt; business payloads remain off-chain |
 
 The BNB ecosystem references supplied by the user, including Agent Studio,
 Agent SDK, Greenfield, MCP/Ask AI, MPP, ERC-8056, and Privacy at Scale, are
