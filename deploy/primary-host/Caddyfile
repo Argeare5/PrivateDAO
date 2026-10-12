@@ -75,6 +75,12 @@
 	redir /services/txline/ /treasury permanent
 	redir /services/torque-mcp /developers permanent
 	redir /services/torque-mcp/ /developers permanent
+	# The former PDAO Worlds surface is archived and must not fall through to
+	# the static app shell. Keep old links useful without presenting the game.
+	redir /game /products permanent
+	redir /game/* /products permanent
+	redir /gaming /products permanent
+	redir /gaming/* /products permanent
 	redir /whiteprint /whitepaper permanent
 
 	header {
