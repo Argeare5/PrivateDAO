@@ -1,10 +1,15 @@
 import assert from "node:assert/strict";
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import {
+  InMemoryProviderRegistry,
+  InMemoryProtocolRegistry,
+  PrivateDaoKernel,
+  ProductExecutionGateway,
   STELLAR_KERNEL_CAPABILITIES,
   STELLAR_NETWORK_CONFIGS,
   StellarHorizonTransport,
   StellarNetworkAdapter,
+  registerCatalogCapabilities,
 } from "../packages/privatedao-runtime/src/index.ts";
 
 const horizon = process.env.PDAO_STELLAR_TESTNET_HORIZON_URL?.replace(/\/$/, "") || "https://horizon-testnet.stellar.org";
@@ -33,6 +38,11 @@ const adapter = new StellarNetworkAdapter({
   capabilities: STELLAR_KERNEL_CAPABILITIES,
   transport,
 });
+const providers = new InMemoryProviderRegistry();
+providers.register(adapter);
+const protocols = new InMemoryProtocolRegistry();
+registerCatalogCapabilities(protocols);
+const gateway = new ProductExecutionGateway(new PrivateDaoKernel(providers), protocols);
 const health = await transport.health();
 assert.equal(health.ok, true, `Stellar Horizon is unavailable: ${health.reason || "unknown"}`);
 
@@ -49,30 +59,40 @@ const results = [];
 for (const capability of STELLAR_KERNEL_CAPABILITIES) {
   const product = productFor(capability);
   const requestId = `stellar-product-e2e-${capability}-${Date.now()}`;
-  const prepared = await adapter.prepare({
-    context: { requestId, idempotencyKey: requestId, product, capability, network: "stellar-testnet" },
+  const intent = {
+    context: {
+      requestId,
+      idempotencyKey: requestId,
+      organizationId: "privatedao-stellar-testnet-e2e",
+      actorId: "stellar-testnet-authorized-signer",
+      product,
+      capability,
+      network: "stellar-testnet",
+      provider: adapter.id,
+    },
     payload: { kind: "stellar-payment", destination: publicKey, amount: "0.000001", memo: `PDAO-${product.slice(0, 16)}` },
     accounts: [{ role: "payer", address: publicKey, network: "stellar-testnet" }],
-  });
+  };
+  const prepared = await gateway.prepare(intent, "maker");
   assert.equal(prepared.unsignedPayload.transactionKind, "payment");
   const transaction = (await import("@stellar/stellar-sdk")).TransactionBuilder.fromXDR(
     prepared.unsignedPayload.transactionXdr,
     (await import("@stellar/stellar-sdk")).Networks.TESTNET,
   );
   transaction.sign(keypair);
-  const submitted = await adapter.submit(prepared, {
+  const submitted = await gateway.submit(prepared, {
     kind: "stellar-signed-xdr",
     network: "stellar-testnet",
     signedTransactionXdr: transaction.toXDR(),
-  });
+  }, "maker");
   let status;
   for (let attempt = 0; attempt < 30; attempt += 1) {
-    status = await adapter.status(prepared.executionId);
+    status = await gateway.status(prepared, "maker");
     if (status.state === "confirmed" || status.state === "failed") break;
     await new Promise((resolve) => setTimeout(resolve, 1_000));
   }
   assert.equal(status?.state, "confirmed", `${product}/${capability} did not confirm`);
-  const receipt = await adapter.receipt(prepared.executionId);
+  const receipt = await gateway.receipt(prepared, "maker");
   results.push({
     product,
     capability,
@@ -91,6 +111,7 @@ const evidence = {
   network: "stellar-testnet",
   environment: "testnet",
   provider: "stellar-testnet-horizon",
+  executionPath: "product-gateway->protocol->kernel->stellar-adapter->horizon",
   signerPublicKey: publicKey,
   broadcastExecuted: true,
   capabilityCount: results.length,
