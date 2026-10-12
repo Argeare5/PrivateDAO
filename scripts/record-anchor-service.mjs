@@ -2,7 +2,7 @@ import http from "node:http";
 import { readFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { Connection, Keypair, PublicKey, Transaction, TransactionInstruction, sendAndConfirmTransaction } from "@solana/web3.js";
-import { canonicalizeRecord, digestObject, digestSchema, evaluatePolicy, selectPublicFields } from "../apps/web/src/lib/record-verification.ts";
+import { canonicalizeRecord, compileSchema, digestObject, digestPolicy, digestSchema, evaluatePolicy, selectPublicFields } from "../apps/web/src/lib/record-verification.ts";
 
 const host = "127.0.0.1";
 const port = Number(process.env.RECORD_TEST_PORT || 18891);
@@ -57,14 +57,17 @@ async function createReceipt(input) {
   const schema = input.schema;
   if (!record || !schema || !input.organizationId) throw new Error("record_schema_and_organization_are_required");
   const canonical = await canonicalizeRecord(record);
+  const validate = compileSchema(schema);
+  if (!validate(canonical.normalized_payload)) throw new Error("record_schema_invalid");
   const schemaDigest = await digestSchema(schema);
   const policy = input.policy;
   const policyEvaluation = evaluatePolicy(policy, canonical.normalized_payload, canonical.canonical_digest);
   if (!policyEvaluation.passed) throw new Error("record_policy_failed");
+  const policyDigest = await digestPolicy(policy);
   const evidenceDigest = await digestObject({
     canonicalDigest: canonical.canonical_digest,
     schemaDigest,
-    policyDigest: policyEvaluation.policy_digest || null,
+    policyDigest: policyDigest || null,
     organizationId: input.organizationId,
   });
   const signer = broadcastEnabled ? await loadSigner() : undefined;
