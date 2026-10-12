@@ -51,10 +51,12 @@ transaction is initiated by the reporting command.
 `docs/evidence/stellar-testnet-product-e2e.json` records nine confirmed
 Stellar Testnet transactions. Each was prepared through the Kernel intent
 boundary, signed by the authorized Testnet account, submitted through Horizon,
-and reconciled into a confirmed receipt. The transactions are controlled
-self-payments with minimal native XLM and are lifecycle evidence for the
-declared product capabilities, not claims that Stellar stores private payroll,
-governance, auction, or verification source data on-chain.
+and reconciled into a confirmed receipt. The current evidence also carries a
+privacy-preserving product workflow envelope: SHA-256 input commitments, plus
+policy or outcome commitments where the capability requires them. The
+transactions remain controlled self-payments with minimal native XLM. They
+prove Kernel product binding and workflow preparation, not that Stellar stores
+private payroll, governance, auction, or verification source data on-chain.
 
 The runner is `scripts/run-stellar-testnet-product-e2e.mjs` and requires both
 explicit Testnet broadcast gates. Mainnet is not accepted by the adapter.

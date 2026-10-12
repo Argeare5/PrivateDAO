@@ -65,9 +65,12 @@ Solana, Zcash, Stellar, and HyperCore remain separate execution families.
 Stellar Testnet is registered through the shared Kernel catalog and routed by
 `StellarNetworkAdapter` to the official Horizon Testnet API. The adapter is
 used by the current non-agent product workflows for preparation, health, fee,
-and receipt boundaries. Broadcast remains disabled by default; the existing
-record-probe transaction is evidence of network access, not proof that every
-product has completed an independent write E2E.
+and receipt boundaries. Nine declared product capabilities have confirmed
+Testnet lifecycle evidence through the Product Gateway, including a signed
+workflow commitment envelope. Broadcast remains disabled by default outside
+the explicit Testnet E2E runner. The evidence is product binding and workflow
+preparation proof; it does not claim that Stellar stores private product data
+or performs private business settlement on-chain.
 
 ## BNB Testnet status
 
