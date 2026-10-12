@@ -108,6 +108,7 @@ jobs:
           npm run test:native-capability-registry
           npm run verify:native-capability-matrix
           npm run verify:public-game-removed
+          npm run verify:stellar:product-e2e
 
       - name: EVM foundation tests
         run: npm run test:runtime:evm-foundation
