@@ -120,6 +120,7 @@ type StellarRecord = {
   state: ExecutionState;
   preparedAt: string;
   transactionHash?: string;
+  workflow?: StellarProductWorkflow;
 };
 
 const DEFAULT_HORIZON_URL = "https://horizon-testnet.stellar.org";
@@ -209,7 +210,12 @@ export class StellarHorizonTransport implements StellarTransport {
       unsignedPayload.transactionXdr = built.xdr;
       unsignedPayload.transactionKind = "payment";
     }
-    this.records.set(executionId, { intent: intent as ExecutionIntent<unknown>, state: "awaiting_signature", preparedAt: new Date().toISOString() });
+    this.records.set(executionId, {
+      intent: intent as ExecutionIntent<unknown>,
+      state: "awaiting_signature",
+      preparedAt: new Date().toISOString(),
+      workflow: payment?.workflow,
+    });
     return {
       executionId,
       intent,
@@ -280,6 +286,12 @@ export class StellarHorizonTransport implements StellarTransport {
       state: "confirmed",
       signatures: [transaction.hash],
       result: transaction as TResult,
+      metadata: record.workflow ? {
+        workflowId: record.workflow.workflowId,
+        inputCommitment: record.workflow.inputCommitment,
+        ...(record.workflow.policyCommitment ? { policyCommitment: record.workflow.policyCommitment } : {}),
+        ...(record.workflow.outcomeCommitment ? { outcomeCommitment: record.workflow.outcomeCommitment } : {}),
+      } : undefined,
       createdAt: typeof transaction.created_at === "string" ? transaction.created_at : new Date().toISOString(),
       environment: "testnet",
       chainId: STELLAR_TESTNET_NETWORK_PASSPHRASE,

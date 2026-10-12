@@ -122,6 +122,7 @@ for (const capability of STELLAR_KERNEL_CAPABILITIES) {
     explorerUrl: receipt.explorerUrl,
     asset: receipt.asset,
     workflow,
+    receiptMetadata: receipt.metadata,
   });
 }
 

@@ -55,6 +55,13 @@ for (const result of evidence.results) {
       assert.match(result.workflow.policyCommitment, /^[a-f0-9]{64}$/i);
     }
     if (result.capability === "auction.settle") assert.match(result.workflow.outcomeCommitment, /^[a-f0-9]{64}$/i);
+    if (result.receiptMetadata !== undefined) {
+      assert.equal(result.receiptMetadata.workflowId, result.workflow.workflowId);
+      assert.equal(result.receiptMetadata.inputCommitment, result.workflow.inputCommitment);
+      if (result.workflow.policyCommitment) assert.equal(result.receiptMetadata.policyCommitment, result.workflow.policyCommitment);
+      if (result.workflow.outcomeCommitment) assert.equal(result.receiptMetadata.outcomeCommitment, result.workflow.outcomeCommitment);
+      assert.equal(Object.keys(result.receiptMetadata).some((key) => /payload|salary|amount|recipient|address|private|secret/i.test(key)), false);
+    }
   }
 
   const response = await fetch(`${horizon}/transactions/${result.transactionHash}`, { headers: { Accept: "application/json" } });

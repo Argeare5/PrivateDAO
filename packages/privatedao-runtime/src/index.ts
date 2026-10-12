@@ -79,6 +79,7 @@ export interface ExecutionReceipt<TResult = unknown> {
   state: Extract<ExecutionState, "confirmed" | "finalized" | "reconciled">;
   signatures: string[];
   result?: TResult;
+  metadata?: Readonly<Record<string, string | number | boolean | null>>;
   reconciliationId?: string;
   proofId?: string;
   createdAt: string;
