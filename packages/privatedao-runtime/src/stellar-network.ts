@@ -9,6 +9,7 @@ import type {
 } from "./index.js";
 import { getNetwork } from "./networks.js";
 import type { FeeEstimate, NetworkAdapter } from "./protocol.js";
+import { validateStellarProductWorkflow, type StellarProductWorkflow } from "./stellar-product-workflow.js";
 
 export type StellarEnvironment = "testnet";
 
@@ -67,6 +68,7 @@ export interface StellarPaymentPayload {
   destination: string;
   amount: string;
   memo?: string;
+  workflow?: StellarProductWorkflow;
 }
 
 export interface StellarRecoveredAccount {
@@ -201,7 +203,7 @@ export class StellarHorizonTransport implements StellarTransport {
       payload: intent.payload,
       accounts: intent.accounts.map(({ role, address }) => ({ role, address })),
     };
-    const payment = parsePaymentPayload(intent.payload);
+    const payment = parsePaymentPayload(intent.payload, intent.context.capability);
     if (payment) {
       const built = await this.buildPaymentTransaction(intent, payment);
       unsignedPayload.transactionXdr = built.xdr;
@@ -332,7 +334,7 @@ export class StellarHorizonTransport implements StellarTransport {
   }
 }
 
-function parsePaymentPayload(payload: unknown): StellarPaymentPayload | undefined {
+function parsePaymentPayload(payload: unknown, capability: CapabilityId): StellarPaymentPayload | undefined {
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) return undefined;
   const candidate = payload as Partial<StellarPaymentPayload>;
   if (candidate.kind !== "stellar-payment") return undefined;
@@ -340,7 +342,10 @@ function parsePaymentPayload(payload: unknown): StellarPaymentPayload | undefine
     throw new Error("Stellar payment requires destination and amount.");
   }
   if (candidate.memo !== undefined && typeof candidate.memo !== "string") throw new Error("Stellar payment memo must be text.");
-  return { kind: "stellar-payment", destination: candidate.destination, amount: candidate.amount, memo: candidate.memo };
+  const workflow = candidate.workflow === undefined
+    ? undefined
+    : validateStellarProductWorkflow(capability, candidate.workflow);
+  return { kind: "stellar-payment", destination: candidate.destination, amount: candidate.amount, memo: candidate.memo, workflow };
 }
 
 export class StellarAdapterError extends Error {

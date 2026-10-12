@@ -208,6 +208,8 @@ export type {
 } from "./payroll.js";
 export { registerCatalogCapabilities } from "./product-registry.js";
 export { ProductExecutionGateway } from "./product-gateway.js";
+export { validateStellarProductWorkflow } from "./stellar-product-workflow.js";
+export type { StellarProductWorkflow } from "./stellar-product-workflow.js";
 export {
   EntraIdentityError,
   EntraTenantAuthorizer,

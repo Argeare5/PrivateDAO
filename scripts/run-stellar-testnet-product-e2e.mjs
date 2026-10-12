@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import {
   InMemoryProviderRegistry,
@@ -55,10 +56,27 @@ function productFor(capability) {
   return "auction";
 }
 
+function commitment(label) {
+  return createHash("sha256").update(`privatedao:stellar-testnet:${label}`).digest("hex");
+}
+
+function workflowFor(capability) {
+  const workflow = {
+    workflowId: `stellar-testnet:${capability}:${Date.now()}`,
+    inputCommitment: commitment(`${capability}:input`),
+  };
+  if (["payroll.calculate", "payroll.approve", "treasury.policy.check", "governance.proposal.execute"].includes(capability)) {
+    workflow.policyCommitment = commitment(`${capability}:policy`);
+  }
+  if (capability === "auction.settle") workflow.outcomeCommitment = commitment(`${capability}:outcome`);
+  return workflow;
+}
+
 const results = [];
 for (const capability of STELLAR_KERNEL_CAPABILITIES) {
   const product = productFor(capability);
   const requestId = `stellar-product-e2e-${capability}-${Date.now()}`;
+  const workflow = workflowFor(capability);
   const intent = {
     context: {
       requestId,
@@ -70,7 +88,7 @@ for (const capability of STELLAR_KERNEL_CAPABILITIES) {
       network: "stellar-testnet",
       provider: adapter.id,
     },
-    payload: { kind: "stellar-payment", destination: publicKey, amount: "0.000001", memo: `PDAO-${product.slice(0, 16)}` },
+    payload: { kind: "stellar-payment", destination: publicKey, amount: "0.000001", memo: `PDAO-${product.slice(0, 16)}`, workflow },
     accounts: [{ role: "payer", address: publicKey, network: "stellar-testnet" }],
   };
   const prepared = await gateway.prepare(intent, "maker");
@@ -103,6 +121,7 @@ for (const capability of STELLAR_KERNEL_CAPABILITIES) {
     ledger: receipt.blockNumber,
     explorerUrl: receipt.explorerUrl,
     asset: receipt.asset,
+    workflow,
   });
 }
 

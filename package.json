@@ -113,6 +113,7 @@
     "test:stellar:signer-boundary": "node --import tsx scripts/test-stellar-signer-boundary.mjs",
     "test:stellar:products": "node --import tsx scripts/run-stellar-testnet-product-e2e.mjs",
     "verify:stellar:product-e2e": "node --import tsx scripts/verify-stellar-product-e2e-evidence.mjs",
+    "test:stellar:product-workflow": "node --import tsx scripts/test-stellar-product-workflow.mjs",
     "verify:product-gateway-boundary": "node --import tsx scripts/verify-product-gateway-boundary.mjs",
     "test:runtime:solana-browser": "node --import tsx scripts/test-solana-browser-provider.mjs",
     "test:runtime:wallet-recovery": "node --import tsx scripts/test-wallet-recovery.mjs",

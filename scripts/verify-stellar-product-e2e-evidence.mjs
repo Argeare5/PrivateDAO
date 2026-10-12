@@ -48,6 +48,14 @@ for (const result of evidence.results) {
   assert.match(String(result.ledger), /^\d+$/);
   assert.equal(seen.has(result.capability), false, `duplicate evidence for ${result.capability}`);
   seen.add(result.capability);
+  if (result.workflow !== undefined) {
+    assert.equal(result.workflow.workflowId.startsWith("stellar-testnet:"), true);
+    assert.match(result.workflow.inputCommitment, /^[a-f0-9]{64}$/i);
+    if (["payroll.calculate", "payroll.approve", "treasury.policy.check", "governance.proposal.execute"].includes(result.capability)) {
+      assert.match(result.workflow.policyCommitment, /^[a-f0-9]{64}$/i);
+    }
+    if (result.capability === "auction.settle") assert.match(result.workflow.outcomeCommitment, /^[a-f0-9]{64}$/i);
+  }
 
   const response = await fetch(`${horizon}/transactions/${result.transactionHash}`, { headers: { Accept: "application/json" } });
   assert.equal(response.ok, true, `${result.capability} Horizon HTTP ${response.status}`);
