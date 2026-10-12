@@ -12,6 +12,7 @@ const networks = [
   ["Hyperliquid", "https://hyperliquid.gitbook.io/hyperliquid-docs/", "/assets/networks/hyperliquid.png"],
   ["Robinhood Chain", "https://docs.robinhood.com/chain/", "/assets/networks/robinhood.svg"],
   ["BNB Chain", "https://www.bnbchain.org/", "/assets/networks/bnb.svg"],
+  ["Stellar", "https://stellar.org/", "/assets/networks/stellar.svg"],
 ] as const;
 
 function NetworkSet() {
