@@ -73,10 +73,10 @@ export const PRODUCT_CATALOG: readonly ProductDescriptor[] = [
     capabilities: [
       capability("payroll.calculate", "payroll", false, true, [solanaDevnet, ethereumSepolia, arbitrumSepolia, tempoTestnet, baseSepolia, bnbTestnet, zcashTestnet, stellarTestnet, robinhoodTestnet, hyperliquidTestnet, hypercoreTestnet]),
       capability("payroll.approve", "payroll", true, true, [solanaDevnet, ethereumSepolia, arbitrumSepolia, tempoTestnet, baseSepolia, bnbTestnet, zcashTestnet, stellarTestnet, robinhoodTestnet, hyperliquidTestnet, hypercoreTestnet]),
-      // Settlement is exposed only where a network-specific provider has
-      // independent evidence. The BNB lane binds a commitment to a real
-      // Testnet payout; Tempo remains token-payroll work, not this native lane.
-      capability("payroll.settle", "payroll", true, true, [zcashTestnet, bnbTestnet]),
+      // Settlement is exposed only where a network-specific provider exists.
+      // Stellar is Kernel-ready for XDR preparation/signing, but remains
+      // unverified until an independent funded payout receipt is recorded.
+      capability("payroll.settle", "payroll", true, true, [zcashTestnet, bnbTestnet, stellarTestnet]),
     ],
   },
   {

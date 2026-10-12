@@ -50,8 +50,10 @@ The coherence verifier fails if any of these projections diverge.
 
 - `agent.discover` and `agent.invoke` remain on the Solana Agent Exchange
   lane. The Solana registry identity is not silently advertised as Stellar.
-- `payroll.settle` is not exposed on Stellar. A product calculation or policy
-  receipt is not a claim that Stellar settled payroll funds.
+- `payroll.settle` is represented in the Kernel catalog as `testnet_ready`.
+  The shared transport can prepare and sign a multi-recipient XDR, but no
+  Stellar payroll payout is advertised as E2E-verified until a funded,
+  independently confirmed settlement receipt exists.
 - The shared `StellarHorizonTransport` now supports a guarded,
   multi-recipient `stellar-payroll-settlement` payload with commitment-bound
   workflow metadata. It can build and sign Testnet XDR, but remains
@@ -86,6 +88,7 @@ npm run test:runtime:stellar
 npm run test:stellar:product-workflow
 npm run test:stellar:signer-boundary
 npm run test:stellar:payroll-prep
+npm run test:stellar:payroll-kernel
 ```
 
 Broadcast remains fail-closed unless both explicit Testnet approval gates are

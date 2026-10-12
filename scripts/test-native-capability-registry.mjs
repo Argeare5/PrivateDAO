@@ -77,9 +77,9 @@ assert.equal(entries.find((entry) => entry.network === "hypercore-testnet" && en
 assert.equal(entries.find((entry) => entry.network === "hypercore-testnet" && entry.product === "record-verification")?.status, "testnet_ready", "HyperCore policy paths must be ready without claiming native execution");
 for (const network of ["bnb-testnet", "robinhood-testnet", "hyperliquid-testnet", "hypercore-testnet", "stellar-testnet"]) {
   const policyRows = entries.filter((entry) => entry.network === network && entry.declared && entry.product !== "agent");
-  const expectedRows = network === "bnb-testnet" ? 10 : 9;
+  const expectedRows = network === "bnb-testnet" ? 10 : network === "stellar-testnet" ? 10 : 9;
   assert.equal(policyRows.length, expectedRows, `${network} must expose all declared product lanes`);
-  const expectedPolicyRows = network === "robinhood-testnet" ? 5 : network === "bnb-testnet" ? 2 : network === "hyperliquid-testnet" ? 6 : network === "stellar-testnet" ? 0 : 9;
+  const expectedPolicyRows = network === "robinhood-testnet" ? 5 : network === "bnb-testnet" ? 2 : network === "hyperliquid-testnet" ? 6 : network === "stellar-testnet" ? 1 : 9;
   assert.equal(policyRows.filter((entry) => entry.status === "testnet_ready" && entry.evidence === "runtime-only").length, expectedPolicyRows, `${network} policy rows must not claim unsupported on-chain E2E`);
 }
 
@@ -89,7 +89,8 @@ assert.equal(stellarVerified.every((entry) => entry.status === "testnet_verified
 assert.equal(stellarVerified.every((entry) => entry.lastVerifiedCommit === "cba4217b9"), true, "Stellar evidence commit must be pinned");
 const stellarPayrollSettlement = entries.find((entry) => entry.network === "stellar-testnet" && entry.capability === "payroll.settle");
 assert(stellarPayrollSettlement, "Stellar payroll settlement row must remain explicit");
-assert.equal(stellarPayrollSettlement.status, "planned", "Stellar payroll settlement must remain outside the declared product lane");
+assert.equal(stellarPayrollSettlement.status, "testnet_ready", "Stellar payroll settlement must remain Kernel-ready without claiming E2E");
+assert.equal(stellarPayrollSettlement.evidence, "runtime-only");
 
 assert.equal(entries.some((entry) => entry.network === "zcash-testnet" && entry.product === "payroll" && entry.declared), true, "Zcash Kernel payroll policy workflows must be declared");
 for (const product of ["blind-verification", "record-verification", "treasury", "auction"]) {

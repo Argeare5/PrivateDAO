@@ -32,6 +32,7 @@ export const STELLAR_KERNEL_CAPABILITIES: readonly CapabilityId[] = [
   "verification.record.verify",
   "payroll.calculate",
   "payroll.approve",
+  "payroll.settle",
   "treasury.policy.check",
   "governance.proposal.execute",
   "auction.bid.commit",

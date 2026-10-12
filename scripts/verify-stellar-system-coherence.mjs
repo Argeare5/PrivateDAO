@@ -34,8 +34,9 @@ const native = buildNativeCapabilityRegistry();
 for (const { product, capability } of expected) {
   const entry = native.find((candidate) => candidate.product === product && candidate.capability === capability && candidate.network === network);
   assert(entry, `missing native registry row for ${product}/${capability}`);
-  assert.equal(entry.status, "testnet_verified", `${product}/${capability} is not testnet verified`);
-  assert.equal(entry.evidence, "testnet-e2e", `${product}/${capability} is missing Stellar E2E evidence`);
+  const verified = capability !== "payroll.settle";
+  assert.equal(entry.status, verified ? "testnet_verified" : "testnet_ready", `${product}/${capability} has an unexpected Stellar readiness status`);
+  assert.equal(entry.evidence, verified ? "testnet-e2e" : "runtime-only", `${product}/${capability} has an unexpected Stellar evidence level`);
   assert.equal(entry.supportsExecution, true);
   assert.equal(entry.supportsReceipt, true);
 }
@@ -47,16 +48,18 @@ for (const { product, capability } of expected) {
   const webBinding = webCapability?.applicationBindings?.find((candidate) => candidate.network === network);
   assert(webBinding, `web catalog is missing ${product}/${capability}/${network}`);
   assert.equal(webBinding.mode, "kernel-gateway");
-  assert.equal(webBinding.evidenceStatus, "testnet_verified");
+  assert.equal(webBinding.evidenceStatus, capability === "payroll.settle" ? "testnet_ready" : "testnet_verified");
 }
 
 assert.equal(expected.some(({ product }) => product === "agent"), false, "Agent Exchange must remain outside Stellar");
-assert.equal(expected.some(({ capability }) => capability === "payroll.settle"), false, "Stellar payroll settlement must remain outside this lane");
+const payrollSettlement = expected.find(({ capability }) => capability === "payroll.settle");
+assert(payrollSettlement, "Stellar payroll settlement must remain represented by the Kernel catalog");
 
 console.log(JSON.stringify({
   status: "PASS",
   network,
   capabilities: expected.length,
   layers: ["catalog", "application-bindings", "native-registry", "web-runtime-catalog"],
-  excluded: ["agent", "payroll.settle"],
+  excluded: ["agent"],
+  preparedOnly: ["payroll.settle"],
 }, null, 2));

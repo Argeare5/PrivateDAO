@@ -48,8 +48,12 @@ try {
   assert.equal(health.networkModes.length, expectedNetworks.length);
   assert.ok(Array.isArray(health.capabilityStatus));
   const stellarCapabilityStatus = health.capabilityStatus.filter((entry) => entry.network === "stellar-testnet");
-  assert.equal(stellarCapabilityStatus.length, 9);
-  assert.equal(stellarCapabilityStatus.every((entry) => entry.status === "testnet_verified" && entry.evidence === "testnet-e2e" && entry.supportsExecution && entry.supportsReceipt), true);
+  assert.equal(stellarCapabilityStatus.length, 10);
+  const stellarPreparedOnly = stellarCapabilityStatus.filter((entry) => entry.capability === "payroll.settle");
+  assert.equal(stellarPreparedOnly.length, 1);
+  assert.equal(stellarPreparedOnly[0].status, "testnet_ready");
+  assert.equal(stellarPreparedOnly[0].evidence, "runtime-only");
+  assert.equal(stellarCapabilityStatus.filter((entry) => entry.capability !== "payroll.settle").every((entry) => entry.status === "testnet_verified" && entry.evidence === "testnet-e2e" && entry.supportsExecution && entry.supportsReceipt), true);
   const hypercoreCapabilityStatus = health.capabilityStatus.filter((entry) => entry.network === "hypercore-testnet");
   assert.equal(hypercoreCapabilityStatus.length, 9);
   assert.equal(hypercoreCapabilityStatus.every((entry) => entry.status === "testnet_ready" && entry.evidence === "runtime-only"), true);
@@ -145,6 +149,7 @@ try {
     ["record-verification", "verification.record.verify"],
     ["payroll", "payroll.calculate"],
     ["payroll", "payroll.approve"],
+    ["payroll", "payroll.settle"],
     ["treasury", "treasury.policy.check"],
     ["governance", "governance.proposal.execute"],
     ["auction", "auction.bid.commit"],
@@ -187,7 +192,7 @@ try {
     assert.equal(status.body.state, "awaiting_signature");
     stellarGatewayCapabilities += 1;
   }
-  assert.equal(stellarGatewayCapabilities, 9);
+  assert.equal(stellarGatewayCapabilities, 10);
 
   const governanceRequest = "gateway-zcash-governance";
   const governanceIntent = {

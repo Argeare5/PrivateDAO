@@ -240,6 +240,14 @@ export const APPLICATION_CAPABILITY_BINDINGS: readonly ApplicationCapabilityBind
       note: "Payroll Maker/Checker approval remains a Kernel policy gate on Stellar Testnet.",
     },
     {
+      product: "payroll" as ProductId,
+      capability: "payroll.settle" as CapabilityId,
+      network,
+      mode: "kernel-gateway" as const,
+      entrypoint: "kernel://payroll.settle",
+      note: "Stellar Testnet payroll settlement is Kernel-ready for commitment-bound XDR preparation and signing; funded payout E2E remains pending.",
+    },
+    {
       product: "treasury" as ProductId,
       capability: "treasury.policy.check" as CapabilityId,
       network,

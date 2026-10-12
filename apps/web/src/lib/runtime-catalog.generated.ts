@@ -2711,6 +2711,23 @@ export const runtimeCatalog = {
                 "BNB"
               ],
               "provider": "evm-bnb-testnet-organizational"
+            },
+            {
+              "network": "stellar-testnet",
+              "mode": "kernel-gateway",
+              "entrypoint": "kernel://payroll.settle",
+              "method": null,
+              "note": "Stellar Testnet payroll settlement is Kernel-ready for commitment-bound XDR preparation and signing; funded payout E2E remains pending.",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
+              "supportsExecution": true,
+              "supportsProof": false,
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
+              "provider": "stellar-testnet-horizon"
             }
           ],
           "networkAvailability": [
@@ -3007,15 +3024,17 @@ export const runtimeCatalog = {
               "stage": "available",
               "environment": "testnet",
               "chainId": "Test SDF Network ; September 2015",
-              "declared": false,
-              "mode": "unbound",
-              "evidenceStatus": "planned",
-              "evidence": "none",
+              "declared": true,
+              "mode": "kernel-gateway",
+              "evidenceStatus": "testnet_ready",
+              "evidence": "runtime-only",
               "executable": false,
               "supportsProof": false,
-              "supportsReceipt": false,
-              "supportsReconciliation": false,
-              "supportedAssets": [],
+              "supportsReceipt": true,
+              "supportsReconciliation": true,
+              "supportedAssets": [
+                "XLM"
+              ],
               "provider": "stellar-testnet-horizon"
             },
             {
