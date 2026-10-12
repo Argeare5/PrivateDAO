@@ -72,6 +72,7 @@ npm run test:native-capability-registry >/dev/null
 npm run verify:native-capability-matrix >/dev/null
 npm run verify:public-game-removed >/dev/null
 npm run test:stellar:product-workflow >/dev/null
+npm run verify:stellar:coherence >/dev/null
 npm run verify:stellar:product-e2e >/dev/null
 
 echo "[verify-all] checking live proof"

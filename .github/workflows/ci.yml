@@ -109,6 +109,7 @@ jobs:
           npm run verify:native-capability-matrix
           npm run verify:public-game-removed
           npm run test:stellar:product-workflow
+          npm run verify:stellar:coherence
           npm run verify:stellar:product-e2e
 
       - name: EVM foundation tests
